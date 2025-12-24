@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "target": "es6",    // 
+        "module": "commonjs",    // 
+        "experimentalDecorators": true, // 启用ES装饰器。
+        "strict": true,
+        "strictNullChecks": false,
+        "moduleResolution": "Node",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "stripInternal": true,
+        "types": [
+            "@cocos/creator-types/engine",
+            "@cocos/creator-types/editor"
+        ]
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    // 排除
+    "exclude": [
+        "node_modules",
+        "dist",
+        "build"
+    ]
+}
