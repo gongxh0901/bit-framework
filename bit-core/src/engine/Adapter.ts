@@ -16,12 +16,19 @@ export abstract class Adapter {
     private listeners: ((...args: any) => void)[] = [];
 
     /**
-     * 外部监听屏幕尺寸发生变化
+     * 添加屏幕尺寸发生变化的监听
      * @param listener 监听器
-     * @internal
      */
     public addResizeListener(listener: (...args: any) => void): void {
         this.listeners.push(listener);
+    }
+
+    /**
+     * 移除屏幕尺寸发生变化的监听
+     * @param listener 监听器
+     */
+    public removeResizeListener(listener: (...args: any) => void): void {
+        this.listeners = this.listeners.filter(l => l !== listener);
     }
 
     /** 

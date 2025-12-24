@@ -1,3 +1,4 @@
+export { Adapter } from "./engine/Adapter";
 export { Platform, PlatformType } from "./engine/Platform";
 export { Screen } from "./engine/Screen";
 
