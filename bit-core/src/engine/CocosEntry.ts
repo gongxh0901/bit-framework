@@ -30,7 +30,7 @@ export abstract class CocosEntry extends Component {
         // 是否开启调试输出
         this.enableDebug && enableDebugMode(true);
 
-        debug("开始初始化【bit-framework】");
+        debug("====================开始初始化=====================");
 
         // 设置游戏真帧率
         game.frameRate = this.fps;
@@ -43,7 +43,7 @@ export abstract class CocosEntry extends Component {
         new CocosAdapter().init();
 
         this.initModule();
-        debug("【bit-framework】初始化完成");
+        debug("=====================初始化完成=====================");
         this.onInit();
     }
 
