@@ -12,7 +12,10 @@ import { Screen } from "./Screen";
 export abstract class Adapter {
     /** 适配器实例 */
     static instance: Adapter;
-
+    /**
+     * 监听器
+     * @internal
+     */
     private listeners: ((...args: any) => void)[] = [];
 
     /**

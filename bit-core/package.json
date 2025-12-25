@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-core",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "基于creator3.0+的bit-core库",
     "main": "./dist/bit-core.cjs",
     "module": "./dist/bit-core.mjs",
