@@ -33,25 +33,25 @@ export class WindowGroup {
      * 获取窗口组的名称。
      * @returns {string} 窗口组的名称。
      */
-    public get name(): string {
-        return this._name;
-    }
+    public get name(): string { return this._name; }
+
+    /** 获取窗口组的根节点 */
+    public get root(): GComponent { return this._root; }
 
     /**
      * 获取当前窗口组中窗口的数量。
      * @returns 窗口数量
      */
-    public get size(): number {
-        return this._windowNames.length;
-    }
+    public get size(): number { return this._windowNames.length; }
+
+    /** 获取窗口组中窗口的名称列表 */
+    public get windowNames(): string[] { return this._windowNames; }
 
     /**
      * 获取是否忽略查询的状态。
      * @returns {boolean} 如果忽略查询，则返回 true，否则返回 false。
      */
-    public get isIgnore(): boolean {
-        return this._ignore;
-    }
+    public get isIgnore(): boolean { return this._ignore; }
 
     /**
      * 实例化 
@@ -67,6 +67,7 @@ export class WindowGroup {
         this._root = root;
         this._ignore = ignoreQuery;
         this._swallowTouch = swallowTouch;
+        this._windowNames = [];
     }
 
     /**
@@ -81,7 +82,7 @@ export class WindowGroup {
                 this.showAdjustment(window, userdata);
                 resolve(window);
             } else {
-                ResLoader.loadRes(info.name).then(() => {
+                ResLoader.loadWindowRes(info.name).then(() => {
                     const window = this.createWindow(info.pkgName, info.name);
                     this.showAdjustment(window, userdata);
                     resolve(window as unknown as T);
@@ -101,6 +102,8 @@ export class WindowGroup {
         this.moveWindowToTop(window);
         // 最后再调用窗口的show方法
         window._show(userdata);
+        // 调整半透明遮罩
+        WindowManager.adjustAlphaGraph();
     }
 
     /**
@@ -210,35 +213,27 @@ export class WindowGroup {
      * @internal
      */
     public removeWindow(name: string): void {
-
         // let lastIndex = this.size - 1;
         let window = WindowManager.getWindow<IWindow>(name);
-        // let header = window.getHeader();
-        // header && this._removeHeader(header);
 
+        window._close();
+
+        // 先删除窗口组中记录的窗口名称
         let index = this._windowNames.lastIndexOf(name);
         this._windowNames.splice(index, 1);
 
-        //TODO::释放资源
+        // 删除WindowManager中记录的窗口
+        WindowManager.removeWindow(name);
 
-        //TODO::从WindowManager中删除窗口
-        // WindowManager._removeWindow(name);
+        // 释放资源
+        ResLoader.unloadWindowRes(name);
 
-        // // 处理窗口显示和隐藏状态
-        // this._processWindowHideStatus(this.size - 1, true);
-        // if (this.size == 0) {
-        //     // 窗口组中不存在窗口时 隐藏窗口组节点
-        //     this._root.visible = false;
-        // } else if (lastIndex == index && index > 0) {
-        //     // 删除的窗口是最后一个 并且前边还有窗口 调整半透明节点的显示层级
-        //     let topName = this.getTopWindowName();
-        //     let window = WindowManager.getWindow(topName);
-        //     // 调整半透明遮罩
-        //     this._adjustAlphaGraph(window);
-        //     // 调整窗口的显示层级
-        //     window._setDepth(this._root.numChildren - 1);
-        // }
-        // this._processHeaderStatus();
+        if (this.size == 0) {
+            this._root.visible = false;
+        } else {
+            this.processWindowHideStatus(this.size - 1);
+        }
+        //TODO:: 调整header
     }
 
     // /**
@@ -288,11 +283,6 @@ export class WindowGroup {
     //  */
     // private _adjustAlphaGraph(window: IWindow): void {
     //     this._root.setChildIndex(this._alphaGraph, this._root.numChildren - 1);
-
-    //     // 半透明遮罩绘制
-    //     this._color.a = window.bgAlpha * 255;
-    //     this._alphaGraph.clearGraphics();
-    //     this._alphaGraph.drawRect(0, this._color, this._color);
     // }
 
     public hasWindow(name: string): boolean {
@@ -300,83 +290,30 @@ export class WindowGroup {
     }
 
     /**
-     * 获取窗口组中顶部窗口的名称。
-     * @returns {string} 顶部窗口的名称。
+     * 获取窗口组顶部窗口实例
+     * @returns {IWindow} 顶部窗口实例
      */
-    public getTopWindowName(): string {
+    public getTopWindow(): IWindow {
         if (this.size > 0) {
-            return this._windowNames[this.size - 1];
+            return WindowManager.getWindow(this._windowNames[this.size - 1]);
         }
-        console.warn(`WindowGroup.getTopWindowName: window group 【${this._name}】 is empty`);
-        return "";
+        console.warn(`窗口组【${this._name}】中不存在窗口`);
+        return null;
     }
-
-
-    // /** 根据窗口 创建顶部资源栏 (内部方法) @internal */
-    // private _createHeader(window: IWindow): void {
-    //     // 只有创建界面的时候, 才会尝试创建顶部资源栏
-    //     let headerInfo = window.getHeaderInfo();
-    //     if (!headerInfo) {
-    //         return;
-    //     }
-    //     let name = headerInfo.name;
-    //     let header = this._getHeader(name);
-    //     if (header) {
-    //         window._setHeader(header);
-    //         header._addRef();
-    //     } else {
-    //         // 创建header节点
-    //         let { pkg } = WindowManager._getResPool().getHeader(name);
-    //         let newHeader = UIPackage.createObject(pkg, name) as HeaderBase;
-    //         newHeader.name = name;
-    //         newHeader.opaque = false;
-    //         window._setHeader(newHeader);
-    //         newHeader.visible = false;
-    //         PropsHelper.serializeProps(newHeader, pkg);
-    //         newHeader._init();
-    //         newHeader._adapted();
-    //         this._root.addChild(newHeader);
-    //         // 添加到显示节点
-    //         newHeader._addRef();
-    //         this._headers.set(newHeader.name, newHeader);
-    //     }
-    // }
-
-    // /**
-    //  * 顶部资源栏窗口 从管理器中移除 (内部方法)
-    //  * @param header 资源栏
-    //  * @internal
-    //  */
-    // public _removeHeader(header: HeaderBase): void {
-    //     if (this._headers.has(header.name)) {
-    //         let refCount = header._decRef();
-    //         if (refCount <= 0) {
-    //             this._headers.delete(header.name);
-    //             header._close();
-    //         }
-    //     }
-    // }
-
-    // /**
-    //  * 获取顶部资源栏 (内部方法)
-    //  * @param name 资源栏的名称
-    //  * @internal
-    //  */
-    // public _getHeader<T extends HeaderBase>(name: string): T | null {
-    //     return this._headers.get(name) as T;
-    // }
 
     /**
      * 关闭窗口组中的所有窗口
      * @param ignores 不关闭的窗口名
      * @internal
      */
-    public closeAllWindow(ignores: string[] = []): void {
-        let existIgnore = ignores.length > 0;
+    public closeAllWindow(ignores: IWindow[] = []): void {
+        let names = this._windowNames.filter(name => !ignores.some(ignore => ignore.name === name));
+        let existIgnore = names.length > 0;
+
         let len = this.size - 1;
         for (let i = len; i >= 0; i--) {
             let name = this._windowNames[i];
-            if (!existIgnore || !ignores.includes(name)) {
+            if (!existIgnore || !names.includes(name)) {
                 WindowManager.getWindow(name)._close();
                 WindowManager.removeWindow(name);
             }

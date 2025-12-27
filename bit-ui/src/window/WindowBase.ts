@@ -150,6 +150,13 @@ export abstract class WindowBase extends GComponent implements IWindow {
         return null;
     }
 
+    /** 
+     * 用于在界面中关闭自己
+     */
+    protected removeSelf(): void {
+        WindowManager.closeWindowByName(this.name);
+    }
+
     protected abstract onAdapted(): void;
 
     protected abstract onInit(): void;

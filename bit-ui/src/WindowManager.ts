@@ -5,6 +5,7 @@
  */
 
 import { Screen } from "@gongxh/bit-core";
+import { Color } from "cc";
 import { GGraph } from "fairygui-cc";
 import { InfoPool } from "./core/InfoPool";
 import { WindowGroup } from "./core/WindowGroup";
@@ -12,9 +13,11 @@ import { MetadataKey } from "./header";
 import { IWindow } from "./interface/IWindow";
 import { IPropsConfig, PropsHelper } from "./utils/PropsHelper";
 import { HeaderBase } from "./window/HeaderBase";
+import { WindowBase } from "./window/WindowBase";
 
 export class WindowManager {
     private static _bgAlpha: number = 0.75;
+    private static _bgColor: Color = new Color(0, 0, 0, 0);
 
     /** @internal */
     private static _alphaGraph: GGraph = null; // 半透明的遮罩
@@ -82,12 +85,68 @@ export class WindowManager {
     }
 
     /**
-     * 半透明遮罩
+     * 设置半透明遮罩
      * @param alphaGraph 半透明遮罩
      * @internal
      */
     public static setAlphaGraph(alphaGraph: GGraph): void {
         this._alphaGraph = alphaGraph;
+    }
+
+    /**
+     * 调整半透明遮罩的显示层级
+     * 从上到下（从所有窗口组）查找第一个bgAlpha不为0的窗口，将遮罩放到该窗口下方
+     * @internal
+     */
+    public static adjustAlphaGraph(): void {
+        let topWindow: WindowBase = null;
+        // 从后往前遍历窗口组（后面的窗口组层级更高）
+        for (let i = this._groupNames.length - 1; i >= 0; i--) {
+            const group = this._groups.get(this._groupNames[i]);
+            if (group.size === 0) {
+                continue;
+            }
+            // 在当前窗口组中从上到下查找第一个bgAlpha不为0的窗口
+            for (let j = group.windowNames.length - 1; j >= 0; j--) {
+                const name = group.windowNames[j];
+                const win = WindowManager.getWindow<WindowBase>(name);
+                if (win.bgAlpha > 0) {
+                    topWindow = win;
+                    break;
+                }
+            }
+            if (topWindow) {
+                break;
+            }
+        }
+        // 如果找到了需要遮罩的窗口
+        if (topWindow) {
+            // 获取窗口组的根节点
+            const parent = topWindow.parent;
+            // 将遮罩设置到目标窗口的下方
+            const wIndex = parent.getChildIndex(topWindow);
+            let gIndex = 0;
+            // 确保遮罩在目标窗口组的根节点下
+            if (this._alphaGraph.parent !== parent) {
+                this._alphaGraph.removeFromParent();
+                parent.addChild(this._alphaGraph);
+                gIndex = parent.numChildren;
+            } else {
+                gIndex = parent.getChildIndex(this._alphaGraph);
+            }
+            let newIndex = gIndex > wIndex ? wIndex : wIndex - 1;
+            parent.setChildIndex(this._alphaGraph, newIndex);
+            // 显示遮罩
+            this._alphaGraph.visible = true;
+
+            // 半透明遮罩绘制
+            this._bgColor.a = topWindow.bgAlpha * 255;
+            this._alphaGraph.clearGraphics();
+            this._alphaGraph.drawRect(0, this._bgColor, this._bgColor);
+        } else {
+            // 没有找到需要遮罩的窗口，隐藏遮罩
+            this._alphaGraph.visible = false;
+        }
     }
 
     /**
@@ -111,7 +170,7 @@ export class WindowManager {
         // 找到他所属的窗口组
         const info = InfoPool.get(name);
         const group = this.getWindowGroup(info.group);
-        return group.showWindow(info, userdata);
+        return group.showWindow<T>(info, userdata);
     }
 
     /**
@@ -136,6 +195,9 @@ export class WindowManager {
         const info = InfoPool.get(name);
         const group = this.getWindowGroup(info.group);
         group.removeWindow(name);
+
+        // 调整半透明遮罩
+        this.adjustAlphaGraph();
     }
 
     /**
@@ -189,9 +251,9 @@ export class WindowManager {
 
     /**
      * 关闭所有窗口
-     * @param ignores 不关闭的窗口名
+     * @param ignores 不关闭的窗口
      */
-    public static closeAllWindow(ignores: string[] = []): void {
+    public static closeAllWindow(ignores: IWindow[] = []): void {
         let len = this._groupNames.length;
         for (let i = len - 1; i >= 0; i--) {
             let group = this.getWindowGroup(this._groupNames[i]);
