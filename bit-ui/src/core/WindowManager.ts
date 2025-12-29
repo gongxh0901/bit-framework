@@ -11,6 +11,7 @@ import { MetadataKey } from "../header";
 import { IWindow } from "../interface/IWindow";
 import { Window } from "../window/Window";
 import { WindowBase } from "../window/WindowBase";
+import { HeaderManager } from "./HeaderManager";
 import { InfoPool } from "./InfoPool";
 import { IPropsConfig, PropsHelper } from "./PropsHelper";
 import { WindowGroup } from "./WindowGroup";
@@ -19,11 +20,6 @@ import { WindowGroup } from "./WindowGroup";
  * 从窗口类型中提取 UserData 类型
  */
 type ExtractUserData<T> = T extends Window<infer U, any> ? U : any;
-
-/**
- * 从窗口类型中提取 HeaderData 类型
- */
-type ExtractHeaderData<T> = T extends Window<any, infer H> ? H : any;
 
 /**
  * 从窗口构造函数中提取窗口实例类型
@@ -66,13 +62,17 @@ export class WindowManager {
      * @internal
      */
     public static onScreenResize(): void {
-        this._windows.forEach((window: IWindow) => {
-            window._adapted();
-        });
+        // 半透明遮罩适配
         if (this._alphaGraph) {
             this._alphaGraph.setPosition(Screen.ScreenWidth * 0.5, Screen.ScreenHeight * 0.5);
             this._alphaGraph.setSize(Screen.ScreenWidth, Screen.ScreenHeight, true);
         }
+        // 所有窗口适配
+        this._windows.forEach((window: IWindow) => {
+            window._adapted();
+        });
+        // 所有header适配
+        HeaderManager.onScreenResize();
     }
 
     /** 
@@ -201,7 +201,7 @@ export class WindowManager {
      * @param name 窗口名称
      * @returns 如果找到窗口，则返回对应类型的窗口实例；否则返回null。
      */
-    public static getWindow<T extends IWindow, U>(name: string): T | null {
+    public static getWindow<T extends IWindow>(name: string): T | undefined {
         return this._windows.get(name) as T;
     }
 
@@ -225,6 +225,13 @@ export class WindowManager {
         return null;
     }
 
+    /**
+     * 获取所有窗口组的名称列表（按层级顺序）
+     * @returns 窗口组的名称列表
+     */
+    public static getGroupNames(): string[] {
+        return this._groupNames;
+    }
     /**
      * 根据给定的组名获取窗口组。如果组不存在，则抛出错误。
      * @param name 窗口组名称
@@ -270,7 +277,7 @@ export class WindowManager {
             // 在当前窗口组中从上到下查找第一个bgAlpha不为0的窗口
             for (let j = group.windowNames.length - 1; j >= 0; j--) {
                 const name = group.windowNames[j];
-                const win = WindowManager.getWindow<WindowBase, any>(name);
+                const win = WindowManager.getWindow<WindowBase>(name);
                 if (win.bgAlpha > 0) {
                     topWindow = win;
                     break;
@@ -285,17 +292,17 @@ export class WindowManager {
             // 获取窗口组的根节点
             const parent = topWindow.parent;
             // 将遮罩设置到目标窗口的下方
-            const wIndex = parent.getChildIndex(topWindow);
+            const windowIndex = parent.getChildIndex(topWindow);
             let gIndex = 0;
             // 确保遮罩在目标窗口组的根节点下
             if (this._alphaGraph.parent !== parent) {
                 this._alphaGraph.removeFromParent();
                 parent.addChild(this._alphaGraph);
-                gIndex = parent.numChildren;
+                gIndex = parent.numChildren - 1;
             } else {
                 gIndex = parent.getChildIndex(this._alphaGraph);
             }
-            let newIndex = gIndex > wIndex ? wIndex : wIndex - 1;
+            let newIndex = gIndex >= windowIndex ? windowIndex : windowIndex - 1;
             parent.setChildIndex(this._alphaGraph, newIndex);
             // 显示遮罩
             this._alphaGraph.visible = true;
@@ -309,71 +316,4 @@ export class WindowManager {
             this._alphaGraph.visible = false;
         }
     }
-
-    // /**
-    //  * 显示指定名称的窗口，并传递可选的用户数据。(用于已加载过资源的窗口)
-    //  * @param windowName - 窗口的名称。
-    //  * @param userdata - 可选参数，用于传递给窗口的用户数据。
-    //  */
-    // public static showWindowIm(windowName: string, userdata?: any): void {
-    //     const info = this._resPool.get(windowName);
-    //     const windowGroup = this.getWindowGroup(info.group);
-    //     this._resPool.addResRef(windowName);
-    //     windowGroup.showWindow(info, userdata);
-    // }
-
-    // /**
-    //  * 关闭窗口
-    //  * @param windowName 窗口名
-    //  */
-    // public static closeWindow(windowName: string): void {
-    //     if (!this._windows.has(windowName)) {
-    //         console.warn(`窗口不存在 ${windowName} 不需要关闭`);
-    //         return;
-    //     }
-    //     // 先在窗口组中移除
-    //     let info = this._resPool.get(windowName);
-    //     const windowGroup = this.getWindowGroup(info.group);
-    //     windowGroup._removeWindow(windowName);
-    //     // 窗口组中没有窗口了
-    //     if (windowGroup.size == 0) {
-    //         let index = this._queryGroupNames.indexOf(windowGroup.name);
-    //         if (index > 0 && windowGroup.name == this.getTopGroupName()) {
-    //             do {
-    //                 const groupName = this._queryGroupNames[--index];
-    //                 let group = this.getWindowGroup(groupName);
-    //                 if (group.size > 0) {
-    //                     this.getWindow(group.getTopWindowName())._recover();
-    //                     break;
-    //                 }
-    //             } while (index >= 0);
-    //         }
-    //     }
-    // }
-
-    // /**
-    //  * 是否存在指定的窗口
-    //  * @param name 窗口的名称。
-    //  */
-    // public static hasWindow(name: string): boolean {
-    //     return this._windows.has(name);
-    // }
-
-
-    // /**
-    //  * 获取当前顶层窗口组的名称。
-    //  * 返回第一个包含至少一个窗口的窗口组名称。(该方法只检查不忽略查询的窗口组)
-    //  * 如果没有找到任何包含窗口的组，则返回空字符串。
-    //  */
-    // public static getTopGroupName(): string {
-    //     let len = this._queryGroupNames.length;
-    //     for (let i = len - 1; i >= 0; i--) {
-    //         let name = this._queryGroupNames[i];
-    //         let group = this._groups.get(name);
-    //         if (group.size > 0) {
-    //             return name;
-    //         }
-    //     }
-    //     return "";
-    // }
 }

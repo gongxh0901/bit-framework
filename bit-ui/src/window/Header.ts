@@ -9,20 +9,18 @@ import { Screen } from "@gongxh/bit-core";
 import { GComponent } from "fairygui-cc";
 import { AdapterType } from "../header";
 import { IHeader } from "../interface/IHeader";
-import { IWindow } from "../interface/IWindow";
 
-
-export abstract class HeaderBase<T> extends GComponent implements IHeader {
+export abstract class Header<T = any> extends GComponent implements IHeader<T> {
     /** 窗口适配类型 */
     public adapterType: AdapterType = AdapterType.Full;
 
     protected abstract onInit(): void;
     protected abstract onShow(userdata?: T): void;
 
-    protected onAdapted(): void { }
-    protected onClose(): void { }
-    protected onHide(): void { }
-    protected onShowFromHide(): void { }
+    protected onAdapted(): void { };
+    protected onClose(): void { };
+    protected onHide(): void { };
+    protected onShowFromHide(): void { };
 
     /**
      * 是否显示中
@@ -36,6 +34,7 @@ export abstract class HeaderBase<T> extends GComponent implements IHeader {
      * @internal
      */
     public _init(): void {
+        this.opaque = false;
         this.onInit();
     }
 
@@ -70,12 +69,12 @@ export abstract class HeaderBase<T> extends GComponent implements IHeader {
 
     /**
      * 显示
-     * @param {IWindow} window 所属窗口
+     * @param userdata 用户数据
      * @internal
      */
-    public _show(): void {
+    public _show(userdata?: T): void {
         this.visible = true;
-        // this.onShow(window, window.getHeaderInfo()?.userdata);
+        this.onShow(userdata);
     }
 
     /**

@@ -55,12 +55,12 @@ export class ResLoader {
 
     /** @internal */
     private static addRef(pkg: string): void {
-        this.pkgRefs.set(pkg, (this.getRef(pkg) || 0) + 1);
+        this.pkgRefs.set(pkg, this.getRef(pkg) + 1);
     }
 
     /** @internal */
     private static subRef(pkg: string): number {
-        let ref = (this.getRef(pkg) || 0) - 1;
+        let ref = this.getRef(pkg) - 1;
         this.pkgRefs.set(pkg, ref);
         return ref;
     }
@@ -108,59 +108,96 @@ export class ResLoader {
 
         // 获取包对应的bundle名
         let bundleNames = list.map(pkg => InfoPool.getBundleName(pkg));
-
         // 加载bundle
-        return new Promise((resolve, reject) => {
-            this.loadBundles(bundleNames).then(() => {
-                let total = list.length;
-                for (const pkg of list) {
-                    let bundleName = InfoPool.getBundleName(pkg);
-                    let bundle = bundleName === "resources" ? resources : assetManager.getBundle(bundleName);
-                    // bundle肯定存在
-                    UIPackage.loadPackage(bundle, InfoPool.getPackagePath(pkg), (err: any) => {
-                        if (err) {
-                            // 减少等待窗的引用计数
-                            this.decWaitRef();
-                            reject(new Error(`UI包【${pkg}】加载失败`));
-                            return;
-                        }
-                        if (--total <= 0) {
-                            // 减少等待窗的引用计数
-                            this.decWaitRef();
-
-                            // 增加包资源的引用计数
-                            packages.forEach(pkg => this.addRef(pkg));
-                            resolve();
-                        }
-                    });
-                }
-            }).catch(err => {
-                reject(err);
-            });
+        return this.loadBundles(bundleNames).then(() => {
+            // 顺序加载每个UI包
+            return this.loadUIPackagesSequentially(list);
+        }).then(() => {
+            // 所有包加载成功后，减少等待窗引用计数
+            this.decWaitRef();
+            // 增加包资源的引用计数
+            packages.forEach(pkg => this.addRef(pkg));
+        }).catch(err => {
+            // 减少等待窗的引用计数
+            this.decWaitRef();
+            throw err;
         });
     }
 
     /**
-     * 加载多个bundle
+     * 加载多个bundle（顺序加载）
      * @param bundleNames bundle名集合
      * @internal
      */
     private static loadBundles(bundleNames: string[]): Promise<void> {
-        return new Promise((resolve, reject) => {
-            let unloadedBundleNames: string[] = bundleNames.filter(bundleName => bundleName !== "resources" && !assetManager.getBundle(bundleName));
-            let total = unloadedBundleNames.length;
-            if (total <= 0) {
-                resolve();
+        let unloadedBundleNames: string[] = bundleNames.filter(bundleName => bundleName !== "resources" && !assetManager.getBundle(bundleName));
+        if (unloadedBundleNames.length <= 0) {
+            return Promise.resolve();
+        }
+
+        // 递归方式实现顺序加载
+        const loadNext = (index: number): Promise<void> => {
+            if (index >= unloadedBundleNames.length) {
+                return Promise.resolve();
             }
-            for (const bundleName of unloadedBundleNames) {
+
+            const bundleName = unloadedBundleNames[index];
+            return new Promise((resolve, reject) => {
                 assetManager.loadBundle(bundleName, (err: any, bundle: any) => {
                     if (err) {
                         reject(new Error(`bundle【${bundleName}】加载失败`));
                     } else {
-                        --total <= 0 && resolve();
+                        resolve(null);
                     }
                 });
+            }).then(() => {
+                // 加载下一个
+                return loadNext(index + 1);
+            });
+        };
+
+        return loadNext(0);
+    }
+
+    /**
+     * 顺序加载多个 UI 包（新增方法）
+     * @param packages 包名列表
+     * @returns Promise
+     */
+    private static loadUIPackagesSequentially(packages: string[]): Promise<void> {
+        // 递归方式实现顺序加载
+        const loadNext = (index: number): Promise<void> => {
+            if (index >= packages.length) {
+                return Promise.resolve();
             }
+
+            const pkg = packages[index];
+            return this.loadSingleUIPackage(pkg).then(() => {
+                // 加载下一个
+                return loadNext(index + 1);
+            });
+        };
+
+        return loadNext(0);
+    }
+
+    /**
+     * 加载单个 UI 包（新增方法）
+     * @param pkg 包名
+     * @returns Promise
+     */
+    private static loadSingleUIPackage(pkg: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            let bundleName = InfoPool.getBundleName(pkg);
+            let bundle = bundleName === "resources" ? resources : assetManager.getBundle(bundleName);
+
+            UIPackage.loadPackage(bundle, InfoPool.getPackagePath(pkg), (err: any) => {
+                if (err) {
+                    reject(new Error(`UI包【${pkg}】加载失败`));
+                } else {
+                    resolve();
+                }
+            });
         });
     }
 

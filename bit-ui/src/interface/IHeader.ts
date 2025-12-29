@@ -5,7 +5,7 @@ import { AdapterType } from "../header";
  * @Date: 2024-12-08
  * @Description: 窗口顶边资源栏
  */
-export interface IHeader {
+export interface IHeader<T = any> {
     /** 资源栏名称 */
     name: string;
     /** 窗口适配类型 */
@@ -30,9 +30,10 @@ export interface IHeader {
 
     /**
      * 显示
+     * @param userdata 用户数据
      * @internal
      */
-    _show(): void;
+    _show(userdata?: T): void;
 
     /**
      * 隐藏

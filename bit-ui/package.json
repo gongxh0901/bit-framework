@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-ui",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "基于creator3.0+的bit-ui库",
     "main": "./dist/bit-ui.cjs",
     "module": "./dist/bit-ui.mjs",
