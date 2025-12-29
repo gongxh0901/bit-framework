@@ -8,7 +8,7 @@ import { debug, Screen } from "@gongxh/bit-core";
 import { _decorator, Component } from "cc";
 import { GComponent, GRoot } from "fairygui-cc";
 import { WindowGroup } from "../core/WindowGroup";
-import { WindowManager } from "../WindowManager";
+import { WindowManager } from "../core/WindowManager";
 const { ccclass, property, menu } = _decorator;
 @ccclass("CocosWindowContainer")
 @menu("bit/UIContainer")

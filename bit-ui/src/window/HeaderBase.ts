@@ -12,21 +12,23 @@ import { IHeader } from "../interface/IHeader";
 import { IWindow } from "../interface/IWindow";
 
 
-export abstract class HeaderBase extends GComponent implements IHeader {
+export abstract class HeaderBase<T> extends GComponent implements IHeader {
     /** 窗口适配类型 */
     public adapterType: AdapterType = AdapterType.Full;
-    /** 引用计数 @internal */
-    public _refCount: number = 0;
 
     protected abstract onInit(): void;
-    protected abstract onShow(window: IWindow, userdata?: any): void;
-    protected abstract onClose(): void;
+    protected abstract onShow(userdata?: T): void;
 
-    protected onHide(): void {
+    protected onAdapted(): void { }
+    protected onClose(): void { }
+    protected onHide(): void { }
+    protected onShowFromHide(): void { }
 
-    }
-    protected onAdapted(): void {
-
+    /**
+     * 是否显示中
+     */
+    public isShowing(): boolean {
+        return this.visible;
     }
 
     /**
@@ -38,7 +40,16 @@ export abstract class HeaderBase extends GComponent implements IHeader {
     }
 
     /**
-     * 窗口适配 (内部方法)
+     * 关闭 (内部方法)
+     * @internal
+     */
+    public _close(): void {
+        this.onClose();
+        this.dispose();
+    }
+
+    /**
+     * 窗口适配
      * @internal
      */
     public _adapted(): void {
@@ -58,17 +69,17 @@ export abstract class HeaderBase extends GComponent implements IHeader {
     }
 
     /**
-     * 显示 (内部方法)
+     * 显示
      * @param {IWindow} window 所属窗口
      * @internal
      */
-    public _show(window: IWindow): void {
+    public _show(): void {
         this.visible = true;
         // this.onShow(window, window.getHeaderInfo()?.userdata);
     }
 
     /**
-     * 隐藏 (内部方法)
+     * 隐藏
      * @internal
      */
     public _hide(): void {
@@ -77,35 +88,11 @@ export abstract class HeaderBase extends GComponent implements IHeader {
     }
 
     /**
-     * 关闭 (内部方法)
+     * 从隐藏状态恢复显示
      * @internal
      */
-    public _close(): void {
-        this.onClose();
-        this.dispose();
-    }
-
-    /**
-     * 增加引用计数 (内部方法)
-     * @internal
-     */
-    public _addRef(): void {
-        this._refCount++;
-    }
-
-    /**
-     * 减少引用计数 (内部方法)
-     * @internal
-     */
-    public _decRef(): number {
-        return --this._refCount;
-    }
-
-    /**
-     * 屏幕大小改变时被调用 (内部方法)
-     * @internal
-     */
-    public _screenResize(): void {
-        this._adapted();
+    public _showFromHide(): void {
+        this.visible = true;
+        this.onShowFromHide();
     }
 }

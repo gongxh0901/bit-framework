@@ -5,8 +5,9 @@
  */
 
 import { AdapterType, WindowType } from "../header";
+import { HeaderInfo } from "../window/HeaderInfo";
 
-export interface IWindow {
+export interface IWindow<TUserData = any, THeaderData = any> {
     /** 窗口名称 */
     name: string;
     /** 窗口类型 */
@@ -37,10 +38,10 @@ export interface IWindow {
 
     /**
      * 显示窗口 (和 _close并不是一一对应)
-     * @param userdata 用户自定义数据
+     * @param userdata 用户自定义数据 类型为 T
      * @internal
      */
-    _show(userdata?: any): void;
+    _show(userdata?: TUserData): void;
 
     /**
      * 恢复到顶部显示时 (除忽略的窗口组外, 显示到最上层时)
@@ -68,10 +69,14 @@ export interface IWindow {
 
     /**
      * 窗口是否显示
-     * @internal
      */
     isShowing(): boolean;
 
+    /**
+     * 窗口是否在最上层
+     * 
+     */
+    isTop(): boolean;
 
     /**
      * 设置窗口深度
@@ -80,9 +85,9 @@ export interface IWindow {
      */
     setDepth(depth: number): void;
 
-    // /** 获取资源栏数据 */
-    // getHeaderInfo(): WindowHeaderInfo;
+    /** 获取资源栏数据 */
+    getHeaderInfo<THeaderData>(): HeaderInfo<THeaderData>;
 
-    // /** @internal */
-    // _setHeader(header: IHeader): void;
+    /** 刷新资源栏 */
+    refreshHeader(): void;
 }

@@ -6,12 +6,12 @@
 
 import { Screen } from "@gongxh/bit-core";
 import { GComponent } from "fairygui-cc";
+import { WindowManager } from "../core/WindowManager";
 import { AdapterType, WindowType } from "../header";
 import { IWindow } from "../interface/IWindow";
-import { WindowManager } from "../WindowManager";
-import { WindowHeaderInfo } from "./WindowHeaderInfo";
+import { HeaderInfo } from "./HeaderInfo";
 
-export abstract class WindowBase extends GComponent implements IWindow {
+export abstract class WindowBase<T = any, U = any> extends GComponent implements IWindow<T, U> {
     /** 窗口类型 */
     public type: WindowType = WindowType.Normal;
 
@@ -23,6 +23,9 @@ export abstract class WindowBase extends GComponent implements IWindow {
 
     /** @internal */
     private _swallowNode: GComponent = null; // 吞噬触摸的节点
+
+    /** @internal */
+    private _isTop: boolean = true;
 
     /**
      * 初始化方法 (框架内部使用)
@@ -43,7 +46,7 @@ export abstract class WindowBase extends GComponent implements IWindow {
 
         // 窗口自身也要设置是否吞噬触摸
         this.opaque = swallowTouch;
-
+        this._isTop = true;
         this.bgAlpha = WindowManager.bgAlpha;
         this.onInit();
     }
@@ -86,7 +89,7 @@ export abstract class WindowBase extends GComponent implements IWindow {
      * @param userdata 用户自定义数据
      * @internal
      */
-    public _show(userdata?: any): void {
+    public _show(userdata?: T): void {
         this.visible = true;
         this.onShow(userdata);
     }
@@ -113,6 +116,7 @@ export abstract class WindowBase extends GComponent implements IWindow {
      * @internal
      */
     public _toTop(): void {
+        this._isTop = true;
         this.onToTop();
     }
 
@@ -121,6 +125,7 @@ export abstract class WindowBase extends GComponent implements IWindow {
      * @internal
      */
     public _toBottom(): void {
+        this._isTop = false;
         this.onToBottom();
     }
 
@@ -137,6 +142,11 @@ export abstract class WindowBase extends GComponent implements IWindow {
         return this.visible;
     }
 
+    /** 是否在最上层显示 (除忽略的窗口组外, 显示到最上层时) */
+    public isTop(): boolean {
+        return this._isTop;
+    }
+
     /** @internal */
     public screenResize(): void {
         this._adapted();
@@ -144,10 +154,17 @@ export abstract class WindowBase extends GComponent implements IWindow {
 
     /**
      * 获取窗口顶部资源栏数据 默认返回空数组
-     * @returns {WindowHeaderInfo[]}
+     * @returns {HeaderInfo}
      */
-    public getHeaderInfo(): WindowHeaderInfo {
-        return null;
+    public abstract getHeaderInfo<U>(): HeaderInfo<U>;
+
+    /** 
+     * 刷新顶部资源栏 
+     * 调用这个方法会重新创建 或者 刷新header
+     * 用来在同一个界面显示不同的header
+     */
+    public refreshHeader(): void {
+        // 强制刷新header
     }
 
     /** 
@@ -162,7 +179,7 @@ export abstract class WindowBase extends GComponent implements IWindow {
     protected abstract onInit(): void;
     protected abstract onClose(): void;
 
-    protected abstract onShow(userdata?: any): void;
+    protected abstract onShow(userdata?: T): void;
     protected abstract onShowFromHide(): void;
     protected abstract onHide(): void;
 

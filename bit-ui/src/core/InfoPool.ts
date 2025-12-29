@@ -6,7 +6,7 @@
 
 import { debug } from "@gongxh/bit-core";
 import { UIObjectFactory } from "fairygui-cc";
-import { PropsHelper } from "../utils/PropsHelper";
+import { PropsHelper } from "./PropsHelper";
 import { IHeaderInfo, IWindowInfo } from "./types";
 
 /** @internal */

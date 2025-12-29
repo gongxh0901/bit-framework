@@ -7,11 +7,11 @@
 import { GComponent, UIPackage } from "fairygui-cc";
 import { WindowType } from "../header";
 import { IWindow } from "../interface/IWindow";
-import { PropsHelper } from "../utils/PropsHelper";
 import { WindowBase } from "../window/WindowBase";
-import { WindowManager } from "../WindowManager";
+import { PropsHelper } from "./PropsHelper";
 import { ResLoader } from "./ResLoader";
 import { IWindowInfo } from "./types";
+import { WindowManager } from "./WindowManager";
 
 export class WindowGroup {
     /** @internal */
@@ -74,18 +74,32 @@ export class WindowGroup {
      * 显示一个窗口
      * @param info 窗口信息
      * @param userdata 
+     * @internal
      */
-    public showWindow<T extends IWindow>(info: IWindowInfo, userdata?: any): Promise<T> {
+    public showWindow<T = any, U = any>(info: IWindowInfo, userdata?: T): Promise<IWindow<T, U>> {
         return new Promise((resolve, reject) => {
+            let lastTopWindow = WindowManager.getTopWindow();
+
             if (WindowManager.hasWindow(info.name)) {
-                const window = WindowManager.getWindow<T>(info.name);
+                const window = WindowManager.getWindow(info.name);
                 this.showAdjustment(window, userdata);
+
+                if (lastTopWindow && lastTopWindow.name !== window.name) {
+                    lastTopWindow._toBottom();
+                }
+                window._toTop();
+
                 resolve(window);
             } else {
                 ResLoader.loadWindowRes(info.name).then(() => {
                     const window = this.createWindow(info.pkgName, info.name);
                     this.showAdjustment(window, userdata);
-                    resolve(window as unknown as T);
+
+                    if (lastTopWindow && lastTopWindow.name !== window.name) {
+                        lastTopWindow._toBottom();
+                    }
+
+                    resolve(window);
                 }).catch((err: Error) => {
                     reject(new Error(`窗口【${info.name}】打开失败: ${err.message}`));
                 });
@@ -96,6 +110,7 @@ export class WindowGroup {
     /**
      * show一个界面后的调整
      * @param window 
+     * @internal
      */
     private showAdjustment(window: IWindow, userdata?: any): void {
         // 如果窗口不在最上层 则调整层级
@@ -214,7 +229,7 @@ export class WindowGroup {
      */
     public removeWindow(name: string): void {
         // let lastIndex = this.size - 1;
-        let window = WindowManager.getWindow<IWindow>(name);
+        let window = WindowManager.getWindow(name);
 
         window._close();
 
@@ -293,7 +308,7 @@ export class WindowGroup {
      * 获取窗口组顶部窗口实例
      * @returns {IWindow} 顶部窗口实例
      */
-    public getTopWindow(): IWindow {
+    public getTopWindow<T extends IWindow>(): T {
         if (this.size > 0) {
             return WindowManager.getWindow(this._windowNames[this.size - 1]);
         }

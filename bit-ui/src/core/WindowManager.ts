@@ -7,13 +7,28 @@
 import { Screen } from "@gongxh/bit-core";
 import { Color } from "cc";
 import { GGraph } from "fairygui-cc";
-import { InfoPool } from "./core/InfoPool";
-import { WindowGroup } from "./core/WindowGroup";
-import { MetadataKey } from "./header";
-import { IWindow } from "./interface/IWindow";
-import { IPropsConfig, PropsHelper } from "./utils/PropsHelper";
-import { HeaderBase } from "./window/HeaderBase";
-import { WindowBase } from "./window/WindowBase";
+import { MetadataKey } from "../header";
+import { IWindow } from "../interface/IWindow";
+import { Window } from "../window/Window";
+import { WindowBase } from "../window/WindowBase";
+import { InfoPool } from "./InfoPool";
+import { IPropsConfig, PropsHelper } from "./PropsHelper";
+import { WindowGroup } from "./WindowGroup";
+
+/**
+ * 从窗口类型中提取 UserData 类型
+ */
+type ExtractUserData<T> = T extends Window<infer U, any> ? U : any;
+
+/**
+ * 从窗口类型中提取 HeaderData 类型
+ */
+type ExtractHeaderData<T> = T extends Window<any, infer H> ? H : any;
+
+/**
+ * 从窗口构造函数中提取窗口实例类型
+ */
+type ExtractWindowInstance<T> = T extends new () => infer R ? R : never;
 
 export class WindowManager {
     private static _bgAlpha: number = 0.75;
@@ -30,9 +45,6 @@ export class WindowManager {
 
     /** @internal */
     private static _windows: Map<string, IWindow> = new Map(); // 所有窗口的引用
-
-    /** @internal */
-    private _headers: Map<string, HeaderBase> = new Map(); // 窗口顶部资源栏
 
     /** @internal */
     public static get bgAlpha(): number {
@@ -94,6 +106,155 @@ export class WindowManager {
     }
 
     /**
+     * 异步打开一个窗口 (如果UI包的资源未加载, 会自动加载 配合 WindowManager.initPackageConfig一起使用)
+     * @param 窗口类
+     * @param userdata 用户数据
+     */
+    public static showWindow<T extends new () => Window<any, any>>(
+        window: T,
+        userdata?: ExtractUserData<ExtractWindowInstance<T>>
+    ): Promise<ExtractWindowInstance<T>> {
+        // 优先使用装饰器设置的静态属性，避免代码混淆后 constructor.name 变化
+        const name = (window as any)[MetadataKey.originalName];
+        if (!name) {
+            throw new Error(`窗口【${window.name}】未注册，请使用 _uidecorator.uiclass 注册窗口`);
+        }
+        return this.showWindowByName(name, userdata) as Promise<ExtractWindowInstance<T>>;
+    }
+
+    /** 
+     * 通过窗口名称打开一个窗口
+     * @param name 窗口名称
+     * @param userdata 用户数据
+     * @internal
+     */
+    public static showWindowByName<T = any, U = any>(name: string, userdata?: T): Promise<IWindow<T, U>> {
+        // 找到他所属的窗口组
+        const info = InfoPool.get(name);
+        const group = this.getWindowGroup(info.group);
+        return group.showWindow<T, U>(info, userdata);
+    }
+
+    /**
+     * 关闭一个窗口
+     * @param ctor 窗口类
+     */
+    public static closeWindow<T extends new () => IWindow>(window: T): void {
+        // 取到窗口的名称，优先使用装饰器设置的静态属性
+        const name = (window as any)[MetadataKey.originalName];
+        this.closeWindowByName(name);
+    }
+
+    /**
+     * 通过窗口名称关闭一个窗口
+     * @param name 窗口名称
+     */
+    public static closeWindowByName(name: string): void {
+        if (!this.hasWindow(name)) {
+            console.warn(`窗口不存在 ${name} 不需要关闭`);
+            return;
+        }
+        const info = InfoPool.get(name);
+        const group = this.getWindowGroup(info.group);
+        group.removeWindow(name);
+
+        // 调整半透明遮罩
+        this.adjustAlphaGraph();
+
+        // 找到最上层的窗口 调用toTop方法
+        let topWindow = this.getTopWindow<IWindow, any>();
+        if (topWindow && !topWindow.isTop()) {
+            topWindow._toTop();
+        }
+    }
+
+    /**
+     * 是否存在窗口
+     * @param name 窗口名称
+     */
+    public static hasWindow(name: string): boolean {
+        return this._windows.has(name);
+    }
+
+    /**
+     * 添加窗口
+     * @param name 窗口名称
+     * @param window 要添加的窗口对象，需实现 IWindow 接口。
+     * @internal
+     */
+    public static addWindow(name: string, window: IWindow): void {
+        this._windows.set(name, window);
+    }
+
+    /**
+     * 移除窗口
+     * @param name 窗口名称
+     * @internal
+     */
+    public static removeWindow(name: string): void {
+        this._windows.delete(name);
+    }
+
+    /**
+     * 根据窗口名称获取窗口实例。
+     * @template T 窗口类型，必须继承自IWindow接口。
+     * @param name 窗口名称
+     * @returns 如果找到窗口，则返回对应类型的窗口实例；否则返回null。
+     */
+    public static getWindow<T extends IWindow, U>(name: string): T | null {
+        return this._windows.get(name) as T;
+    }
+
+    /**
+     * 获取当前最顶层的窗口实例。
+     * 默认会忽略掉忽略查询的窗口组
+     * @returns {T | null} - 返回最顶层的窗口实例，如果没有找到则返回 null。
+     */
+    public static getTopWindow<T extends IWindow, U>(isAll: boolean = true): T | null {
+        const names = this._groupNames;
+        for (let i = names.length - 1; i >= 0; i--) {
+            const group = this.getWindowGroup(names[i]);
+            if (group.isIgnore && !isAll) {
+                continue;
+            }
+            if (group.size === 0) {
+                continue;
+            }
+            return group.getTopWindow() as T;
+        }
+        return null;
+    }
+
+    /**
+     * 根据给定的组名获取窗口组。如果组不存在，则抛出错误。
+     * @param name 窗口组名称
+     * @returns 返回找到的窗口组。
+     */
+    public static getWindowGroup(name: string): WindowGroup {
+        if (this._groups.has(name)) {
+            return this._groups.get(name);
+        }
+        throw new Error(`窗口组【${name}】不存在`);
+    }
+
+    /**
+     * 关闭所有窗口
+     * @param ignores 不关闭的窗口
+     */
+    public static closeAllWindow(ignores: IWindow[] = []): void {
+        let len = this._groupNames.length;
+        for (let i = len - 1; i >= 0; i--) {
+            let group = this.getWindowGroup(this._groupNames[i]);
+            group.closeAllWindow(ignores);
+        }
+        // 找到最上层的窗口 调用toTop方法
+        let topWindow = this.getTopWindow<IWindow, any>();
+        if (topWindow && !topWindow.isTop()) {
+            topWindow._toTop();
+        }
+    }
+
+    /**
      * 调整半透明遮罩的显示层级
      * 从上到下（从所有窗口组）查找第一个bgAlpha不为0的窗口，将遮罩放到该窗口下方
      * @internal
@@ -109,7 +270,7 @@ export class WindowManager {
             // 在当前窗口组中从上到下查找第一个bgAlpha不为0的窗口
             for (let j = group.windowNames.length - 1; j >= 0; j--) {
                 const name = group.windowNames[j];
-                const win = WindowManager.getWindow<WindowBase>(name);
+                const win = WindowManager.getWindow<WindowBase, any>(name);
                 if (win.bgAlpha > 0) {
                     topWindow = win;
                     break;
@@ -146,118 +307,6 @@ export class WindowManager {
         } else {
             // 没有找到需要遮罩的窗口，隐藏遮罩
             this._alphaGraph.visible = false;
-        }
-    }
-
-    /**
-     * 异步打开一个窗口 (如果UI包的资源未加载, 会自动加载 配合 WindowManager.initPackageConfig一起使用)
-     * @param 窗口类
-     * @param userdata 用户数据
-     */
-    public static showWindow<T extends new () => IWindow>(window: T, userdata?: any): Promise<IWindow> {
-        // 优先使用装饰器设置的静态属性，避免代码混淆后 constructor.name 变化
-        const name = (window as any)[MetadataKey.originalName];
-        return this.showWindowByName(name, userdata);
-    }
-
-    /** 
-     * 通过窗口名称打开一个窗口
-     * @param name 窗口名称
-     * @param userdata 用户数据
-     * @internal
-     */
-    public static showWindowByName<T extends IWindow>(name: string, userdata?: any): Promise<T> {
-        // 找到他所属的窗口组
-        const info = InfoPool.get(name);
-        const group = this.getWindowGroup(info.group);
-        return group.showWindow<T>(info, userdata);
-    }
-
-    /**
-     * 关闭一个窗口
-     * @param ctor 窗口类
-     */
-    public static closeWindow<T extends new () => IWindow>(window: T): void {
-        // 取到窗口的名称，优先使用装饰器设置的静态属性
-        const name = (window as any)[MetadataKey.originalName];
-        this.closeWindowByName(name);
-    }
-
-    /**
-     * 通过窗口名称关闭一个窗口
-     * @param name 窗口名称
-     */
-    public static closeWindowByName(name: string): void {
-        if (!this.hasWindow(name)) {
-            console.warn(`窗口不存在 ${name} 不需要关闭`);
-            return;
-        }
-        const info = InfoPool.get(name);
-        const group = this.getWindowGroup(info.group);
-        group.removeWindow(name);
-
-        // 调整半透明遮罩
-        this.adjustAlphaGraph();
-    }
-
-    /**
-     * 是否存在窗口
-     * @param name 窗口名称
-     */
-    public static hasWindow(name: string): boolean {
-        return this._windows.has(name);
-    }
-
-    /**
-     * 添加窗口
-     * @param name 窗口名称
-     * @param window 要添加的窗口对象，需实现 IWindow 接口。
-     * @internal
-     */
-    public static addWindow(name: string, window: IWindow): void {
-        this._windows.set(name, window);
-    }
-
-    /**
-     * 移除窗口
-     * @param name 窗口名称
-     * @internal
-     */
-    public static removeWindow(name: string): void {
-        this._windows.delete(name);
-    }
-
-    /**
-     * 根据窗口名称获取窗口实例。
-     * @template T 窗口类型，必须继承自IWindow接口。
-     * @param name 窗口名称
-     * @returns 如果找到窗口，则返回对应类型的窗口实例；否则返回null。
-     */
-    public static getWindow<T extends IWindow>(name: string): T | null {
-        return this._windows.get(name) as T;
-    }
-
-    /**
-     * 根据给定的组名获取窗口组。如果组不存在，则抛出错误。
-     * @param name 窗口组名称
-     * @returns 返回找到的窗口组。
-     */
-    public static getWindowGroup(name: string): WindowGroup {
-        if (this._groups.has(name)) {
-            return this._groups.get(name);
-        }
-        throw new Error(`窗口组【${name}】不存在`);
-    }
-
-    /**
-     * 关闭所有窗口
-     * @param ignores 不关闭的窗口
-     */
-    public static closeAllWindow(ignores: IWindow[] = []): void {
-        let len = this._groupNames.length;
-        for (let i = len - 1; i >= 0; i--) {
-            let group = this.getWindowGroup(this._groupNames[i]);
-            group.closeAllWindow(ignores);
         }
     }
 
@@ -301,25 +350,6 @@ export class WindowManager {
     //         }
     //     }
     // }
-
-    // /**
-    //  * 获取当前最顶层的窗口实例。
-    //  * @template T - 窗口实例的类型，必须继承自 IWindow 接口。
-    //  * @returns {T | null} - 返回最顶层的窗口实例，如果没有找到则返回 null。
-    //  * @description 该方法会遍历所有窗口组，找到最顶层的窗口并返回其实例。
-    //  */
-    // public static getTopWindow<T extends IWindow>(): T | null {
-    //     let len = this._queryGroupNames.length;
-    //     for (let i = len; i > 0;) {
-    //         let group = this.getWindowGroup(this._queryGroupNames[--i]);
-    //         if (group.size > 0) {
-    //             return this.getWindow<T>(group.getTopWindowName());
-    //         }
-    //     }
-    //     return null;
-    // }
-
-
 
     // /**
     //  * 是否存在指定的窗口

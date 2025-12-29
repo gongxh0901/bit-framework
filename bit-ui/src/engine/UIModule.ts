@@ -7,8 +7,8 @@ import { _decorator, JsonAsset } from "cc";
 
 import { Adapter, debug, Module, Screen } from "@gongxh/bit-core";
 import { GGraph, GRoot } from "fairygui-cc";
-import { IPropsConfig, PropsHelper } from "../utils/PropsHelper";
-import { WindowManager } from "../WindowManager";
+import { IPropsConfig, PropsHelper } from "../core/PropsHelper";
+import { WindowManager } from "../core/WindowManager";
 import { CocosWindowContainer } from "./CocosWindowContainer";
 
 const { ccclass, menu, property } = _decorator;

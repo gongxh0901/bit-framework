@@ -3,9 +3,10 @@
  * @Date: 2024-12-14
  * @Description: 
  */
+import { HeaderInfo } from "./HeaderInfo";
 import { WindowBase } from "./WindowBase";
 
-export abstract class Window extends WindowBase {
+export abstract class Window<T = any, U = any> extends WindowBase<T, U> {
     protected onAdapted(): void {
 
     }
@@ -13,7 +14,7 @@ export abstract class Window extends WindowBase {
     protected abstract onInit(): void
     protected abstract onClose(): void
 
-    protected abstract onShow(userdata?: any): void;
+    protected abstract onShow(userdata?: T): void;
 
     protected onHide(): void { }
     protected onShowFromHide(): void { }
@@ -27,5 +28,22 @@ export abstract class Window extends WindowBase {
      */
     protected onEmptyAreaClick(): void {
 
+    }
+
+    /**
+     * 获取窗口顶部资源栏数据 默认返回空数组
+     * @returns {HeaderInfo}
+     */
+    public getHeaderInfo<U>(): HeaderInfo<U> {
+        return null;
+    }
+
+    /** 
+     * 刷新顶部资源栏 
+     * 调用这个方法会重新创建 或者 刷新header
+     * 用来在同一个界面显示不同的header
+     */
+    public refreshHeader(): void {
+        // 强制刷新header
     }
 }
