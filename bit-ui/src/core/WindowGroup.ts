@@ -142,10 +142,10 @@ export class WindowGroup {
             this._windowNames.splice(index, 1);
             // 放到数组的末尾
             this._windowNames.push(window.name);
-
-            // 调整了显示层级, 根据最上层的窗口的type, 处理上一个窗口的关闭状态
-            this._processWindowCloseStatus(window);
         }
+        // 根据窗口的type, 处理上一个窗口的关闭状态
+        this._processWindowCloseStatus(window);
+
         // 调整窗口的显示层级
         window.setDepth(this._root.numChildren - 1);
 
@@ -301,6 +301,7 @@ export class WindowGroup {
             console.error(`[BUG] 窗口【${name}】不在数组中，数据结构已损坏`);
             return;
         }
+        this._windowNames.splice(index, 1);
         // 删除WindowManager中记录的窗口
         WindowManager.removeWindow(name);
 
