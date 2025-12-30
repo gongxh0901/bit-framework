@@ -37,13 +37,4 @@ export abstract class Window<T = any, U = any> extends WindowBase<T, U> {
     public getHeaderInfo<U>(): HeaderInfo<U> {
         return null;
     }
-
-    /** 
-     * 刷新顶部资源栏 
-     * 调用这个方法会重新创建 或者 刷新header
-     * 用来在同一个界面显示不同的header
-     */
-    public refreshHeader(): void {
-        // 强制刷新header
-    }
 }
