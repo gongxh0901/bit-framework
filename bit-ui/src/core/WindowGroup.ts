@@ -166,16 +166,15 @@ export class WindowGroup {
         window._adapted();
         // 添加到显示节点
         this._root.addChild(window);
+        // 窗口组之前没有窗口, 显示窗口组节点
+        if (this.size === 0) {
+            this._root.visible = true;
+        }
         this._windowNames.push(name);
         WindowManager.addWindow(name, window);
 
         // 处理header（只请求，不立即添加到节点，由adjustHeaderDepth动态管理）
         HeaderManager.requestHeader(name, window.getHeaderInfo());
-
-        // 窗口组之前没有窗口, 显示窗口组节点
-        if (this.size === 0) {
-            this._root.visible = true;
-        }
         return window;
     }
 
