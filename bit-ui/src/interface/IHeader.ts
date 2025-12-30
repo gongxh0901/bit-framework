@@ -42,12 +42,6 @@ export interface IHeader<T = any> {
     _hide(): void;
 
     /**
-     * 从隐藏状态恢复显示
-     * @internal
-     */
-    _showFromHide(): void;
-
-    /**
      * 是否显示中
      */
     isShowing(): boolean;

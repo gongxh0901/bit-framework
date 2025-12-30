@@ -85,13 +85,4 @@ export abstract class Header<T = any> extends GComponent implements IHeader<T> {
         this.visible = false;
         this.onHide();
     }
-
-    /**
-     * 从隐藏状态恢复显示
-     * @internal
-     */
-    public _showFromHide(): void {
-        this.visible = true;
-        this.onShowFromHide();
-    }
 }

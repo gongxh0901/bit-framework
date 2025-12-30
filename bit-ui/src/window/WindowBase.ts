@@ -6,6 +6,7 @@
 
 import { Screen } from "@gongxh/bit-core";
 import { GComponent } from "fairygui-cc";
+import { HeaderManager } from "../core/HeaderManager";
 import { WindowManager } from "../core/WindowManager";
 import { AdapterType, WindowType } from "../header";
 import { IWindow } from "../interface/IWindow";
@@ -164,7 +165,7 @@ export abstract class WindowBase<T = any, U = any> extends GComponent implements
      * 用来在同一个界面显示不同的header
      */
     public refreshHeader(): void {
-        // 强制刷新header
+        HeaderManager.refreshWindowHeader(this.name, this.getHeaderInfo());
     }
 
     /** 

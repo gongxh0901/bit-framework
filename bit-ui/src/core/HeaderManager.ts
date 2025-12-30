@@ -69,7 +69,7 @@ export class HeaderManager {
      * @param windowName 窗口名
      * @param fromHide 窗口是否从隐藏状态恢复显示
      */
-    public static showHeader(windowName: string, fromHide: boolean = false): void {
+    public static showHeader(windowName: string): void {
         if (!this.hasHeader(windowName)) {
             return;
         }
@@ -82,11 +82,7 @@ export class HeaderManager {
         // 只有当前窗口是最上层时才显示
         const currentTopWindow = this._cacheHeaderTopWindow.get(headerName);
         if (currentTopWindow === windowName) {
-            if (fromHide) {
-                header._showFromHide();
-            } else {
-                header._show(this.getHeaderUserData(windowName));
-            }
+            header._show(this.getHeaderUserData(windowName));
         }
     }
 
@@ -168,6 +164,45 @@ export class HeaderManager {
         }
         const headerName = this.getHeaderName(windowName);
         return this._headers.get(headerName) || null;
+    }
+
+    /**
+     * 刷新窗口的header
+     * 如果新的header和旧的header不是同一个，先释放旧的，再创建新的
+     * 如果是同一个，更新userdata并重新显示
+     * @param windowName 窗口名
+     * @param newHeaderInfo 新的header信息
+     */
+    public static refreshWindowHeader(windowName: string, newHeaderInfo: HeaderInfo<any> | null): void {
+        const oldHeaderName = this.getHeaderName(windowName);
+        const newHeaderName = newHeaderInfo?.name;
+
+        // 情况1：新旧 header 名称相同，只需要更新 userdata 并重新显示
+        if (oldHeaderName === newHeaderName) {
+            if (newHeaderInfo) {
+                // 更新保存的 userdata
+                this._headerInfos.set(windowName, newHeaderInfo);
+                // 重新显示 header（如果当前窗口是最上层）
+                const currentTopWindow = this._cacheHeaderTopWindow.get(newHeaderName);
+                if (currentTopWindow === windowName) {
+                    const header = this.getHeader(newHeaderName);
+                    header._show(newHeaderInfo.userdata);
+                }
+            }
+            return;
+        }
+
+        // 情况2：header 名称不同，先释放旧的，再创建新的
+        // 释放旧的 header
+        if (oldHeaderName) {
+            this.releaseHeader(windowName);
+        }
+
+        // 请求新的 header 并显示
+        if (newHeaderInfo) {
+            this.requestHeader(windowName, newHeaderInfo);
+            this.showHeader(windowName);
+        }
     }
 
     private static createHeader(headerInfo: HeaderInfo<any>): IHeader {

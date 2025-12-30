@@ -188,7 +188,7 @@ export class WindowGroup {
         if (curWindow && startIndex == this.size - 1 && !curWindow.isShowing()) {
             curWindow._showFromHide();
             // 恢复显示header
-            HeaderManager.showHeader(curWindow.name, true);
+            HeaderManager.showHeader(curWindow.name);
         }
         // 已经是最后一个了
         if (startIndex <= 0) {
@@ -230,7 +230,7 @@ export class WindowGroup {
                 if (prevWindow && !prevWindow.isShowing()) {
                     prevWindow._showFromHide();
                     // 恢复显示header（使用记录的userdata）
-                    HeaderManager.showHeader(prevWindowName, true);
+                    HeaderManager.showHeader(prevWindowName);
                 }
             }
 
