@@ -8,8 +8,8 @@ import { Screen } from "@gongxh/bit-core";
 import { GComponent } from "fairygui-cc";
 import { HeaderManager } from "../core/HeaderManager";
 import { WindowManager } from "../core/WindowManager";
-import { AdapterType, WindowType } from "../header";
 import { IWindow } from "../interface/IWindow";
+import { AdapterType, WindowType } from "../interface/type";
 import { HeaderInfo } from "./HeaderInfo";
 
 export abstract class WindowBase<T = any, U = any> extends GComponent implements IWindow<T, U> {

@@ -5,7 +5,7 @@
  */
 
 import { InfoPool } from "./core/InfoPool";
-import { IDecoratorInfo, MetadataKey } from "./header";
+import { IDecoratorInfo, MetadataKey } from "./interface/type";
 
 /**
  * 获取对象属性
@@ -44,8 +44,12 @@ export namespace _uidecorator {
      * @param {string} groupName 窗口组名称
      * @param {string} pkgName fgui包名
      * @param {string} name 窗口名 (与fgui中的组件名一一对应)
+     * @param {string[] | string} inlinePkgs 内联的包名 当前界面需要引用其他包中的资源时使用 引用多个包用数组 引用单个包用字符串
+     * 
+     * @example @uiclass("窗口组", "UI包名", "MyWindow", ["包名1", "包名2"])
+     * @example @uiclass("窗口组", "UI包名", "MyWindow", "包名1")
      */
-    export function uiclass(groupName: string, pkgName: string, name: string): Function {
+    export function uiclass(groupName: string, pkgName: string, name: string, inlinePkgs?: string[] | string): Function {
         /** target 类的构造函数 */
         return function (ctor: any): any {
             // 检查是否有原始构造函数引用（由其他装饰器如 @dataclass 提供）
@@ -64,7 +68,13 @@ export namespace _uidecorator {
                     name: name,
                 },
             });
-            InfoPool.add(ctor, groupName, pkgName, name);
+            let pkgs: string[] = [];
+            if (Array.isArray(inlinePkgs)) {
+                pkgs = inlinePkgs;
+            } else if (typeof inlinePkgs === "string") {
+                pkgs = [inlinePkgs];
+            }
+            InfoPool.add(ctor, groupName, pkgName, name, pkgs);
             return ctor;
         };
     }

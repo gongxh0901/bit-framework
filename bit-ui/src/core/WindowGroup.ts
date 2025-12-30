@@ -5,8 +5,8 @@
  */
 
 import { GComponent, UIPackage } from "fairygui-cc";
-import { WindowType } from "../header";
 import { IWindow } from "../interface/IWindow";
+import { WindowType } from "../interface/type";
 import { WindowBase } from "../window/WindowBase";
 import { HeaderManager } from "./HeaderManager";
 import { PropsHelper } from "./PropsHelper";

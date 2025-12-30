@@ -1,4 +1,4 @@
-import { AdapterType } from "../header";
+import { AdapterType } from "./type";
 
 /**
  * @Author: Gongxh

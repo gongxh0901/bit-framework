@@ -80,5 +80,8 @@ export interface IDecoratorInfo {
         name: string;
         /** 窗口组名称 可选(只有窗口才会设置) */
         group?: string;
+
+        /** 内联的包名 当前界面需要引用其他包中的资源时使用 (只有窗口才会设置) */
+        inlinePkgs?: string[];
     }
 }

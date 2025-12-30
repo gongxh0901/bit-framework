@@ -4,8 +4,8 @@
  * @Description: 
  */
 
-import { AdapterType, WindowType } from "../header";
 import { HeaderInfo } from "../window/HeaderInfo";
+import { AdapterType, WindowType } from "./type";
 
 export interface IWindow<TUserData = any, THeaderData = any> {
     /** 窗口名称 */

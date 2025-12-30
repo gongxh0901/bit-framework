@@ -7,13 +7,14 @@
 import { Screen } from "@gongxh/bit-core";
 import { Color } from "cc";
 import { GGraph } from "fairygui-cc";
-import { MetadataKey } from "../header";
 import { IWindow } from "../interface/IWindow";
+import { MetadataKey } from "../interface/type";
 import { Window } from "../window/Window";
 import { WindowBase } from "../window/WindowBase";
 import { HeaderManager } from "./HeaderManager";
 import { InfoPool } from "./InfoPool";
 import { IPropsConfig, PropsHelper } from "./PropsHelper";
+import { ResLoader } from "./ResLoader";
 import { WindowGroup } from "./WindowGroup";
 
 /**
@@ -52,11 +53,6 @@ export class WindowManager {
         this._bgAlpha = value;
     }
 
-    // /** 配置UI包的一些信息 (可以不配置 完全手动管理) */
-    // public static initPackageConfig(res: IPackageConfigRes): void {
-    //     // this._resPool.initPackageConfig(res);
-    // }
-
     /**
      * 屏幕大小改变时 调用所有窗口的screenResize方法 (内部方法)
      * @internal
@@ -76,11 +72,49 @@ export class WindowManager {
     }
 
     /** 
+     * 添加手动管理资源加载 和 卸载的包名
+     * @param pkgName 包名
+     */
+    public static addManualPackage(pkgName: string): void {
+        InfoPool.addManualPackage(pkgName);
+    }
+
+    /**
+     * 提供一种特殊需求 用来手动设置包所在的 bundle名 以及包在bundle中的路径
+     * @param name 窗口名称
+     * @param bundleName bundle名 默认: resources
+     * @param path 包在bundle中的路径 默认: ui目录
+     */
+    public static setPackageInfo(pkgName: string, bundleName: string = "resources", path: string = "ui"): void {
+        if (bundleName !== "resources") {
+            InfoPool.addBundleName(pkgName, bundleName);
+        }
+        if (path !== "ui") {
+            InfoPool.addPackagePath(pkgName, path);
+        }
+    }
+
+    /** 
      * 用于手动设置UI导出数据
      * @param config UI导出数据
      */
     public static setUIConfig(config: IPropsConfig): void {
         PropsHelper.setConfig(config as any);
+    }
+
+    /**
+     * 设置UI包加载相关回调函数
+     * @param callbacks 包含加载回调的对象
+     * @param callbacks.showWaitWindow 显示加载等待窗的回调
+     * @param callbacks.hideWaitWindow 隐藏加载等待窗的回调
+     * @param callbacks.fail 打开窗口时资源加载失败的回调 code( 1:bundle加载失败 2:包加载失败 )
+     */
+    public static setPackageCallbacks(callbacks: {
+        showWaitWindow: () => void;
+        hideWaitWindow: () => void;
+        fail: (windowName: string, code: 1 | 2, message: string) => void;
+    }): void {
+        ResLoader.setCallbacks(callbacks);
     }
 
     /**
@@ -106,7 +140,7 @@ export class WindowManager {
     }
 
     /**
-     * 异步打开一个窗口 (如果UI包的资源未加载, 会自动加载 配合 WindowManager.initPackageConfig一起使用)
+     * 异步打开一个窗口 (如果UI包的资源未加载, 会自动加载 可以配合 WindowManager.setPackageCallbacks一起使用)
      * @param 窗口类
      * @param userdata 用户数据
      */

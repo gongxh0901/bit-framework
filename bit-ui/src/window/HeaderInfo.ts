@@ -4,8 +4,8 @@
  * @Description: 窗口顶部资源栏信息
  */
 
-import { MetadataKey } from "../header";
 import { IHeader } from "../interface/IHeader";
+import { MetadataKey } from "../interface/type";
 
 export class HeaderInfo<T> {
     /** header名字 */

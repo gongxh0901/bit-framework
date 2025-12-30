@@ -7,8 +7,8 @@
 
 import { Screen } from "@gongxh/bit-core";
 import { GComponent } from "fairygui-cc";
-import { AdapterType } from "../header";
 import { IHeader } from "../interface/IHeader";
+import { AdapterType } from "../interface/type";
 
 export abstract class Header<T = any> extends GComponent implements IHeader<T> {
     /** 窗口适配类型 */

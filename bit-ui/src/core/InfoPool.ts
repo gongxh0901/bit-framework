@@ -11,46 +11,29 @@ import { IHeaderInfo, IWindowInfo } from "./types";
 
 /** @internal */
 export class InfoPool {
-    /** 
-     * 窗口信息池 
-     * @internal
-     */
-    private static _windowInfos: Map<string, IWindowInfo> = new Map();
-    /** 
-     * 窗口header信息池 
-     * @internal
-     */
-    private static _headerInfos: Map<string, IHeaderInfo> = new Map();
+    /** @internal */
+    private static _windowInfos: Map<string, IWindowInfo> = new Map(); // 窗口信息池 窗口名 -> 窗口信息
 
-    /**
-     * 自定义组件信息
-     * @internal
-     */
-    private static _customComponents: Set<string> = new Set();
+    /** @internal */
+    private static _headerInfos: Map<string, IHeaderInfo> = new Map();  // 窗口header信息池 窗口header名 -> header信息
 
-    /**
-     * 默认的UI包在对应bundle下的路径 默认目录: ui
-     * @internal
-     */
-    private static _defaultPath: string = "ui";
+    /** @internal */
+    private static _customComponents: Set<string> = new Set(); // 自定义组件信息池 自定义组件名 -> 组件信息
 
-    /** 
-     * UI包所在的bundle名 1对1 默认: resources
-     * @internal
-     */
-    private static _customPackageBundle: Map<string, string> = new Map();
+    /** @internal */
+    private static _customPackageBundle: Map<string, string> = new Map(); // UI包所在的bundle名 1对1 默认: resources
 
-    /**
-     * 自定义UI包所在的路径 1对1
-     * @internal
-     */
-    private static _customPackagePath: Map<string, string> = new Map();
+    /** @internal */
+    private static _customPackagePath: Map<string, string> = new Map();  // 自定义UI包所在的路径 1对1
 
-    /**
-     * 窗口名对应的包名列表 窗口名 -> 包名列表
-     * @internal
-     */
-    private static _windowPkgs: Map<string, string[]> = new Map();
+    /** @internal */
+    private static _windowPkgs: Map<string, string[]> = new Map(); // 窗口名对应的包名列表 窗口名 -> 包名列表
+
+    /** @internal */
+    private static _manualPackages: Set<string> = new Set(); // 需要手动管理的资源包名
+
+    /** @internal */
+    private static _dirty: boolean = true;
 
     /**
      * 添加窗口信息
@@ -61,7 +44,7 @@ export class InfoPool {
      * @param bundleName bundle名
      * @internal
      */
-    public static add(ctor: any, group: string, pkg: string, name: string): void {
+    public static add(ctor: any, group: string, pkg: string, name: string, pkgs: string[]): void {
         if (this.has(name)) {
             console.warn(`窗口【${name}】已注册，跳过，请检查是否重复注册`);
             return;
@@ -77,6 +60,11 @@ export class InfoPool {
         UIObjectFactory.setExtension(`ui://${pkg}/${name}`, ctor);
 
         this.addWindowPkg(name, pkg);
+        if (pkgs.length > 0) {
+            for (const pkg of pkgs) {
+                this.addWindowPkg(name, pkg);
+            }
+        }
     }
 
     /**
@@ -210,7 +198,7 @@ export class InfoPool {
      * @internal
      */
     public static getPackagePath(pkg: string): string {
-        return `${this._customPackagePath.get(pkg) || this._defaultPath}/${pkg}`;
+        return `${this._customPackagePath.get(pkg) || 'ui'}/${pkg}`;
     }
 
     /** 
@@ -220,6 +208,7 @@ export class InfoPool {
      * @internal
      */
     public static addWindowPkg(windowName: string, pkg: string): void {
+        this._dirty = true;
         if (!this._windowPkgs.has(windowName)) {
             this._windowPkgs.set(windowName, [pkg]);
         } else {
@@ -234,7 +223,21 @@ export class InfoPool {
      * @internal
      */
     public static getWindowPkg(windowName: string): string[] {
+        if (this._dirty) {
+            this.refreshWindowPackages();
+            this._dirty = false;
+        }
         return this._windowPkgs.get(windowName) || [];
+    }
+
+    /**
+     * 添加手动管理资源加载 和 卸载的包名
+     * @param pkgName 包名
+     * @internal
+     */
+    public static addManualPackage(pkgName: string): void {
+        this._dirty = true;
+        this._manualPackages.add(pkgName);
     }
 
     /**
@@ -251,5 +254,18 @@ export class InfoPool {
         ctor.prototype.onConstruct = onConstruct;
         // 自定义组件扩展
         UIObjectFactory.setExtension(`ui://${pkg}/${name}`, ctor);
+    }
+
+    /** 刷新窗口需要的包名信息 */
+    private static refreshWindowPackages(): void {
+        for (const packages of this._windowPkgs.values()) {
+            let len = packages.length;
+            for (let index = len - 1; index >= 0; index--) {
+                const name = packages[index];
+                if (this._manualPackages.has(name)) {
+                    packages.splice(index, 1);
+                }
+            }
+        }
     }
 }
