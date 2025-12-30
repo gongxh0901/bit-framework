@@ -20,6 +20,12 @@ export class ResLoader {
     /** 包的引用计数 包名 -> 引用计数 */
     private static pkgRefs: Map<string, number> = new Map();
 
+    /** 
+     * 自动释放UI资源
+     * @internal
+     */
+    private static autoRelease: boolean = true;
+
     /** UI包加载回调 - 显示加载等待窗 @internal */
     private static _showWaitWindow: (() => void) | null = null;
 
@@ -41,6 +47,11 @@ export class ResLoader {
         this._showWaitWindow = callbacks.showWaitWindow;
         this._hideWaitWindow = callbacks.hideWaitWindow;
         this._onLoadFail = callbacks.fail;
+    }
+
+    /** @internal */
+    public static setAutoRelease(auto: boolean): void {
+        this.autoRelease = auto;
     }
 
     /**
@@ -236,8 +247,23 @@ export class ResLoader {
      */
     private static unloadUIPackages(packages: string[]): void {
         for (const pkg of packages) {
-            if (this.subRef(pkg) === 0) {
+            if (this.subRef(pkg) === 0 && this.autoRelease) {
                 UIPackage.removePackage(pkg);
+            }
+        }
+    }
+
+    /**
+     * 释放不再使用中的自动加载的UI资源
+     * 释放所有引用计数 <= 0 的UI资源
+     * @internal
+     */
+    public static releaseUnusedRes(): void {
+        let keys = Array.from(this.pkgRefs.keys());
+        for (const key of keys) {
+            if (this.getRef(key) <= 0) {
+                UIPackage.removePackage(key);
+                this.pkgRefs.delete(key);
             }
         }
     }

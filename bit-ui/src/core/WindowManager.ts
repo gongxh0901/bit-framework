@@ -350,4 +350,13 @@ export class WindowManager {
             this._alphaGraph.visible = false;
         }
     }
+
+
+    /**
+     * 释放不再使用中的自动加载的UI资源
+     * 针对在 UIModule 中设置了不自动释放资源的场景
+     */
+    public static releaseUnusedRes(): void {
+        ResLoader.releaseUnusedRes();
+    }
 }

@@ -8,6 +8,7 @@ import { _decorator, JsonAsset } from "cc";
 import { Adapter, debug, Module, Screen } from "@gongxh/bit-core";
 import { GGraph, GRoot } from "fairygui-cc";
 import { IPropsConfig, PropsHelper } from "../core/PropsHelper";
+import { ResLoader } from "../core/ResLoader";
 import { WindowManager } from "../core/WindowManager";
 import { CocosWindowContainer } from "./CocosWindowContainer";
 
@@ -20,11 +21,15 @@ export class UIModule extends Module {
 
     @property({ displayName: "底部遮罩透明度", tooltip: "半透明遮罩的默认透明度", min: 0, max: 1, step: 0.01 }) bgAlpha: number = 0.75;
 
+    @property({ displayName: "自动释放UI资源", tooltip: "界面关闭时自动释放加载的资源" }) autoReleaseUIRes: boolean = true;
+
     /** 模块名称 */
     public moduleName: string = "UI模块";
 
     public onInit(): void {
         this.ui_config && PropsHelper.setConfig(this.ui_config.json as IPropsConfig);
+
+        ResLoader.setAutoRelease(this.autoReleaseUIRes);
 
         // 设置底部遮罩的默认透明度
         WindowManager.bgAlpha = this.bgAlpha;
