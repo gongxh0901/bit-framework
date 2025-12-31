@@ -117,39 +117,39 @@ export class ResLoader {
         this.unloadUIPackages(packageNames);
     }
 
-    /** 
+    /**
      * 根据传入的UIPackage名称集合 加载多个UI包资源
      * @param packages 包名列表
      * @param windowName 窗口名（用于失败回调）
      * @internal
      */
-    private static loadUIPackages(packages: string[], windowName: string): Promise<void> {
+    private static async loadUIPackages(packages: string[], windowName: string): Promise<void> {
         // 先找出来所有需要加载的包名
         let list = packages.filter(pkg => this.getRef(pkg) <= 0);
         if (list.length <= 0) {
             // 增加引用计数
             packages.forEach(pkg => this.addRef(pkg));
-            return Promise.resolve();
+            return;
         }
         // 一定有需要加载的资源
         this.addWaitRef();
 
-        // 获取包对应的bundle名
-        let bundleNames = list.map(pkg => InfoPool.getBundleName(pkg));
-        // 加载bundle
-        return this.loadBundles(bundleNames, windowName).then(() => {
+        try {
+            // 获取包对应的bundle名
+            let bundleNames = list.map(pkg => InfoPool.getBundleName(pkg));
+            // 加载bundle
+            await this.loadBundles(bundleNames, windowName);
             // 顺序加载每个UI包
-            return this.loadUIPackagesSequentially(list, windowName);
-        }).then(() => {
+            await this.loadUIPackagesSequentially(list, windowName);
             // 所有包加载成功后，减少等待窗引用计数
             this.decWaitRef();
             // 增加包资源的引用计数
             packages.forEach(pkg => this.addRef(pkg));
-        }).catch((err: Error) => {
+        } catch (err) {
             // 减少等待窗的引用计数
             this.decWaitRef();
             throw err;
-        });
+        }
     }
 
     /**
@@ -158,20 +158,15 @@ export class ResLoader {
      * @param windowName 窗口名（用于失败回调）
      * @internal
      */
-    private static loadBundles(bundleNames: string[], windowName: string): Promise<void> {
+    private static async loadBundles(bundleNames: string[], windowName: string): Promise<void> {
         let unloadedBundleNames: string[] = bundleNames.filter(bundleName => bundleName !== "resources" && !assetManager.getBundle(bundleName));
         if (unloadedBundleNames.length <= 0) {
-            return Promise.resolve();
+            return;
         }
 
-        // 递归方式实现顺序加载
-        const loadNext = (index: number): Promise<void> => {
-            if (index >= unloadedBundleNames.length) {
-                return Promise.resolve();
-            }
-
-            const bundleName = unloadedBundleNames[index];
-            return new Promise((resolve, reject) => {
+        // 顺序加载每个bundle
+        for (const bundleName of unloadedBundleNames) {
+            await new Promise<void>((resolve, reject) => {
                 assetManager.loadBundle(bundleName, (err: any, bundle: any) => {
                     if (err) {
                         // 调用失败回调
@@ -180,16 +175,11 @@ export class ResLoader {
                         }
                         reject(new Error(`bundle【${bundleName}】加载失败`));
                     } else {
-                        resolve(null);
+                        resolve();
                     }
                 });
-            }).then(() => {
-                // 加载下一个
-                return loadNext(index + 1);
             });
-        };
-
-        return loadNext(0);
+        }
     }
 
     /**
@@ -198,21 +188,11 @@ export class ResLoader {
      * @param windowName 窗口名（用于失败回调）
      * @internal
      */
-    private static loadUIPackagesSequentially(packages: string[], windowName?: string): Promise<void> {
-        // 递归方式实现顺序加载
-        const loadNext = (index: number): Promise<void> => {
-            if (index >= packages.length) {
-                return Promise.resolve();
-            }
-
-            const pkg = packages[index];
-            return this.loadSingleUIPackage(pkg, windowName).then(() => {
-                // 加载下一个
-                return loadNext(index + 1);
-            });
-        };
-
-        return loadNext(0);
+    private static async loadUIPackagesSequentially(packages: string[], windowName?: string): Promise<void> {
+        // 顺序加载每个UI包
+        for (const pkg of packages) {
+            await this.loadSingleUIPackage(pkg, windowName);
+        }
     }
 
     /**

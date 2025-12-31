@@ -144,10 +144,7 @@ export class WindowManager {
      * @param 窗口类
      * @param userdata 用户数据
      */
-    public static showWindow<T extends new () => Window<any, any>>(
-        window: T,
-        userdata?: ExtractUserData<ExtractWindowInstance<T>>
-    ): Promise<ExtractWindowInstance<T>> {
+    public static showWindow<T extends new () => Window<any, any>>(window: T, userdata?: ExtractUserData<ExtractWindowInstance<T>>): Promise<ExtractWindowInstance<T>> {
         // 优先使用装饰器设置的静态属性，避免代码混淆后 constructor.name 变化
         const name = (window as any)[MetadataKey.originalName];
         if (!name) {

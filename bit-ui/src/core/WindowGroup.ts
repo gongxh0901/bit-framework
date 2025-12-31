@@ -74,38 +74,35 @@ export class WindowGroup {
     /**
      * 显示一个窗口
      * @param info 窗口信息
-     * @param userdata 
+     * @param userdata
      * @internal
      */
-    public showWindow<T = any, U = any>(info: IWindowInfo, userdata?: T): Promise<IWindow<T, U>> {
-        return new Promise((resolve, reject) => {
-            let lastTopWindow = WindowManager.getTopWindow();
+    public async showWindow<T = any, U = any>(info: IWindowInfo, userdata?: T): Promise<IWindow<T, U>> {
+        let lastTopWindow = WindowManager.getTopWindow();
 
-            if (WindowManager.hasWindow(info.name)) {
-                const window = WindowManager.getWindow<IWindow>(info.name);
+        if (WindowManager.hasWindow(info.name)) {
+            const window = WindowManager.getWindow<IWindow>(info.name);
+            this.showAdjustment(window, userdata);
+
+            if (lastTopWindow && lastTopWindow.name !== window.name) {
+                lastTopWindow._toBottom();
+                window._toTop();
+            }
+            return window;
+        } else {
+            try {
+                await ResLoader.loadWindowRes(info.name);
+                const window = this.createWindow(info.pkgName, info.name);
                 this.showAdjustment(window, userdata);
 
                 if (lastTopWindow && lastTopWindow.name !== window.name) {
                     lastTopWindow._toBottom();
                 }
-                window._toTop();
-
-                resolve(window);
-            } else {
-                ResLoader.loadWindowRes(info.name).then(() => {
-                    const window = this.createWindow(info.pkgName, info.name);
-                    this.showAdjustment(window, userdata);
-
-                    if (lastTopWindow && lastTopWindow.name !== window.name) {
-                        lastTopWindow._toBottom();
-                    }
-
-                    resolve(window);
-                }).catch((err: Error) => {
-                    reject(new Error(`窗口【${info.name}】打开失败: ${err.message}`));
-                });
+                return window;
+            } catch (err: any) {
+                throw new Error(`窗口【${info.name}】打开失败: ${err.message}`);
             }
-        });
+        }
     }
 
     /**
