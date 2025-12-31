@@ -25,7 +25,7 @@
         "dist"
     ],
     "author": "gongxh",
-    "license": "ISC",
+    "license": "MIT",
     "repository": {
         "type": "gitlab",
         "url": "https://github.com/Gongxh0901/kunpolibrary"

@@ -29,7 +29,7 @@
     "game-framework"
   ],
   "author": "gongxh",
-  "license": "ISC",
+  "license": "MIT",
   "engines": {
     "node": ">=16.0.0",
     "pnpm": ">=8.0.0"
