@@ -1,0 +1,41 @@
+{
+    "name": "@gongxh/bit-condition",
+    "version": "0.0.6",
+    "description": "基于creator的条件系统库",
+    "main": "./dist/kunpocc-condition.cjs",
+    "module": "./dist/kunpocc-condition.mjs",
+    "types": "./dist/kunpocc-condition.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/kunpocc-condition.cjs",
+            "import": "./dist/kunpocc-condition.mjs",
+            "types": "./dist/kunpocc-condition.d.ts",
+            "default": "./dist/kunpocc-condition.cjs"
+        },
+        "./min": {
+            "require": "./dist/kunpocc-condition.min.cjs",
+            "import": "./dist/kunpocc-condition.min.mjs"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "pnpm run clean && rollup -c rollup.config.mjs"
+    },
+    "files": [
+        "dist"
+    ],
+    "author": "bit老宫",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gongxh0901/bit-framework.git",
+        "directory": "bit-condition"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "dependencies": {
+        "@gongxh/bit-core": "workspace:*",
+        "fairygui-cc": "^1.2.2"
+    }
+}

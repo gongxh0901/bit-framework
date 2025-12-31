@@ -40,6 +40,15 @@ importers:
 
   bit-behaviortree: {}
 
+  bit-condition:
+    dependencies:
+      '@gongxh/bit-core':
+        specifier: workspace:*
+        version: link:../bit-core
+      fairygui-cc:
+        specifier: ^1.2.2
+        version: 1.2.2
+
   bit-core: {}
 
   bit-ec:

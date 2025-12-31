@@ -16,8 +16,9 @@
     "build:assets": "pnpm --filter @gongxh/bit-assets build",
     "build:behaviortree": "pnpm --filter @gongxh/bit-behaviortree build",
     "build:ec": "pnpm --filter @gongxh/bit-ec build",
+    "build:condition": "pnpm --filter @gongxh/bit-condition build",
 
-    "build:all": "pnpm build:core && pnpm build:ui && pnpm build:ecs && pnpm build:event && pnpm build:net && pnpm build:quadtree && pnpm build:assets && pnpm build:behaviortree && pnpm build:ec",
+    "build:all": "pnpm build:core && pnpm build:ui && pnpm build:ecs && pnpm build:event && pnpm build:net && pnpm build:quadtree && pnpm build:assets && pnpm build:behaviortree && pnpm build:ec && pnpm build:condition",
 
     "dev:core": "pnpm --filter @gongxh/bit-core build --watch",
     "dev:ui": "pnpm --filter @gongxh/bit-ui build --watch",
@@ -31,6 +32,7 @@
     "publish:assets": "pnpm --filter @gongxh/bit-assets publish",
     "publish:behaviortree": "pnpm --filter @gongxh/bit-behaviortree publish",
     "publish:ec": "pnpm --filter @gongxh/bit-ec publish",
+    "publish:condition": "pnpm --filter @gongxh/bit-condition publish",
 
     "version:patch": "pnpm -r --filter='!kunpocreator' exec npm version patch",
     "version:minor": "pnpm -r --filter='!kunpocreator' exec npm version minor",

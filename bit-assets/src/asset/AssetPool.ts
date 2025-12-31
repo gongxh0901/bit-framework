@@ -40,6 +40,8 @@ export class AssetPool {
             // 增加引用计数
             asset.addRef();
             let info = bundle.getAssetInfo(uuid);
+            //TODO:: 这里使用了私有属性
+            /** @ts-ignore */
             let key = this.getKey(info.path, bundle.name);
             // log(`>>>uuid:${uuid}, path:${info.path}`);
             this._uuidToName.set(uuid, key);

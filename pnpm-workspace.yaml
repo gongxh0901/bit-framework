@@ -12,6 +12,7 @@ packages:
   - 'bit-assets'
   - 'bit-behaviortree'
   - 'bit-ec'
+  - 'bit-condition'
   # 演示项目
   - 'demo'
 
