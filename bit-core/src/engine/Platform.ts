@@ -5,7 +5,7 @@
  */
 
 import { sys } from "cc";
-import { debug } from "../log";
+import { debug } from "../utils/log";
 
 export enum PlatformType {
     Android = 1,

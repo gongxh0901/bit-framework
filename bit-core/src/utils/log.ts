@@ -4,7 +4,7 @@
  * @Description: log相关的api
  */
 
-import { KUNPO_DEBUG } from "./header";
+import { KUNPO_DEBUG } from "../header";
 
 function log(...args: any[]): void {
     console.log("bit-framework:", ...args);

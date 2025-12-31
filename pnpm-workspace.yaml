@@ -1,0 +1,10 @@
+# pnpm workspace 配置
+# 定义 monorepo 中的子项目
+
+packages:
+  # 库项目
+  - 'bit-core'
+  - 'bit-ui'
+  # 演示项目
+  - 'demo'
+

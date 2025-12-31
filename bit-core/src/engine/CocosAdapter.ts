@@ -6,7 +6,7 @@
 
 import { screen as ccScreen, view } from "cc";
 import { Size } from "../header";
-import { debug } from "../log";
+import { debug } from "../utils/log";
 import { Adapter } from "./Adapter";
 
 export class CocosAdapter extends Adapter {

@@ -6,7 +6,7 @@
 
 import { ResolutionPolicy, view } from "cc";
 import { Size } from "../header";
-import { debug } from "../log";
+import { debug } from "../utils/log";
 import { Screen } from "./Screen";
 
 export abstract class Adapter {

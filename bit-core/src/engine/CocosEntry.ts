@@ -6,7 +6,8 @@
 
 import { _decorator, Component, director, game } from "cc";
 import { enableDebugMode } from "../header";
-import { debug } from "../log";
+import { debug } from "../utils/log";
+import { Time } from "../utils/Time";
 import { CocosAdapter } from "./CocosAdapter";
 import { Module } from "./Module";
 import { PlatformInitializer } from "./Platform";
@@ -29,9 +30,7 @@ export abstract class CocosEntry extends Component {
     protected start(): void {
         // 是否开启调试输出
         this.enableDebug && enableDebugMode(true);
-
         debug("====================开始初始化=====================");
-
         // 设置游戏真帧率
         game.frameRate = this.fps;
         director.addPersistRootNode(this.node);
@@ -41,10 +40,19 @@ export abstract class CocosEntry extends Component {
         new PlatformInitializer();
         // 适配器
         new CocosAdapter().init();
-
+        // 时间相关
+        this.initTime();
+        // 初始化模块
         this.initModule();
         debug("=====================初始化完成=====================");
         this.onInit();
+    }
+
+    /** 
+     * 时间相关
+     */
+    private initTime(): void {
+        Time._configBoot();
     }
 
     /**

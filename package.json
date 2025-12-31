@@ -1,0 +1,49 @@
+{
+  "name": "@gongxh/bit-framework",
+  "version": "1.0.0",
+  "private": true,
+  "description": "bit-framework monorepo - Cocos Creator 游戏框架",
+  "scripts": {
+    "clean": "pnpm -r --parallel clean",
+    
+    "build": "pnpm -r --filter='!kunpocreator' build",
+    "build:core": "pnpm --filter @gongxh/bit-core build",
+    "build:ui": "pnpm --filter @gongxh/bit-ui build",
+    "build:all": "pnpm build:core && pnpm build:ui",
+    
+    "dev:core": "pnpm --filter @gongxh/bit-core build --watch",
+    "dev:ui": "pnpm --filter @gongxh/bit-ui build --watch",
+    
+    "publish:core": "pnpm --filter @gongxh/bit-core publish",
+    "publish:ui": "pnpm --filter @gongxh/bit-ui publish",
+
+    "version:patch": "pnpm -r --filter='!kunpocreator' exec npm version patch",
+    "version:minor": "pnpm -r --filter='!kunpocreator' exec npm version minor",
+    "version:major": "pnpm -r --filter='!kunpocreator' exec npm version major"
+  },
+  "keywords": [
+    "bit-framework",
+    "cocos",
+    "cocos-creator",
+    "monorepo",
+    "game-framework"
+  ],
+  "author": "gongxh",
+  "license": "ISC",
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@cocos/creator-types": "^3.8.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@types/lodash": "^4.17.13",
+    "@types/node": "^22.10.2",
+    "rollup": "^4.28.1",
+    "rollup-plugin-dts": "^6.1.1",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.6.2"
+  }
+}
+
