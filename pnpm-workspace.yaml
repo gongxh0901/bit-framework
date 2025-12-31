@@ -5,6 +5,13 @@ packages:
   # 库项目
   - 'bit-core'
   - 'bit-ui'
+  - 'bit-ecs'
+  - 'bit-event'
+  - 'bit-net'
+  - 'bit-quadtree'
+  - 'bit-assets'
+  - 'bit-behaviortree'
+  - 'bit-ec'
   # 演示项目
   - 'demo'
 

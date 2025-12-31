@@ -1,0 +1,42 @@
+{
+    "name": "@gongxh/bit-event",
+    "version": "0.0.6",
+    "description": "kunpocc-event",
+    "main": "./dist/kunpocc-event.min.cjs",
+    "module": "./dist/kunpocc-event.min.mjs",
+    "types": "./dist/kunpocc-event.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/kunpocc-event.cjs",
+            "import": "./dist/kunpocc-event.mjs",
+            "types": "./dist/kunpocc-event.d.ts",
+            "default": "./dist/kunpocc-event.cjs"
+        },
+        "./min": {
+            "require": "./dist/kunpocc-event.min.cjs",
+            "import": "./dist/kunpocc-event.min.mjs"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "pnpm run clean && rollup -c rollup.config.mjs"
+    },
+    "files": [
+        "dist/kunpocc-event.cjs",
+        "dist/kunpocc-event.mjs",
+        "dist/kunpocc-event.min.cjs",
+        "dist/kunpocc-event.min.mjs",
+        "dist/kunpocc-event.d.ts",
+        "CHANGELOG.md"
+    ],
+    "author": "bit老宫",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gongxh0901/bit-framework.git",
+        "directory": "bit-event"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    }
+}

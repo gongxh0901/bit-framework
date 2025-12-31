@@ -1,0 +1,41 @@
+{
+    "name": "@gongxh/bit-ec",
+    "version": "0.0.6",
+    "description": "基于creator的ec库",
+    "main": "./dist/kunpocc-ec.cjs",
+    "module": "./dist/kunpocc-ec.mjs",
+    "types": "./dist/kunpocc-ec.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/kunpocc-ec.cjs",
+            "import": "./dist/kunpocc-ec.mjs",
+            "types": "./dist/kunpocc-ec.d.ts",
+            "default": "./dist/kunpocc-ec.cjs"
+        },
+        "./min": {
+            "require": "./dist/kunpocc-ec.min.cjs",
+            "import": "./dist/kunpocc-ec.min.mjs"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "pnpm run clean && rollup -c rollup.config.mjs"
+    },
+    "files": [
+        "dist"
+    ],
+    "author": "bit老宫",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gongxh0901/bit-framework.git",
+        "directory": "bit-ec"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "dependencies": {
+        "@gongxh/bit-assets": "workspace:*",
+        "@gongxh/bit-event": "workspace:*"
+    }
+}

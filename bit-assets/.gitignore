@@ -1,0 +1,9 @@
+# 文件
+.DS_Store
+package-lock.json
+
+# 文件夹
+.vscode/
+node_modules/
+dist/
+build/

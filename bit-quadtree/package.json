@@ -1,0 +1,41 @@
+{
+    "name": "@gongxh/bit-quadtree",
+    "version": "0.0.6",
+    "description": "基于TypeScript的四叉树库",
+    "main": "./dist/kunpocc-quadtree.cjs",
+    "module": "./dist/kunpocc-quadtree.mjs",
+    "types": "./dist/kunpocc-quadtree.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/kunpocc-quadtree.cjs",
+            "import": "./dist/kunpocc-quadtree.mjs",
+            "types": "./dist/kunpocc-quadtree.d.ts",
+            "default": "./dist/kunpocc-quadtree.cjs"
+        },
+        "./min": {
+            "require": "./dist/kunpocc-quadtree.min.cjs",
+            "import": "./dist/kunpocc-quadtree.min.mjs"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "pnpm run clean && rollup -c rollup.config.mjs"
+    },
+    "files": [
+        "dist/kunpocc-quadtree.cjs",
+        "dist/kunpocc-quadtree.mjs",
+        "dist/kunpocc-quadtree.min.cjs",
+        "dist/kunpocc-quadtree.min.mjs",
+        "dist/kunpocc-quadtree.d.ts"
+    ],
+    "author": "bit老宫",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gongxh0901/bit-framework.git",
+        "directory": "bit-quadtree"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    }
+}

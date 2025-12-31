@@ -1,0 +1,43 @@
+{
+    "name": "@gongxh/bit-ecs",
+    "version": "0.0.6",
+    "description": "一个ts实现的ECS系统",
+    "main": "./dist/kunpocc-ecs.cjs",
+    "module": "./dist/kunpocc-ecs.mjs",
+    "types": "./dist/kunpocc-ecs.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/kunpocc-ecs.cjs",
+            "import": "./dist/kunpocc-ecs.mjs",
+            "types": "./dist/kunpocc-ecs.d.ts",
+            "default": "./dist/kunpocc-ecs.cjs"
+        },
+        "./min": {
+            "require": "./dist/kunpocc-ecs.min.cjs",
+            "import": "./dist/kunpocc-ecs.min.mjs"
+        }
+    },
+    "scripts": {
+      "dev": "ts-node-dev --respawn src/index.ts",
+      "clean": "rm -rf dist",
+      "build": "pnpm run clean && rollup -c rollup.config.mjs"
+  },
+  "files": [
+      "dist/kunpocc-ecs.cjs",
+      "dist/kunpocc-ecs.mjs",
+      "dist/kunpocc-ecs.min.cjs",
+      "dist/kunpocc-ecs.min.mjs",
+      "dist/kunpocc-ecs.d.ts"
+  ],
+
+    "author": "bit老宫",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/gongxh0901/bit-framework.git",
+      "directory": "bit-ecs"
+    },
+    "publishConfig": {
+      "registry": "https://registry.npmjs.org/"
+    }
+} 

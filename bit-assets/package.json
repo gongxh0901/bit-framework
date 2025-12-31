@@ -1,0 +1,37 @@
+{
+    "name": "@gongxh/bit-assets",
+    "version": "0.0.6",
+    "description": "基于creator3.0+的bit-assets库",
+    "main": "./dist/kunpocc-assets.cjs",
+    "module": "./dist/kunpocc-assets.mjs",
+    "types": "./dist/kunpocc-assets.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/kunpocc-assets.cjs",
+            "import": "./dist/kunpocc-assets.mjs",
+            "types": "./dist/kunpocc-assets.d.ts",
+            "default": "./dist/kunpocc-assets.cjs"
+        },
+        "./min": {
+            "require": "./dist/kunpocc-assets.min.cjs",
+            "import": "./dist/kunpocc-assets.min.mjs"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "pnpm run clean && rollup -c rollup.config.mjs"
+    },
+    "files": [
+        "dist"
+    ],
+    "author": "bit老宫",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gongxh0901/bit-framework.git",
+        "directory": "bit-assets"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    }
+}

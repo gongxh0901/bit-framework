@@ -1,0 +1,45 @@
+{
+    "name": "@gongxh/bit-net",
+    "version": "0.0.6",
+    "description": "网络相关",
+    "main": "./dist/kunpocc-net.cjs",
+    "module": "./dist/kunpocc-net.mjs",
+    "types": "./dist/kunpocc-net.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/kunpocc-net.cjs",
+            "import": "./dist/kunpocc-net.mjs",
+            "types": "./dist/kunpocc-net.d.ts",
+            "default": "./dist/kunpocc-net.cjs"
+        },
+        "./min": {
+            "require": "./dist/kunpocc-net.min.cjs",
+            "import": "./dist/kunpocc-net.min.mjs"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "pnpm run clean && rollup -c rollup.config.mjs"
+    },
+    "files": [
+        "dist/kunpocc-net.cjs",
+        "dist/kunpocc-net.mjs",
+        "dist/kunpocc-net.min.cjs",
+        "dist/kunpocc-net.min.mjs",
+        "dist/kunpocc-net.d.ts",
+        "libs/lib.ali.api.d.ts",
+        "libs/lib.bytedance.api.d.ts",
+        "libs/lib.wx.api.d.ts"
+    ],
+    "author": "bit老宫",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gongxh0901/bit-framework.git",
+        "directory": "bit-net"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "dependencies": {}
+}

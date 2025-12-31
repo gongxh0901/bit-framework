@@ -1,0 +1,37 @@
+{
+    "name": "@gongxh/bit-behaviortree",
+    "version": "0.0.6",
+    "description": "行为树库",
+    "main": "./dist/kunpocc-behaviortree.cjs",
+    "module": "./dist/kunpocc-behaviortree.mjs",
+    "types": "./dist/kunpocc-behaviortree.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/kunpocc-behaviortree.cjs",
+            "import": "./dist/kunpocc-behaviortree.mjs",
+            "types": "./dist/kunpocc-behaviortree.d.ts",
+            "default": "./dist/kunpocc-behaviortree.cjs"
+        },
+        "./min": {
+            "require": "./dist/kunpocc-behaviortree.min.cjs",
+            "import": "./dist/kunpocc-behaviortree.min.mjs"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "pnpm run clean && rollup -c rollup.config.mjs"
+    },
+    "files": [
+        "dist"
+    ],
+    "author": "bit老宫",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gongxh0901/bit-framework.git",
+        "directory": "bit-behaviortree"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    }
+}
