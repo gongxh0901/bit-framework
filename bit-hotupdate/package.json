@@ -1,0 +1,41 @@
+{
+    "name": "@gongxh/bit-hotupdate",
+    "version": "0.0.6",
+    "description": "基于Cocos Creator的热更新库",
+    "main": "./dist/bit-hotupdate.cjs",
+    "module": "./dist/bit-hotupdate.mjs",
+    "types": "./dist/bit-hotupdate.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/bit-hotupdate.cjs",
+            "import": "./dist/bit-hotupdate.mjs",
+            "types": "./dist/bit-hotupdate.d.ts",
+            "default": "./dist/bit-hotupdate.cjs"
+        },
+        "./min": {
+            "require": "./dist/bit-hotupdate.min.cjs",
+            "import": "./dist/bit-hotupdate.min.mjs"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "pnpm run clean && rollup -c rollup.config.mjs"
+    },
+    "files": [
+        "dist"
+    ],
+    "author": "bit老宫",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gongxh0901/bit-framework.git",
+        "directory": "bit-hotupdate"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "dependencies": {
+        "@gongxh/bit-core": "workspace:*",
+        "@gongxh/bit-net": "workspace:*"
+    }
+}

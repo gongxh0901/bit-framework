@@ -14,6 +14,7 @@ packages:
   - 'bit-ec'
   - 'bit-condition'
   - 'bit-minigame'
+  - 'bit-hotupdate'
   # 演示项目
   - 'demo'
 

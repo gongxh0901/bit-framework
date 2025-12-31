@@ -61,6 +61,15 @@ importers:
 
   bit-event: {}
 
+  bit-hotupdate:
+    dependencies:
+      '@gongxh/bit-core':
+        specifier: workspace:*
+        version: link:../bit-core
+      '@gongxh/bit-net':
+        specifier: workspace:*
+        version: link:../bit-net
+
   bit-minigame:
     dependencies:
       '@gongxh/bit-core':

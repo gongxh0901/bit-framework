@@ -14,6 +14,9 @@ export { md5 } from "./utils/MD5";
 export { Time } from "./utils/Time";
 export { Utils } from "./utils/Utils";
 
+/** 网络 */
+export { ICheckUpdatePromiseResult, IPromiseResult } from "./interface/PromiseResult";
+
 /** 定时器 */
 export { GlobalTimer } from "./timer/GlobalTimer";
 export { InnerTimer } from "./timer/InnerTimer";

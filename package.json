@@ -18,8 +18,9 @@
     "build:ec": "pnpm --filter @gongxh/bit-ec build",
     "build:condition": "pnpm --filter @gongxh/bit-condition build",
     "build:minigame": "pnpm --filter @gongxh/bit-minigame build",
+    "build:hotupdate": "pnpm --filter @gongxh/bit-hotupdate build",
 
-    "build:all": "pnpm build:core && pnpm build:ui && pnpm build:ecs && pnpm build:event && pnpm build:net && pnpm build:quadtree && pnpm build:assets && pnpm build:behaviortree && pnpm build:ec && pnpm build:condition && pnpm build:minigame",
+    "build:all": "pnpm build:core && pnpm build:ui && pnpm build:ecs && pnpm build:event && pnpm build:net && pnpm build:quadtree && pnpm build:assets && pnpm build:behaviortree && pnpm build:ec && pnpm build:condition && pnpm build:minigame && pnpm build:hotupdate",
 
     "dev:core": "pnpm --filter @gongxh/bit-core build --watch",
     "dev:ui": "pnpm --filter @gongxh/bit-ui build --watch",
@@ -35,6 +36,7 @@
     "publish:ec": "pnpm --filter @gongxh/bit-ec publish",
     "publish:condition": "pnpm --filter @gongxh/bit-condition publish",
     "publish:minigame": "pnpm --filter @gongxh/bit-minigame publish",
+    "publish:hotupdate": "pnpm --filter @gongxh/bit-hotupdate publish",
 
     "version:patch": "pnpm -r --filter='!kunpocreator' exec npm version patch",
     "version:minor": "pnpm -r --filter='!kunpocreator' exec npm version minor",
