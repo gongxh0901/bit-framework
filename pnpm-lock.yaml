@@ -44,9 +44,6 @@ importers:
 
   bit-ec:
     dependencies:
-      '@gongxh/bit-assets':
-        specifier: workspace:*
-        version: link:../bit-assets
       '@gongxh/bit-event':
         specifier: workspace:*
         version: link:../bit-event

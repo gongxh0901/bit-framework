@@ -35,7 +35,6 @@
         "registry": "https://registry.npmjs.org/"
     },
     "dependencies": {
-        "@gongxh/bit-assets": "workspace:*",
         "@gongxh/bit-event": "workspace:*"
     }
 }

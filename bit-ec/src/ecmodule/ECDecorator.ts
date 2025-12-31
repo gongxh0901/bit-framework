@@ -5,8 +5,19 @@
  */
 
 import { Color, Size, Vec2, Vec3 } from "cc";
-import { ObjectHelper } from "../tool/ObjectHelper";
 
+/**
+ * 获取对象属性
+ * @param obj 对象
+ * @param key 属性名
+ * @returns 属性值
+ */
+function getObjectProp(obj: Record<string, any>, key: string): any {
+    if (obj.hasOwnProperty(key)) {
+        return obj[key];
+    }
+    return (obj[key] = Object.assign({}, obj[key]));
+}
 
 export namespace _ecdecorator {
     /** @internal */
@@ -129,7 +140,7 @@ export namespace _ecdecorator {
     /** 组件属性装饰器 */
     export function ecprop(options: ECPropInfo): any {
         return function (target: any, propName: any): void {
-            ObjectHelper.getObjectProp(target.constructor, ECPropMeta)[propName] = options;
+            getObjectProp(target.constructor, ECPropMeta)[propName] = options;
         };
     }
 }
