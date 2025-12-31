@@ -2,19 +2,19 @@
     "name": "@gongxh/bit-behaviortree",
     "version": "0.0.6",
     "description": "行为树库",
-    "main": "./dist/kunpocc-behaviortree.cjs",
-    "module": "./dist/kunpocc-behaviortree.mjs",
-    "types": "./dist/kunpocc-behaviortree.d.ts",
+    "main": "./dist/bit-behaviortree.cjs",
+    "module": "./dist/bit-behaviortree.mjs",
+    "types": "./dist/bit-behaviortree.d.ts",
     "exports": {
         ".": {
-            "require": "./dist/kunpocc-behaviortree.cjs",
-            "import": "./dist/kunpocc-behaviortree.mjs",
-            "types": "./dist/kunpocc-behaviortree.d.ts",
-            "default": "./dist/kunpocc-behaviortree.cjs"
+            "require": "./dist/bit-behaviortree.cjs",
+            "import": "./dist/bit-behaviortree.mjs",
+            "types": "./dist/bit-behaviortree.d.ts",
+            "default": "./dist/bit-behaviortree.cjs"
         },
         "./min": {
-            "require": "./dist/kunpocc-behaviortree.min.cjs",
-            "import": "./dist/kunpocc-behaviortree.min.mjs"
+            "require": "./dist/bit-behaviortree.min.cjs",
+            "import": "./dist/bit-behaviortree.min.mjs"
         }
     },
     "scripts": {

@@ -61,6 +61,12 @@ importers:
 
   bit-event: {}
 
+  bit-minigame:
+    dependencies:
+      '@gongxh/bit-core':
+        specifier: workspace:*
+        version: link:../bit-core
+
   bit-net: {}
 
   bit-quadtree: {}

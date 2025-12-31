@@ -2,19 +2,19 @@
     "name": "@gongxh/bit-quadtree",
     "version": "0.0.6",
     "description": "基于TypeScript的四叉树库",
-    "main": "./dist/kunpocc-quadtree.cjs",
-    "module": "./dist/kunpocc-quadtree.mjs",
-    "types": "./dist/kunpocc-quadtree.d.ts",
+    "main": "./dist/bit-quadtree.cjs",
+    "module": "./dist/bit-quadtree.mjs",
+    "types": "./dist/bit-quadtree.d.ts",
     "exports": {
         ".": {
-            "require": "./dist/kunpocc-quadtree.cjs",
-            "import": "./dist/kunpocc-quadtree.mjs",
-            "types": "./dist/kunpocc-quadtree.d.ts",
-            "default": "./dist/kunpocc-quadtree.cjs"
+            "require": "./dist/bit-quadtree.cjs",
+            "import": "./dist/bit-quadtree.mjs",
+            "types": "./dist/bit-quadtree.d.ts",
+            "default": "./dist/bit-quadtree.cjs"
         },
         "./min": {
-            "require": "./dist/kunpocc-quadtree.min.cjs",
-            "import": "./dist/kunpocc-quadtree.min.mjs"
+            "require": "./dist/bit-quadtree.min.cjs",
+            "import": "./dist/bit-quadtree.min.mjs"
         }
     },
     "scripts": {
@@ -22,11 +22,11 @@
         "build": "pnpm run clean && rollup -c rollup.config.mjs"
     },
     "files": [
-        "dist/kunpocc-quadtree.cjs",
-        "dist/kunpocc-quadtree.mjs",
-        "dist/kunpocc-quadtree.min.cjs",
-        "dist/kunpocc-quadtree.min.mjs",
-        "dist/kunpocc-quadtree.d.ts"
+        "dist/bit-quadtree.cjs",
+        "dist/bit-quadtree.mjs",
+        "dist/bit-quadtree.min.cjs",
+        "dist/bit-quadtree.min.mjs",
+        "dist/bit-quadtree.d.ts"
     ],
     "author": "bit老宫",
     "license": "MIT",

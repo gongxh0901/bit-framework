@@ -13,6 +13,7 @@ packages:
   - 'bit-behaviortree'
   - 'bit-ec'
   - 'bit-condition'
+  - 'bit-minigame'
   # 演示项目
   - 'demo'
 

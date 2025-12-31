@@ -1,0 +1,40 @@
+{
+    "name": "@gongxh/bit-minigame",
+    "version": "0.0.6",
+    "description": "小游戏平台适配库（支持微信、支付宝、字节跳动）",
+    "main": "./dist/bit-minigame.cjs",
+    "module": "./dist/bit-minigame.mjs",
+    "types": "./dist/bit-minigame.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/bit-minigame.cjs",
+            "import": "./dist/bit-minigame.mjs",
+            "types": "./dist/bit-minigame.d.ts",
+            "default": "./dist/bit-minigame.cjs"
+        },
+        "./min": {
+            "require": "./dist/bit-minigame.min.cjs",
+            "import": "./dist/bit-minigame.min.mjs"
+        }
+    },
+    "scripts": {
+        "clean": "rm -rf dist",
+        "build": "pnpm run clean && rollup -c rollup.config.mjs"
+    },
+    "files": [
+        "dist"
+    ],
+    "author": "bit老宫",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gongxh0901/bit-framework.git",
+        "directory": "bit-minigame"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "dependencies": {
+        "@gongxh/bit-core": "workspace:*"
+    }
+}

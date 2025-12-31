@@ -2,19 +2,19 @@
     "name": "@gongxh/bit-net",
     "version": "0.0.6",
     "description": "网络相关",
-    "main": "./dist/kunpocc-net.cjs",
-    "module": "./dist/kunpocc-net.mjs",
-    "types": "./dist/kunpocc-net.d.ts",
+    "main": "./dist/bit-net.cjs",
+    "module": "./dist/bit-net.mjs",
+    "types": "./dist/bit-net.d.ts",
     "exports": {
         ".": {
-            "require": "./dist/kunpocc-net.cjs",
-            "import": "./dist/kunpocc-net.mjs",
-            "types": "./dist/kunpocc-net.d.ts",
-            "default": "./dist/kunpocc-net.cjs"
+            "require": "./dist/bit-net.cjs",
+            "import": "./dist/bit-net.mjs",
+            "types": "./dist/bit-net.d.ts",
+            "default": "./dist/bit-net.cjs"
         },
         "./min": {
-            "require": "./dist/kunpocc-net.min.cjs",
-            "import": "./dist/kunpocc-net.min.mjs"
+            "require": "./dist/bit-net.min.cjs",
+            "import": "./dist/bit-net.min.mjs"
         }
     },
     "scripts": {
@@ -22,11 +22,11 @@
         "build": "pnpm run clean && rollup -c rollup.config.mjs"
     },
     "files": [
-        "dist/kunpocc-net.cjs",
-        "dist/kunpocc-net.mjs",
-        "dist/kunpocc-net.min.cjs",
-        "dist/kunpocc-net.min.mjs",
-        "dist/kunpocc-net.d.ts",
+        "dist/bit-net.cjs",
+        "dist/bit-net.mjs",
+        "dist/bit-net.min.cjs",
+        "dist/bit-net.min.mjs",
+        "dist/bit-net.d.ts",
         "libs/lib.ali.api.d.ts",
         "libs/lib.bytedance.api.d.ts",
         "libs/lib.wx.api.d.ts"

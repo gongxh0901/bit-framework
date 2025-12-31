@@ -1,3 +1,3 @@
 import { createRollupConfig } from '../rollup.config.base.mjs';
 
-export default createRollupConfig('kunpocc-ec', ['cc']);
+export default createRollupConfig('bit-ec', ['cc']);

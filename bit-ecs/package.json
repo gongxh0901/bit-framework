@@ -2,19 +2,19 @@
     "name": "@gongxh/bit-ecs",
     "version": "0.0.6",
     "description": "一个ts实现的ECS系统",
-    "main": "./dist/kunpocc-ecs.cjs",
-    "module": "./dist/kunpocc-ecs.mjs",
-    "types": "./dist/kunpocc-ecs.d.ts",
+    "main": "./dist/bit-ecs.cjs",
+    "module": "./dist/bit-ecs.mjs",
+    "types": "./dist/bit-ecs.d.ts",
     "exports": {
         ".": {
-            "require": "./dist/kunpocc-ecs.cjs",
-            "import": "./dist/kunpocc-ecs.mjs",
-            "types": "./dist/kunpocc-ecs.d.ts",
-            "default": "./dist/kunpocc-ecs.cjs"
+            "require": "./dist/bit-ecs.cjs",
+            "import": "./dist/bit-ecs.mjs",
+            "types": "./dist/bit-ecs.d.ts",
+            "default": "./dist/bit-ecs.cjs"
         },
         "./min": {
-            "require": "./dist/kunpocc-ecs.min.cjs",
-            "import": "./dist/kunpocc-ecs.min.mjs"
+            "require": "./dist/bit-ecs.min.cjs",
+            "import": "./dist/bit-ecs.min.mjs"
         }
     },
     "scripts": {
@@ -23,11 +23,11 @@
       "build": "pnpm run clean && rollup -c rollup.config.mjs"
   },
   "files": [
-      "dist/kunpocc-ecs.cjs",
-      "dist/kunpocc-ecs.mjs",
-      "dist/kunpocc-ecs.min.cjs",
-      "dist/kunpocc-ecs.min.mjs",
-      "dist/kunpocc-ecs.d.ts"
+      "dist/bit-ecs.cjs",
+      "dist/bit-ecs.mjs",
+      "dist/bit-ecs.min.cjs",
+      "dist/bit-ecs.min.mjs",
+      "dist/bit-ecs.d.ts"
   ],
 
     "author": "bit老宫",

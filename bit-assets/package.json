@@ -2,19 +2,19 @@
     "name": "@gongxh/bit-assets",
     "version": "0.0.6",
     "description": "基于creator3.0+的bit-assets库",
-    "main": "./dist/kunpocc-assets.cjs",
-    "module": "./dist/kunpocc-assets.mjs",
-    "types": "./dist/kunpocc-assets.d.ts",
+    "main": "./dist/bit-assets.cjs",
+    "module": "./dist/bit-assets.mjs",
+    "types": "./dist/bit-assets.d.ts",
     "exports": {
         ".": {
-            "require": "./dist/kunpocc-assets.cjs",
-            "import": "./dist/kunpocc-assets.mjs",
-            "types": "./dist/kunpocc-assets.d.ts",
-            "default": "./dist/kunpocc-assets.cjs"
+            "require": "./dist/bit-assets.cjs",
+            "import": "./dist/bit-assets.mjs",
+            "types": "./dist/bit-assets.d.ts",
+            "default": "./dist/bit-assets.cjs"
         },
         "./min": {
-            "require": "./dist/kunpocc-assets.min.cjs",
-            "import": "./dist/kunpocc-assets.min.mjs"
+            "require": "./dist/bit-assets.min.cjs",
+            "import": "./dist/bit-assets.min.mjs"
         }
     },
     "scripts": {

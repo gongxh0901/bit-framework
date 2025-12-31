@@ -2,19 +2,19 @@
     "name": "@gongxh/bit-ec",
     "version": "0.0.6",
     "description": "基于creator的ec库",
-    "main": "./dist/kunpocc-ec.cjs",
-    "module": "./dist/kunpocc-ec.mjs",
-    "types": "./dist/kunpocc-ec.d.ts",
+    "main": "./dist/bit-ec.cjs",
+    "module": "./dist/bit-ec.mjs",
+    "types": "./dist/bit-ec.d.ts",
     "exports": {
         ".": {
-            "require": "./dist/kunpocc-ec.cjs",
-            "import": "./dist/kunpocc-ec.mjs",
-            "types": "./dist/kunpocc-ec.d.ts",
-            "default": "./dist/kunpocc-ec.cjs"
+            "require": "./dist/bit-ec.cjs",
+            "import": "./dist/bit-ec.mjs",
+            "types": "./dist/bit-ec.d.ts",
+            "default": "./dist/bit-ec.cjs"
         },
         "./min": {
-            "require": "./dist/kunpocc-ec.min.cjs",
-            "import": "./dist/kunpocc-ec.min.mjs"
+            "require": "./dist/bit-ec.min.cjs",
+            "import": "./dist/bit-ec.min.mjs"
         }
     },
     "scripts": {

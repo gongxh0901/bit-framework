@@ -12,6 +12,7 @@ export { Binary } from "./utils/Binary";
 export { debug, error, info, log, warn } from "./utils/log";
 export { md5 } from "./utils/MD5";
 export { Time } from "./utils/Time";
+export { Utils } from "./utils/Utils";
 
 /** 定时器 */
 export { GlobalTimer } from "./timer/GlobalTimer";

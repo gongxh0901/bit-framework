@@ -1,20 +1,20 @@
 {
     "name": "@gongxh/bit-event",
     "version": "0.0.6",
-    "description": "kunpocc-event",
-    "main": "./dist/kunpocc-event.min.cjs",
-    "module": "./dist/kunpocc-event.min.mjs",
-    "types": "./dist/kunpocc-event.d.ts",
+    "description": "bit-event",
+    "main": "./dist/bit-event.min.cjs",
+    "module": "./dist/bit-event.min.mjs",
+    "types": "./dist/bit-event.d.ts",
     "exports": {
         ".": {
-            "require": "./dist/kunpocc-event.cjs",
-            "import": "./dist/kunpocc-event.mjs",
-            "types": "./dist/kunpocc-event.d.ts",
-            "default": "./dist/kunpocc-event.cjs"
+            "require": "./dist/bit-event.cjs",
+            "import": "./dist/bit-event.mjs",
+            "types": "./dist/bit-event.d.ts",
+            "default": "./dist/bit-event.cjs"
         },
         "./min": {
-            "require": "./dist/kunpocc-event.min.cjs",
-            "import": "./dist/kunpocc-event.min.mjs"
+            "require": "./dist/bit-event.min.cjs",
+            "import": "./dist/bit-event.min.mjs"
         }
     },
     "scripts": {
@@ -22,11 +22,11 @@
         "build": "pnpm run clean && rollup -c rollup.config.mjs"
     },
     "files": [
-        "dist/kunpocc-event.cjs",
-        "dist/kunpocc-event.mjs",
-        "dist/kunpocc-event.min.cjs",
-        "dist/kunpocc-event.min.mjs",
-        "dist/kunpocc-event.d.ts",
+        "dist/bit-event.cjs",
+        "dist/bit-event.mjs",
+        "dist/bit-event.min.cjs",
+        "dist/bit-event.min.mjs",
+        "dist/bit-event.d.ts",
         "CHANGELOG.md"
     ],
     "author": "bit老宫",

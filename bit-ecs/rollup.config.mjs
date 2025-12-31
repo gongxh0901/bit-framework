@@ -1,3 +1,3 @@
 import { createRollupConfig } from '../rollup.config.base.mjs';
 
-export default createRollupConfig('kunpocc-ecs', ['cc', 'fairygui-cc']);
+export default createRollupConfig('bit-ecs', ['cc', 'fairygui-cc']);

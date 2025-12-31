@@ -2,19 +2,19 @@
     "name": "@gongxh/bit-condition",
     "version": "0.0.6",
     "description": "基于creator的条件系统库",
-    "main": "./dist/kunpocc-condition.cjs",
-    "module": "./dist/kunpocc-condition.mjs",
-    "types": "./dist/kunpocc-condition.d.ts",
+    "main": "./dist/bit-condition.cjs",
+    "module": "./dist/bit-condition.mjs",
+    "types": "./dist/bit-condition.d.ts",
     "exports": {
         ".": {
-            "require": "./dist/kunpocc-condition.cjs",
-            "import": "./dist/kunpocc-condition.mjs",
-            "types": "./dist/kunpocc-condition.d.ts",
-            "default": "./dist/kunpocc-condition.cjs"
+            "require": "./dist/bit-condition.cjs",
+            "import": "./dist/bit-condition.mjs",
+            "types": "./dist/bit-condition.d.ts",
+            "default": "./dist/bit-condition.cjs"
         },
         "./min": {
-            "require": "./dist/kunpocc-condition.min.cjs",
-            "import": "./dist/kunpocc-condition.min.mjs"
+            "require": "./dist/bit-condition.min.cjs",
+            "import": "./dist/bit-condition.min.mjs"
         }
     },
     "scripts": {

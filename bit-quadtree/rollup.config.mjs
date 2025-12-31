@@ -1,3 +1,3 @@
 import { createRollupConfig } from '../rollup.config.base.mjs';
 
-export default createRollupConfig('kunpocc-quadtree', ['cc', 'fairygui-cc']);
+export default createRollupConfig('bit-quadtree', ['cc', 'fairygui-cc']);
