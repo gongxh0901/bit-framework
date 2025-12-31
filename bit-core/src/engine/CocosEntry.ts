@@ -4,8 +4,10 @@
  * @Description:cocos游戏入口 定义了游戏启动时的基本配置和初始化流程。
  */
 
-import { _decorator, Component, director, game } from "cc";
+import { _decorator, Component, director, game, macro } from "cc";
 import { enableDebugMode } from "../header";
+import { GlobalTimer } from "../timer/GlobalTimer";
+import { InnerTimer } from "../timer/InnerTimer";
 import { debug } from "../utils/log";
 import { Time } from "../utils/Time";
 import { CocosAdapter } from "./CocosAdapter";
@@ -53,6 +55,9 @@ export abstract class CocosEntry extends Component {
      */
     private initTime(): void {
         Time._configBoot();
+        InnerTimer.initTimer();
+        GlobalTimer.initTimer();
+        this.schedule(this.tick.bind(this), 0, macro.REPEAT_FOREVER);
     }
 
     /**
@@ -64,5 +69,15 @@ export abstract class CocosEntry extends Component {
         for (const module of modules) {
             module.init();
         }
+    }
+
+    /**
+     * 更新
+     * @param dt 时间间隔
+     * @internal
+     */
+    private tick(dt: number): void {
+        InnerTimer.update(dt);
+        GlobalTimer.update(dt);
     }
 }
