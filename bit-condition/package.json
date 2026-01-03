@@ -32,7 +32,8 @@
         "directory": "bit-condition"
     },
     "publishConfig": {
-        "registry": "https://registry.npmjs.org/"
+        "registry": "https://registry.npmjs.org/",
+        "access": "public"
     },
     "dependencies": {
         "@gongxh/bit-core": "workspace:*",
