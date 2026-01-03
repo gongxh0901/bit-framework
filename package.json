@@ -1,6 +1,6 @@
 {
   "name": "@gongxh/bit-framework",
-  "version": "1.0.0",
+  "version": "0.0.6",
   "private": true,
   "description": "bit-framework monorepo - Cocos Creator 游戏框架",
   "scripts": {
@@ -37,6 +37,8 @@
     "publish:condition": "pnpm --filter @gongxh/bit-condition publish",
     "publish:minigame": "pnpm --filter @gongxh/bit-minigame publish",
     "publish:hotupdate": "pnpm --filter @gongxh/bit-hotupdate publish",
+
+    "publish:all": "pnpm publish:core && pnpm publish:ui && pnpm publish:ecs && pnpm publish:event && pnpm publish:net && pnpm publish:quadtree && pnpm publish:assets && pnpm publish:behaviortree && pnpm publish:ec && pnpm publish:condition && pnpm publish:minigame && pnpm publish:hotupdate",
 
     "version:patch": "pnpm -r --filter='!kunpocreator' exec npm version patch",
     "version:minor": "pnpm -r --filter='!kunpocreator' exec npm version minor",

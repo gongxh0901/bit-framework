@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <displayList>
+    <component id="n0_g5jd" name="n0" src="kofe0" fileName="btns/button1.xml" xy="0,0" size="750,117">
+      <relation target="" sidePair="width-width,top-top"/>
+      <Button title="这是个header2"/>
+    </component>
+  </displayList>
+</component>

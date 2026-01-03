@@ -1,0 +1,273 @@
+{
+    "props": {
+        "customComponents": {
+            "name": "n0",
+            "idPath": "n0_73ie",
+            "namePath": "n0"
+        },
+        "btn_close": {
+            "name": "n0",
+            "idPath": "n0_73ie",
+            "namePath": "n0"
+        },
+        "t1": {
+            "name": "group22",
+            "idPath": "n10_kofe",
+            "namePath": "group22"
+        },
+        "t2": {
+            "name": "btn3",
+            "idPath": "n4_zmnj",
+            "namePath": "btn3"
+        },
+        "t4": {
+            "name": "n0",
+            "idPath": "n4_zmnj/n0_zmnj",
+            "namePath": "btn3/n0"
+        },
+        "t6": {
+            "name": "n8",
+            "idPath": "n8_p4hj",
+            "namePath": "n8"
+        },
+        "t3": {
+            "name": "btn0",
+            "idPath": "n1_zmnj",
+            "namePath": "btn0"
+        },
+        "t5": {
+            "name": "btn0",
+            "idPath": "n1_zmnj",
+            "namePath": "btn0"
+        },
+        "t7": {
+            "name": "group22",
+            "idPath": "n10_kofe",
+            "namePath": "group22"
+        },
+        "t8": {
+            "name": "n8",
+            "idPath": "n8_p4hj",
+            "namePath": "n8"
+        },
+        "t9": {
+            "name": "n7",
+            "idPath": "n7_fnoh",
+            "namePath": "n7"
+        },
+        "t10": {
+            "name": "group11",
+            "idPath": "n9_kofe",
+            "namePath": "group11"
+        },
+        "t11": {
+            "name": "group33",
+            "idPath": "n11_kofe",
+            "namePath": "group33"
+        },
+        "grauphsss": {
+            "name": "grauph",
+            "idPath": "n0_73ie",
+            "namePath": "grauph"
+        },
+        "customComponentssss": {
+            "name": "com",
+            "idPath": "n8_p4hj",
+            "namePath": "com"
+        },
+        "btn0sss": {
+            "name": "btn0",
+            "idPath": "n1_zmnj",
+            "namePath": "btn0"
+        },
+        "btn2sss": {
+            "name": "btn2",
+            "idPath": "n3_zmnj",
+            "namePath": "btn2"
+        },
+        "btn3sss": {
+            "name": "btn3",
+            "idPath": "n4_zmnj",
+            "namePath": "btn3"
+        },
+        "btn4sss": {
+            "name": "btn4",
+            "idPath": "n5_zmnj",
+            "namePath": "btn4"
+        },
+        "lab_textsss": {
+            "name": "lab_text",
+            "idPath": "n7_fnoh",
+            "namePath": "lab_text"
+        },
+        "group33sss": {
+            "name": "group33",
+            "idPath": "n11_kofe",
+            "namePath": "group33"
+        },
+        "group22sss": {
+            "name": "n0",
+            "idPath": "n0_73ie",
+            "namePath": "n0"
+        },
+        "btn_header1": {
+            "name": "btn_header1",
+            "idPath": "n1_zmnj",
+            "namePath": "btn_header1"
+        },
+        "btn_header2": {
+            "name": "btn_header2",
+            "idPath": "n12_wx4p",
+            "namePath": "btn_header2"
+        },
+        "btn_empty": {
+            "name": "btn_empty",
+            "idPath": "n3_zmnj",
+            "namePath": "btn_empty"
+        },
+        "btn_closeone": {
+            "name": "btn_closeone",
+            "idPath": "n4_zmnj",
+            "namePath": "btn_closeone"
+        },
+        "btn_closeall": {
+            "name": "btn_closeall",
+            "idPath": "n5_zmnj",
+            "namePath": "btn_closeall"
+        },
+        "btn_hideone": {
+            "name": "btn_hideone",
+            "idPath": "n13_wx4p",
+            "namePath": "btn_hideone"
+        },
+        "btn_hideall": {
+            "name": "btn_hideall",
+            "idPath": "n14_wx4p",
+            "namePath": "btn_hideall"
+        },
+        "btn_game": {
+            "name": "btn_game",
+            "idPath": "n16_cmn3",
+            "namePath": "btn_game"
+        }
+    },
+    "callbacks": {
+        "onInit": {
+            "name": "group11",
+            "idPath": "n9_kofe",
+            "namePath": "group11"
+        },
+        "onShow": {
+            "name": "group33",
+            "idPath": "n11_kofe",
+            "namePath": "group33"
+        },
+        "onClick_btn0": {
+            "name": "btn0",
+            "idPath": "n1_zmnj",
+            "namePath": "btn0"
+        },
+        "onClick_btn2": {
+            "name": "btn2",
+            "idPath": "n3_zmnj",
+            "namePath": "btn2"
+        },
+        "onClick_btn3": {
+            "name": "btn3",
+            "idPath": "n4_zmnj",
+            "namePath": "btn3"
+        },
+        "onClick_btn4": {
+            "name": "btn4",
+            "idPath": "n5_zmnj",
+            "namePath": "btn4"
+        },
+        "onClickBtnHeader1": {
+            "name": "btn_header1",
+            "idPath": "n1_zmnj",
+            "namePath": "btn_header1"
+        },
+        "onClickBtnHeader2": {
+            "name": "btn_header2",
+            "idPath": "n12_wx4p",
+            "namePath": "btn_header2"
+        },
+        "onClickBtnEmpty": {
+            "name": "btn_empty",
+            "idPath": "n3_zmnj",
+            "namePath": "btn_empty"
+        },
+        "onClickBtnCloseOne": {
+            "name": "btn_closeone",
+            "idPath": "n4_zmnj",
+            "namePath": "btn_closeone"
+        },
+        "onClickBtnCloseAll": {
+            "name": "btn_closeall",
+            "idPath": "n5_zmnj",
+            "namePath": "btn_closeall"
+        },
+        "onClickBtnHideOne": {
+            "name": "btn_hideone",
+            "idPath": "n13_wx4p",
+            "namePath": "btn_hideone"
+        },
+        "onClickBtnHideAll": {
+            "name": "btn_hideall",
+            "idPath": "n14_wx4p",
+            "namePath": "btn_hideall"
+        },
+        "onClickBtnGame": {
+            "name": "btn_game",
+            "idPath": "n16_cmn3",
+            "namePath": "btn_game"
+        },
+        "onClickBtnCondition": {
+            "name": "btn_condition",
+            "idPath": "n17_eiv0",
+            "namePath": "btn_condition"
+        },
+        "onClickLoadBuffer": {
+            "name": "btn_config",
+            "idPath": "n18_pldv",
+            "namePath": "btn_config"
+        },
+        "onSocketWindow": {
+            "name": "btn_socket",
+            "idPath": "n19_jwlw",
+            "namePath": "btn_socket"
+        },
+        "onClickMiniGame": {
+            "name": "btn_minigame",
+            "idPath": "n20_jevi",
+            "namePath": "btn_minigame"
+        },
+        "onClickBtnHotUpdate": {
+            "name": "btn_hotupdate",
+            "idPath": "n21_bz1o",
+            "namePath": "btn_hotupdate"
+        },
+        "onClickUI": {
+            "name": "btn_ui",
+            "idPath": "n22_sf8l",
+            "namePath": "btn_ui"
+        },
+        "onClickData": {
+            "name": "btn_data",
+            "idPath": "n23_rrvv",
+            "namePath": "btn_data"
+        }
+    },
+    "controls": {
+        "status": "status",
+        "sta2": "sta2",
+        "bookCtrl": "bookSta",
+        "resultCtrl": "resultShow",
+        "doneCtrl": "done"
+    },
+    "transitions": {
+        "t0": "t0",
+        "t1": "t1"
+    },
+    "__version__": "0.0.1"
+}

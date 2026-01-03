@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package com.kunpo.proto;
+
+message CommonMessage {
+    // 请求命令类型: 0 心跳，1 业务
+    int32 cmdCode=1;
+    // 业务路由
+    int32 protocolId=2;
+    // 业务数据
+    bytes data=3;
+    // 响应码: 0:成功, 其他为有错误
+    sint32 responseStatus=4;
+    // 错误消息、异常消息
+    string msg=5;
+    // 消息标记号；由前端请求时设置，服务器响应时会携带上
+    int32 msgId=6;
+}

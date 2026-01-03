@@ -1,0 +1,13 @@
+{
+  "name": "kunpocreator",
+  "uuid": "f5d24040-9cd4-4a5a-8559-38bf55e621f7",
+  "creator": {
+    "version": "3.8.6"
+  },
+  "dependencies": {
+    "@gongxh/bit-core": "file:../bit-core",
+    "@gongxh/bit-ui": "file:../bit-ui",
+    "fairygui-cc": "^1.2.2",
+    "ts-node": "^10.9.2"
+  }
+}

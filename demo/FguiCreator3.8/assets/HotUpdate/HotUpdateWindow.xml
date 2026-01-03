@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <displayList>
+    <graph id="n0_73ie" name="n0" xy="0,0" size="750,1334" type="rect" lineSize="5" lineColor="#ffff0000" fillColor="#ff003333" corner="20">
+      <relation target="" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </graph>
+    <component id="n1_zmnj" name="btn_check" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="215,306" size="320,73">
+      <relation target="" sidePair="center-center,middle-middle"/>
+      <Button title="检测更新" titleFontSize="26"/>
+    </component>
+    <component id="n22_jevi" name="btn_update" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="215,437" size="320,73">
+      <relation target="" sidePair="center-center,middle-middle"/>
+      <Button title="开始更新" titleFontSize="26"/>
+    </component>
+    <component id="n24_jevi" name="btn_close" src="ukhni" fileName="btns/btn_close.xml" pkg="mkwn34a7" xy="323,1079">
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+    </component>
+    <text id="n25_74au" name="lab_version" xy="231,81" size="288,49" fontSize="36" color="#ffffff" align="center" vAlign="middle" text="当前资源版本号:1">
+      <relation target="" sidePair="center-center,top-top"/>
+    </text>
+    <text id="n26_74au" name="lab_desc" xy="25,617" size="700,228" fontSize="36" color="#ffffff" align="center" vAlign="middle" autoSize="none" text="检查中">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </text>
+  </displayList>
+</component>

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package com.kunpo.proto.test;
+
+// 用户基本信息
+message UserInfo {
+    int32 userId = 1;
+    string userName = 2;
+    string nickName = 3;
+    int32 level = 4;
+    int64 createTime = 5;
+}

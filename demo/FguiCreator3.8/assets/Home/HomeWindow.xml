@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <controller name="status" pages="0,1,1,2,2,3" selected="0"/>
+  <controller name="sta2" pages="0,,1," selected="0"/>
+  <controller name="bookSta" pages="0,,1," selected="0"/>
+  <controller name="resultShow" pages="0,,1," selected="0"/>
+  <controller name="done" pages="0,,1," selected="0"/>
+  <displayList>
+    <graph id="n0_73ie" name="n0" xy="0,0" size="750,1334" type="rect" lineSize="5" lineColor="#ffff0000" fillColor="#ff003399" corner="20">
+      <relation target="" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </graph>
+    <component id="n17_eiv0" name="btn_condition" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="215,644" size="320,73">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="条件显示节点" titleFontSize="26"/>
+    </component>
+    <component id="n18_pldv" name="btn_config" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="215,547" size="320,73">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="加载二进制数据表" titleFontSize="26"/>
+    </component>
+    <component id="n19_jwlw" name="btn_socket" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="215,450" size="320,73">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="socket测试" titleFontSize="26"/>
+    </component>
+    <component id="n20_jevi" name="btn_minigame" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="215,353" size="320,73">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="小游戏接口测试" titleFontSize="26"/>
+    </component>
+    <component id="n21_bz1o" name="btn_hotupdate" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="215,256" size="320,73">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="热更新测试" titleFontSize="26"/>
+    </component>
+    <component id="n22_sf8l" name="btn_ui" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="215,158" size="320,73">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="界面功能" titleFontSize="26"/>
+    </component>
+    <component id="n23_rrvv" name="btn_data" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="215,738" size="320,73">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="数据更新" titleFontSize="26"/>
+    </component>
+  </displayList>
+  <transition name="t0"/>
+  <transition name="t1"/>
+</component>

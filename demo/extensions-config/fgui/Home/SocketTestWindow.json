@@ -1,0 +1,47 @@
+{
+    "props": {
+        "text_input": {
+            "name": "text_input",
+            "idPath": "n6_jwlw",
+            "namePath": "text_input"
+        },
+        "text_input_message": {
+            "name": "text_input_message",
+            "idPath": "n9_jwlw",
+            "namePath": "text_input_message"
+        }
+    },
+    "callbacks": {
+        "onCloseWindow": {
+            "name": "btn_close",
+            "idPath": "n2_fnoh",
+            "namePath": "btn_close"
+        },
+        "onDisconnect": {
+            "name": "btn_stop",
+            "idPath": "n5_jwlw",
+            "namePath": "btn_stop"
+        },
+        "onConnection": {
+            "name": "btn_start",
+            "idPath": "n3_jwlw",
+            "namePath": "btn_start"
+        },
+        "onSend": {
+            "name": "btn_send",
+            "idPath": "n4_jwlw",
+            "namePath": "btn_send"
+        },
+        "onSendText": {
+            "name": "btn_send",
+            "idPath": "n4_jwlw",
+            "namePath": "btn_send"
+        },
+        "onSendBinary": {
+            "name": "btn_send_protobuf",
+            "idPath": "n10_fxlq",
+            "namePath": "btn_send_protobuf"
+        }
+    },
+    "__version__": "0.0.1"
+}

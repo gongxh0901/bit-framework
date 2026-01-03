@@ -1,0 +1,80 @@
+{
+  "__version__": "1.3.9",
+  "bundleConfig": {
+    "custom": {
+      "default": {
+        "displayName": "i18n:builder.asset_bundle.defaultConfig",
+        "configs": {
+          "native": {
+            "preferredOptions": {
+              "isRemote": false,
+              "compressionType": "merge_all_json"
+            }
+          },
+          "web": {
+            "preferredOptions": {
+              "isRemote": false,
+              "compressionType": "merge_dep"
+            },
+            "fallbackOptions": {
+              "compressionType": "merge_dep"
+            }
+          },
+          "miniGame": {
+            "fallbackOptions": {
+              "isRemote": true,
+              "compressionType": "merge_all_json"
+            },
+            "configMode": "fallback",
+            "overwriteSettings": {
+              "alipay-mini-game": {
+                "isRemote": true,
+                "compressionType": "merge_all_json"
+              },
+              "bytedance-mini-game": {
+                "isRemote": true,
+                "compressionType": "merge_all_json"
+              },
+              "fb-instant-games": {
+                "isRemote": true,
+                "compressionType": "merge_all_json"
+              },
+              "huawei-quick-game": {
+                "isRemote": true,
+                "compressionType": "merge_all_json"
+              },
+              "migu-mini-game": {
+                "isRemote": false,
+                "compressionType": "merge_all_json"
+              },
+              "oppo-mini-game": {
+                "isRemote": true,
+                "compressionType": "merge_all_json"
+              },
+              "taobao-mini-game": {
+                "isRemote": true,
+                "compressionType": "merge_all_json"
+              },
+              "vivo-mini-game": {
+                "isRemote": true,
+                "compressionType": "merge_all_json"
+              },
+              "wechatgame": {
+                "isRemote": true,
+                "compressionType": "merge_all_json"
+              },
+              "xiaomi-quick-game": {
+                "isRemote": true,
+                "compressionType": "merge_all_json"
+              },
+              "taobao-creative-app": {
+                "isRemote": true,
+                "compressionType": "merge_all_json"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

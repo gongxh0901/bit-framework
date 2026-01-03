@@ -1,0 +1,21 @@
+{
+    "props": {
+        "toast": {
+            "name": "toast",
+            "idPath": "n1_e679",
+            "namePath": "toast"
+        },
+        "labTips": {
+            "name": "labTips",
+            "idPath": "n1_e679/n0_8ej8",
+            "namePath": "toast/labTips"
+        },
+        "bgMask": {
+            "name": "bgMask",
+            "idPath": "n2_q3s0",
+            "namePath": "bgMask"
+        }
+    },
+    "callbacks": {},
+    "__version__": "0.0.1"
+}

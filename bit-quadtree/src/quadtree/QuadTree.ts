@@ -199,7 +199,7 @@ export class QuadTree {
      * 检索功能：
      * 给出一个物体对象，该函数负责将该物体可能发生碰撞的所有物体选取出来。该函数先查找物体所属的象限，该象限下的物体都是有可能发生碰撞的，然后再递归地查找子象限...
      */
-    public collide(shape: IShape, binaryMask: number = -1, result: IShape[] = null): IShape[] {
+    public query(shape: IShape, binaryMask: number = -1, result: IShape[] = null): IShape[] {
         if (!result) {
             result = [];
             result.length = 0;
@@ -216,10 +216,10 @@ export class QuadTree {
             if (quadrant === Quadrant.MORE) {
                 // 遍历所有子象限
                 for (let i = this._trees.length - 1; i >= 0; i--) {
-                    this._trees[i].collide(shape, binaryMask, result);
+                    this._trees[i].query(shape, binaryMask, result);
                 }
             } else {
-                this._trees[quadrant].collide(shape, binaryMask, result);
+                this._trees[quadrant].query(shape, binaryMask, result);
             }
         }
 

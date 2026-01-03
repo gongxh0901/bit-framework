@@ -1,0 +1,11 @@
+{
+    "props": {
+        "lab_desc": {
+            "name": "lab_tips",
+            "idPath": "n1_tihq",
+            "namePath": "lab_tips"
+        }
+    },
+    "callbacks": {},
+    "__version__": "0.0.1"
+}

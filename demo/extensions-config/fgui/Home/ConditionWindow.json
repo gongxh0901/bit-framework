@@ -1,0 +1,62 @@
+{
+    "props": {
+        "reddot1": {
+            "name": "reddot1",
+            "idPath": "n7_eiv0",
+            "namePath": "reddot1"
+        },
+        "reddot2": {
+            "name": "reddot2",
+            "idPath": "n8_eiv0",
+            "namePath": "reddot2"
+        },
+        "btn_condition1": {
+            "name": "btn_condition1",
+            "idPath": "n9_eiv0",
+            "namePath": "btn_condition1"
+        },
+        "btn_condition2": {
+            "name": "btn_condition2",
+            "idPath": "n10_eiv0",
+            "namePath": "btn_condition2"
+        },
+        "btn_condition3": {
+            "name": "btn_condition3",
+            "idPath": "n11_eiv0",
+            "namePath": "btn_condition3"
+        },
+        "btn_condition4": {
+            "name": "btn_condition4",
+            "idPath": "n12_eiv0",
+            "namePath": "btn_condition4"
+        }
+    },
+    "callbacks": {
+        "onClickBtnClose": {
+            "name": "btn_close",
+            "idPath": "n4_fnoh",
+            "namePath": "btn_close"
+        },
+        "onClickBtnCondition1": {
+            "name": "btn_condition1",
+            "idPath": "n9_eiv0",
+            "namePath": "btn_condition1"
+        },
+        "onClickBtnCondition2": {
+            "name": "btn_condition2",
+            "idPath": "n10_eiv0",
+            "namePath": "btn_condition2"
+        },
+        "onClickBtnCondition3": {
+            "name": "btn_condition3",
+            "idPath": "n11_eiv0",
+            "namePath": "btn_condition3"
+        },
+        "onClickBtnCondition4": {
+            "name": "btn_condition4",
+            "idPath": "n12_eiv0",
+            "namePath": "btn_condition4"
+        }
+    },
+    "__version__": "0.0.1"
+}

@@ -1,0 +1,99 @@
+{
+    "props": {
+        "btn_closeOne": {
+            "name": "btn_closeone",
+            "idPath": "n4_zmnj",
+            "namePath": "btn_closeone"
+        },
+        "btn_closeAll": {
+            "name": "btn_closeall",
+            "idPath": "n5_zmnj",
+            "namePath": "btn_closeall"
+        }
+    },
+    "callbacks": {
+        "onClickBtnHeader1": {
+            "name": "btn_header1",
+            "idPath": "n1_zmnj",
+            "namePath": "btn_header1"
+        },
+        "onClickBtnHeader2": {
+            "name": "btn_header2",
+            "idPath": "n12_wx4p",
+            "namePath": "btn_header2"
+        },
+        "onClickBtnCloseOne": {
+            "name": "btn_closeone",
+            "idPath": "n4_zmnj",
+            "namePath": "btn_closeone"
+        },
+        "onClickBtnCloseAll": {
+            "name": "btn_closeall",
+            "idPath": "n5_zmnj",
+            "namePath": "btn_closeall"
+        },
+        "onClickBtnHideOne": {
+            "name": "btn_hideone",
+            "idPath": "n13_wx4p",
+            "namePath": "btn_hideone"
+        },
+        "onClickBtnHideAll": {
+            "name": "btn_hideall",
+            "idPath": "n14_wx4p",
+            "namePath": "btn_hideall"
+        },
+        "onClickBtnEmpty": {
+            "name": "btn_empty",
+            "idPath": "n3_zmnj",
+            "namePath": "btn_empty"
+        },
+        "onClickBtnClose": {
+            "name": "btn_close",
+            "idPath": "n22_sf8l",
+            "namePath": "btn_close"
+        },
+        "onClickSameItem": {
+            "name": "btn_sameitem",
+            "idPath": "n23_h2xj",
+            "namePath": "btn_sameitem"
+        },
+        "onCloseOne": {
+            "name": "btn_closeone",
+            "idPath": "n4_zmnj",
+            "namePath": "btn_closeone"
+        },
+        "onCloseAll": {
+            "name": "btn_closeall",
+            "idPath": "n5_zmnj",
+            "namePath": "btn_closeall"
+        },
+        "onCloseSelf": {
+            "name": "btn_close",
+            "idPath": "n22_sf8l",
+            "namePath": "btn_close"
+        },
+        "onNormalWindow1": {
+            "name": "btn_normal1",
+            "idPath": "n24_j2i4",
+            "namePath": "btn_normal1"
+        },
+        "onNormalWindow2": {
+            "name": "btn_normal2",
+            "idPath": "n25_j2i4",
+            "namePath": "btn_normal2"
+        },
+        "onHideOneWindow": {
+            "name": "btn_hideone",
+            "idPath": "n13_wx4p",
+            "namePath": "btn_hideone"
+        },
+        "onHideAllWindow": {
+            "name": "btn_hideall",
+            "idPath": "n14_wx4p",
+            "namePath": "btn_hideall"
+        }
+    },
+    "controls": {},
+    "transitions": {},
+    "__version__": "0.0.1"
+}

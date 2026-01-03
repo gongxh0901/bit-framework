@@ -1,0 +1,74 @@
+{
+    "props": {
+        "lab_level": {
+            "name": "lab_level",
+            "idPath": "n28_rrvv",
+            "namePath": "lab_level"
+        },
+        "lab_storey": {
+            "name": "lab_storey",
+            "idPath": "n29_rrvv",
+            "namePath": "lab_storey"
+        },
+        "lab_ispassed": {
+            "name": "lab_bool",
+            "idPath": "n30_rrvv",
+            "namePath": "lab_bool"
+        },
+        "lab_min": {
+            "name": "lab_datamin",
+            "idPath": "n31_rrvv",
+            "namePath": "lab_datamin"
+        },
+        "lab_max": {
+            "name": "lab_datamax",
+            "idPath": "n32_rrvv",
+            "namePath": "lab_datamax"
+        }
+    },
+    "callbacks": {
+        "onRefreshLevel": {
+            "name": "btn_refresh_level",
+            "idPath": "n1_zmnj",
+            "namePath": "btn_refresh_level"
+        },
+        "onRefreshStorey": {
+            "name": "btn_refresh_storey",
+            "idPath": "n23_rrvv",
+            "namePath": "btn_refresh_storey"
+        },
+        "onRefreshBool": {
+            "name": "btn_refresh_bool",
+            "idPath": "n24_rrvv",
+            "namePath": "btn_refresh_bool"
+        },
+        "onRefreshData": {
+            "name": "btn_refresh_data",
+            "idPath": "n25_rrvv",
+            "namePath": "btn_refresh_data"
+        },
+        "onRefreshMin": {
+            "name": "btn_refresh_min",
+            "idPath": "n26_rrvv",
+            "namePath": "btn_refresh_min"
+        },
+        "onRefreshMax": {
+            "name": "btn_refresh_max",
+            "idPath": "n33_gsjf",
+            "namePath": "btn_refresh_max"
+        },
+        "onRefreshAll": {
+            "name": "btn_refresh_all",
+            "idPath": "n27_rrvv",
+            "namePath": "btn_refresh_all"
+        },
+        "onTouchClose": {
+            "name": "btn_close",
+            "idPath": "n22_sf8l",
+            "namePath": "btn_close"
+        }
+    },
+    "controls": {},
+    "transitions": {},
+    "__version__": "0.0.1"
+}

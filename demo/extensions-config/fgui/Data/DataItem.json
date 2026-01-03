@@ -1,0 +1,13 @@
+{
+    "props": {
+        "lab_level": {
+            "name": "lab_level",
+            "idPath": "n1_c2y1",
+            "namePath": "lab_level"
+        }
+    },
+    "callbacks": {},
+    "controls": {},
+    "transitions": {},
+    "__version__": "0.0.1"
+}

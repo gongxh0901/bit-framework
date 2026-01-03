@@ -1,0 +1,18 @@
+{
+    "props": {
+        "loader": {
+            "name": "loader",
+            "idPath": "n1_fchf",
+            "namePath": "loader"
+        },
+        "lab_desc": {
+            "name": "lab_desc",
+            "idPath": "n1_fchf",
+            "namePath": "lab_desc"
+        }
+    },
+    "callbacks": {},
+    "controls": {},
+    "transitions": {},
+    "__version__": "0.0.1"
+}

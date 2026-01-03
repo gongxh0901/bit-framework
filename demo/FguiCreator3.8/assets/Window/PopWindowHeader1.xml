@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <displayList>
+    <graph id="n0_73ie" name="n0" xy="25,265" size="700,804" type="rect" lineSize="5" fillColor="#ff666666" corner="20">
+      <relation target="" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </graph>
+    <image id="n1_dj6b" name="n1" src="sf8l5" fileName="image/Icon-60@2x.png" xy="315,607">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </image>
+    <component id="n2_fnoh" name="btn_close" src="ukhni" fileName="btns/btn_close.xml" pkg="mkwn34a7" xy="631,248">
+      <relation target="n0_73ie" sidePair="right-right,top-top"/>
+    </component>
+  </displayList>
+</component>

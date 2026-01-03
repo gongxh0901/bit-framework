@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="mkwn34a7">
+  <resources>
+    <component id="kofe0" name="button1.xml" path="/btns/" exported="true"/>
+    <image id="kofe1" name="image_button1.png" path="/btns/" scale="9grid" scale9grid="32,30,3,5"/>
+    <component id="kofe2" name="Slider1_grip.xml" path="/btns/"/>
+    <component id="kofe3" name="Slider1.xml" path="/btns/"/>
+    <component id="kofe4" name="ProgressBar1.xml" path="/btns/"/>
+    <component id="kofe5" name="ComboBox1_item.xml" path="/btns/"/>
+    <component id="kofe6" name="ComboBox1_popup.xml" path="/btns/"/>
+    <component id="kofe7" name="ComboBox1.xml" path="/btns/" exported="true"/>
+    <component id="kofe8" name="Label1.xml" path="/btns/"/>
+    <font id="kofe9" name="Font1.fnt" path="/btns/" exported="true"/>
+    <movieclip id="kofea" name="MovieClip1.jta" path="/btns/"/>
+    <component id="g5jdb" name="WindowHeader1.xml" path="/header/" exported="true"/>
+    <component id="wx4pc" name="WindowHeader2.xml" path="/header/" exported="true"/>
+    <component id="qphyd" name="empty.xml" path="/" exported="true"/>
+    <component id="ebfme" name="LoadUIWindow.xml" path="/load/" exported="true"/>
+    <image id="ebfmf" name="image_net_wait.png" path="/load/"/>
+    <component id="ukhnh" name="AlertWindow.xml" path="/window/" exported="true"/>
+    <component id="ukhni" name="btn_close.xml" path="/btns/" exported="true"/>
+    <image id="ukhnj" name="image_button_close.png" path="/btns/"/>
+    <component id="gukgk" name="ToastWindow.xml" path="/window/" exported="true"/>
+    <image id="gukgl" name="image_toastbg.png" path="/window/toast/"/>
+    <component id="gukgm" name="toast.xml" path="/window/toast/"/>
+    <image id="gukgn" name="image_black.png" path="/image/" scale="9grid" scale9grid="4,4,2,2"/>
+    <component id="fchfo" name="Item1.xml" path="/" exported="true"/>
+  </resources>
+  <publish name="" path="../assets/resources/ui/manual" packageCount="2"/>
+</packageDescription>

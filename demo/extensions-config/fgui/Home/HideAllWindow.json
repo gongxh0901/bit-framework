@@ -1,0 +1,17 @@
+{
+    "props": {
+        "btn_close": {
+            "name": "btn_close",
+            "idPath": "n4_fnoh",
+            "namePath": "btn_close"
+        }
+    },
+    "callbacks": {
+        "onClickBtnClose": {
+            "name": "btn_close",
+            "idPath": "n4_fnoh",
+            "namePath": "btn_close"
+        }
+    },
+    "__version__": "0.0.1"
+}

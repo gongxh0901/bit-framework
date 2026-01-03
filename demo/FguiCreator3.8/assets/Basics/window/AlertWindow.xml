@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334" pivot="0.5,0.5" designImageAlpha="30" designImageLayer="1">
+  <displayList>
+    <graph id="n0_eqwn" name="bg" xy="36,416" size="678,500" type="rect" lineSize="3" fillColor="#ff999999" corner="20">
+      <relation target="" sidePair="center-center,middle-middle"/>
+      <relation target="n4_eqwn" sidePair="height-height"/>
+    </graph>
+    <component id="n3_eqwn" name="btn_close" src="ukhni" fileName="btns/btn_close.xml" xy="626,394">
+      <relation target="n0_eqwn" sidePair="right-right,top-top"/>
+    </component>
+    <component id="n10_jtaa" name="btn_cancel" src="kofe0" fileName="btns/button1.xml" xy="211,802">
+      <relation target="n0_eqwn" sidePair="center-center,bottom-bottom"/>
+    </component>
+    <component id="n9_kjg6" name="btn_ok" src="kofe0" fileName="btns/button1.xml" xy="433,802" size="126,73">
+      <relation target="n0_eqwn" sidePair="center-center,bottom-bottom"/>
+    </component>
+    <text id="n2_eqwn" name="lab_title" xy="375,471" pivot="0.5,0.5" anchor="true" size="210,64" fontSize="48" color="#ffffff" align="center" vAlign="middle" autoSize="shrink" strokeColor="#000000" strokeSize="2" shadowColor="#000000" shadowOffset="0,3" singleLine="true" text="标题">
+      <relation target="n0_eqwn" sidePair="center-center,top-top"/>
+    </text>
+    <text id="n4_eqwn" name="lab_content" xy="85,571" size="580,157" fontSize="36" color="#ffffff" align="center" vAlign="middle" leading="10" letterSpacing="2" autoSize="height" strokeColor="#000000" strokeSize="2" shadowColor="#000000" shadowOffset="0,2" text="这是描述内容这是描述内容这是描述内容这是描述内容这是描述内容描述内容描述内容">
+      <relation target="n0_eqwn" sidePair="center-center,middle-middle"/>
+    </text>
+  </displayList>
+  <transition name="open" options="2" autoPlay="true" frameRate="30">
+    <item time="0" type="Scale" tween="true" startValue="0,0" endValue="1,1" duration="9" ease="Back.Out"/>
+  </transition>
+</component>

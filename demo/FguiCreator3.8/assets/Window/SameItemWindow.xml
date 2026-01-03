@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <displayList>
+    <graph id="n2_fnoh" name="n2" xy="43,362" size="663,610" type="rect" lineSize="5" fillColor="#ff666666" corner="20">
+      <relation target="" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </graph>
+    <component id="n4_fnoh" name="btn_close" src="ukhni" fileName="btns/btn_close.xml" pkg="mkwn34a7" xy="612,343">
+      <relation target="n2_fnoh" sidePair="right-right,top-top"/>
+    </component>
+    <component id="n5_h2xj" name="n5" src="fchfo" fileName="Item1.xml" pkg="mkwn34a7" xy="225,451">
+      <relation target="n2_fnoh" sidePair="center-center,middle-middle"/>
+    </component>
+    <component id="n6_h2xj" name="n6" src="fchfx" fileName="Item1.xml" xy="225,678">
+      <relation target="n2_fnoh" sidePair="center-center,middle-middle"/>
+    </component>
+  </displayList>
+</component>

@@ -1,0 +1,37 @@
+{
+    "props": {
+        "btn_close": {
+            "name": "btn_close",
+            "idPath": "n24_jevi",
+            "namePath": "btn_close"
+        },
+        "lab_version": {
+            "name": "lab_version",
+            "idPath": "n25_74au",
+            "namePath": "lab_version"
+        },
+        "lab_desc": {
+            "name": "lab_desc",
+            "idPath": "n26_74au",
+            "namePath": "lab_desc"
+        }
+    },
+    "callbacks": {
+        "onCheckUpdate": {
+            "name": "btn_check",
+            "idPath": "n1_zmnj",
+            "namePath": "btn_check"
+        },
+        "onStartUpdate": {
+            "name": "btn_update",
+            "idPath": "n22_jevi",
+            "namePath": "btn_update"
+        },
+        "onClickClose": {
+            "name": "btn_close",
+            "idPath": "n24_jevi",
+            "namePath": "btn_close"
+        }
+    },
+    "__version__": "0.0.1"
+}

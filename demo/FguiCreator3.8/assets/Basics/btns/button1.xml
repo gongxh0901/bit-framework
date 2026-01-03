@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="126,73" pivot="0.5,0.5" extention="Button">
+  <controller name="button" pages="0,up,1,down" selected="0"/>
+  <displayList>
+    <image id="n0_zmnj" name="n0" src="kofe1" fileName="btns/image_button1.png" xy="0,0" size="126,73">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <text id="n2_zmnj" name="title" xy="27,11" size="72,46" fontSize="34" color="#ffffff" align="center" vAlign="middle" strokeColor="#000000" strokeSize="3" text="文本">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </text>
+  </displayList>
+  <Button downEffect="scale" downEffectValue=".95"/>
+</component>

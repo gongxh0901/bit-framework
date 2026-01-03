@@ -1,0 +1,11 @@
+{
+    "props": {
+        "n1": {
+            "name": "n1",
+            "idPath": "n1_hg37",
+            "namePath": "n1"
+        }
+    },
+    "callbacks": {},
+    "__version__": "0.0.1"
+}

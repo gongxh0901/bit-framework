@@ -1,0 +1,52 @@
+{
+    "props": {
+        "bg": {
+            "name": "bg",
+            "idPath": "n0_eqwn",
+            "namePath": "bg"
+        },
+        "btn_close": {
+            "name": "btn_close",
+            "idPath": "n3_eqwn",
+            "namePath": "btn_close"
+        },
+        "btn_ok": {
+            "name": "btn_ok",
+            "idPath": "n9_kjg6",
+            "namePath": "btn_ok"
+        },
+        "btn_cancel": {
+            "name": "btn_cancel",
+            "idPath": "n10_jtaa",
+            "namePath": "btn_cancel"
+        },
+        "lab_title": {
+            "name": "lab_title",
+            "idPath": "n2_eqwn",
+            "namePath": "lab_title"
+        },
+        "lab_content": {
+            "name": "lab_content",
+            "idPath": "n4_eqwn",
+            "namePath": "lab_content"
+        }
+    },
+    "callbacks": {
+        "onClickBtnClose": {
+            "name": "btn_close",
+            "idPath": "n3_eqwn",
+            "namePath": "btn_close"
+        },
+        "onClickBtnCancel": {
+            "name": "btn_cancel",
+            "idPath": "n10_jtaa",
+            "namePath": "btn_cancel"
+        },
+        "onClickBtnOk": {
+            "name": "btn_ok",
+            "idPath": "n9_kjg6",
+            "namePath": "btn_ok"
+        }
+    },
+    "__version__": "0.0.1"
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="150,150">
+  <displayList>
+    <graph id="n0_c2y1" name="n0" xy="0,0" size="150,150" type="rect">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n1_c2y1" name="lab_level" xy="0,0" size="150,150" fontSize="36" align="center" vAlign="middle" autoSize="shrink" bold="true" text="组件">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </text>
+  </displayList>
+</component>

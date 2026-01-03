@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <displayList>
+    <graph id="n2_fnoh" name="n2" xy="43,362" size="663,610" type="rect" lineSize="5" fillColor="#ff666666" corner="20">
+      <relation target="" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </graph>
+    <text id="n3_fnoh" name="n3" xy="223,627" size="304,79" fontSize="60" color="#ffffff" align="center" vAlign="middle" text="隐藏前一个">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </text>
+    <component id="n4_fnoh" name="btn_close" src="ukhni" fileName="btns/btn_close.xml" pkg="mkwn34a7" xy="612,343">
+      <relation target="n2_fnoh" sidePair="right-right,top-top"/>
+    </component>
+  </displayList>
+</component>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <controller name="status" pages="0,none,1,connect" selected="0"/>
+  <displayList>
+    <graph id="n0_73ie" name="n0" xy="25,67" size="700,1200" type="rect" lineSize="5" fillColor="#ff666666" corner="20">
+      <relation target="" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </graph>
+    <component id="n2_fnoh" name="btn_close" src="ukhni" fileName="btns/btn_close.xml" pkg="mkwn34a7" xy="631,50">
+      <relation target="n0_73ie" sidePair="right-right,top-top"/>
+    </component>
+    <component id="n5_jwlw" name="btn_stop" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="220,411" size="310,87" touchable="false" grayed="true">
+      <gearLook controller="status" pages="0" values="1,0,1,0" default="1,0,0,1"/>
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+      <Button title="断开连接"/>
+    </component>
+    <component id="n3_jwlw" name="btn_start" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="220,295" size="310,87">
+      <gearLook controller="status" pages="1" values="1,0,0,1" default="1,0,0,1"/>
+      <gearText controller="status" pages="1" values="连接中" default="连接"/>
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+      <Button title="连接"/>
+    </component>
+    <component id="n4_jwlw" name="btn_send" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="398,905" size="310,87" touchable="false" grayed="true">
+      <gearLook controller="status" pages="0" values="1,0,1,0" default="1,0,0,1"/>
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+      <Button title="发送文本消息"/>
+    </component>
+    <component id="n10_fxlq" name="btn_send_protobuf" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="55,905" size="310,87" touchable="false" grayed="true">
+      <gearLook controller="status" pages="0" values="1,0,1,0" default="1,0,0,1"/>
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+      <Button title="发送二进制消息"/>
+    </component>
+    <graph id="n7_jwlw" name="n7" xy="81,168" size="588,100" type="rect" lineSize="3" corner="15">
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+    </graph>
+    <text id="n6_jwlw" name="text_input" xy="93,180" size="564,77" fontSize="36" vAlign="middle" autoSize="shrink" singleLine="true" text="" input="true" prompt="[color=#666666]请输入要连接的地址[/color]">
+      <relation target="n7_jwlw" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </text>
+    <graph id="n8_jwlw" name="n8" xy="44,521" size="661,357" type="rect" lineSize="3" corner="15">
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+    </graph>
+    <text id="n9_jwlw" name="text_input_message" xy="56,533" size="639,334" fontSize="36" autoSize="shrink" singleLine="true" text="" input="true" prompt="[color=#666666]请输入要发送的内容[/color]">
+      <relation target="n8_jwlw" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </text>
+  </displayList>
+</component>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <displayList>
+    <text id="n1_tihq" name="lab_tips" xy="278,675" size="204,44" fontSize="32" color="#ffffff" align="center" vAlign="middle" strokeColor="#000000" strokeSize="3" singleLine="true" text="资源加载中....">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </text>
+    <image id="n3_irvb" name="icon1" src="ebfmf" fileName="image_net_wait.png" xy="185,578" pivot="0.5,1" scale="0.5,0.5">
+      <relation target="n2_irvb" sidePair="middle-middle,right-left"/>
+    </image>
+    <image id="n4_irvb" name="icon2" src="ebfmf" fileName="image_net_wait.png" xy="245,578" pivot="0.5,1" scale="0.5,0.5">
+      <relation target="n2_irvb" sidePair="middle-middle,right-left"/>
+    </image>
+    <image id="n2_irvb" name="icon3" src="ebfmf" fileName="image_net_wait.png" xy="305,578" pivot="0.5,1" scale="0.5,0.5">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </image>
+    <image id="n5_irvb" name="icon4" src="ebfmf" fileName="image_net_wait.png" xy="365,578" pivot="0.5,1" scale="0.5,0.5">
+      <relation target="n2_irvb" sidePair="middle-middle,left-right"/>
+    </image>
+    <image id="n6_irvb" name="icon5" src="ebfmf" fileName="image_net_wait.png" xy="425,578" pivot="0.5,1" scale="0.5,0.5">
+      <relation target="n2_irvb" sidePair="middle-middle,left-right"/>
+    </image>
+    <image id="n7_irvb" name="icon6" src="ebfmf" fileName="image_net_wait.png" xy="485,578" pivot="0.5,1" scale="0.5,0.5">
+      <relation target="n2_irvb" sidePair="middle-middle,left-right"/>
+    </image>
+  </displayList>
+  <transition name="loop" options="2" autoPlay="true" autoPlayRepeat="-1" frameRate="60">
+    <item time="0" type="Alpha" target="n1_tihq" tween="true" startValue="1" endValue="0.5" duration="18" ease="Sine.InOut"/>
+    <item time="0" type="Scale" target="n3_irvb" tween="true" startValue="0.5,0.5" endValue="1,1" duration="6" ease="Linear"/>
+    <item time="12" type="Scale" target="n3_irvb" tween="true" startValue="1,1" endValue="0.5,0.5" duration="6" ease="Linear"/>
+    <item time="18" type="Alpha" target="n1_tihq" tween="true" startValue="0.5" endValue="1" duration="18" ease="Sine.InOut"/>
+    <item time="18" type="Scale" target="n4_irvb" tween="true" startValue="0.5,0.5" endValue="1,1" duration="6" ease="Linear"/>
+    <item time="30" type="Scale" target="n4_irvb" tween="true" startValue="1,1" endValue="0.5,0.5" duration="6" ease="Linear"/>
+    <item time="36" type="Alpha" target="n1_tihq" tween="true" startValue="1" endValue="0.5" duration="18" ease="Sine.InOut"/>
+    <item time="36" type="Scale" target="n2_irvb" tween="true" startValue="0.5,0.5" endValue="1,1" duration="6" ease="Linear"/>
+    <item time="48" type="Scale" target="n2_irvb" tween="true" startValue="1,1" endValue="0.5,0.5" duration="6" ease="Linear"/>
+    <item time="54" type="Alpha" target="n1_tihq" tween="true" startValue="0.5" endValue="1" duration="18" ease="Sine.InOut"/>
+    <item time="54" type="Scale" target="n5_irvb" value="0.5,0.5"/>
+    <item time="54" type="Scale" target="n5_irvb" tween="true" startValue="0.5,0.5" endValue="1,1" duration="6" ease="Linear"/>
+    <item time="66" type="Scale" target="n5_irvb" tween="true" startValue="1,1" endValue="0.5,0.5" duration="6" ease="Linear"/>
+    <item time="72" type="Alpha" target="n1_tihq" tween="true" startValue="1" endValue="0.5" duration="18" ease="Sine.InOut"/>
+    <item time="72" type="Scale" target="n6_irvb" value="0.5,0.5"/>
+    <item time="72" type="Scale" target="n6_irvb" tween="true" startValue="0.5,0.5" endValue="1,1" duration="6" ease="Linear"/>
+    <item time="84" type="Scale" target="n6_irvb" tween="true" startValue="1,1" endValue="0.5,0.5" duration="6" ease="Linear"/>
+    <item time="90" type="Alpha" target="n1_tihq" tween="true" startValue="0.5" endValue="1" duration="18" ease="Sine.InOut"/>
+    <item time="90" type="Scale" target="n7_irvb" tween="true" startValue="0.5,0.5" endValue="1,1" duration="6" ease="Linear"/>
+    <item time="102" type="Scale" target="n7_irvb" tween="true" startValue="1,1" endValue="0.5,0.5" duration="6" ease="Linear"/>
+  </transition>
+  <transition name="open" options="2" autoPlay="true" frameRate="60">
+    <item time="0" type="Alpha" value="0"/>
+    <item time="6" type="Alpha" tween="true" startValue="0" endValue="1" duration="6" ease="Linear"/>
+  </transition>
+</component>

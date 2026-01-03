@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="n43z7yae">
+  <resources>
+    <component id="sf8l0" name="ConditionWindow.xml" path="/" exported="true"/>
+    <component id="sf8l1" name="item_reddot.xml" path="/image/"/>
+    <image id="sf8l2" name="image_reddot_bg.png" path="/image/"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>

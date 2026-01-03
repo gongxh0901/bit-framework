@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="42,42" pivot="0.5,0.5">
+  <displayList>
+    <image id="n17_wjpd" name="img" src="sf8l2" fileName="image/image_reddot_bg.png" xy="0,0" pivot="0.5,0.5">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+  </displayList>
+  <transition name="normal" options="2" autoPlay="true" autoPlayRepeat="-1" frameRate="30">
+    <item time="0" type="Scale" target="n17_wjpd" tween="true" startValue="1,1" endValue="0.85,0.85" duration="6"/>
+    <item time="6" type="Scale" target="n17_wjpd" tween="true" startValue="0.85,0.85" endValue="1.1,1.1" duration="12"/>
+    <item time="18" type="Scale" target="n17_wjpd" tween="true" startValue="1.1,1.1" endValue="1,1" duration="6"/>
+  </transition>
+</component>

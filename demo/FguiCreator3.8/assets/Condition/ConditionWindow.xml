@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <displayList>
+    <graph id="n2_fnoh" name="n2" xy="30,45" size="690,1243" type="rect" lineSize="5" fillColor="#ff666666" corner="20">
+      <relation target="" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </graph>
+    <component id="n4_fnoh" name="btn_close" src="ukhni" fileName="btns/btn_close.xml" pkg="mkwn34a7" xy="626,26">
+      <relation target="n2_fnoh" sidePair="right-right,top-top"/>
+    </component>
+    <component id="n5_eiv0" name="n5" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="57,183" size="308,99" touchable="false">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="任意条件达成显示"/>
+    </component>
+    <component id="n6_eiv0" name="n6" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="394,183" size="308,99" touchable="false">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="所有条件达成显示"/>
+    </component>
+    <component id="n7_eiv0" name="reddot1" src="sf8l1" fileName="image/item_reddot.xml" xy="336,170">
+      <relation target="n5_eiv0" sidePair="right-right,top-top"/>
+    </component>
+    <component id="n8_eiv0" name="reddot2" src="sf8l1" fileName="image/item_reddot.xml" xy="669,169">
+      <relation target="n6_eiv0" sidePair="right-right,top-top"/>
+    </component>
+    <component id="n9_eiv0" name="btn_condition1" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="150,700" size="450,99">
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+      <Button title="条件1"/>
+    </component>
+    <component id="n10_eiv0" name="btn_condition2" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="150,824" size="450,99">
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+      <Button title="条件2"/>
+    </component>
+    <component id="n11_eiv0" name="btn_condition3" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="150,948" size="450,99">
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+      <Button title="条件3"/>
+    </component>
+    <component id="n12_eiv0" name="btn_condition4" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="150,1072" size="450,99">
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+      <Button title="条件4"/>
+    </component>
+  </displayList>
+</component>

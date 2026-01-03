@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="nu4s9n4y">
+  <resources>
+    <component id="sf8l0" name="CloseAllWindow.xml" path="/" exported="true"/>
+    <component id="sf8l1" name="CloseOneWindow.xml" path="/" exported="true"/>
+    <component id="sf8l2" name="HideAllWindow.xml" path="/" exported="true"/>
+    <component id="sf8l3" name="HideOneWindow.xml" path="/" exported="true"/>
+    <component id="sf8l4" name="PopWindow.xml" path="/" exported="true"/>
+    <image id="sf8l5" name="Icon-60@2x.png" path="/image/"/>
+    <component id="sf8l6" name="PopWindowHeader1.xml" path="/" exported="true"/>
+    <component id="sf8l7" name="PopWindowHeader2.xml" path="/" exported="true"/>
+    <component id="sf8l8" name="UIBaseWindow.xml" path="/" exported="true"/>
+    <component id="sf8lw" name="CustomComponents.xml" path="/"/>
+    <component id="fchfx" name="Item1.xml" path="/"/>
+    <component id="h2xjy" name="SameItemWindow.xml" path="/" exported="true"/>
+    <component id="j2i4z" name="NormalWindow1.xml" path="/" exported="true"/>
+    <component id="j2i410" name="NormalWindow2.xml" path="/" exported="true"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>

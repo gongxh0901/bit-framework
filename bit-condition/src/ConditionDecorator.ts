@@ -16,7 +16,7 @@ export namespace _conditionDecorator {
      * 条件装饰器
      * @param {number} conditionType 条件类型
      */
-    export function conditionClass(conditionType: number): Function {
+    export function condition(conditionType: number): Function {
         /** target 类的构造函数 */
         return function (ctor: any): void {
             cdClassMap.set(conditionType, ctor);

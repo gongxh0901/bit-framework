@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <displayList>
+    <graph id="n0_73ie" name="n0" xy="0,0" size="750,1334" type="rect" lineSize="5" lineColor="#ffff0000" fillColor="#ff003399" corner="20">
+      <relation target="" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </graph>
+    <component id="n13_wx4p" name="btn_hideone" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="46,77" size="320,73">
+      <relation target="" sidePair="left-left,top-top"/>
+      <Button title="隐藏前一个" titleFontSize="26"/>
+    </component>
+    <component id="n14_wx4p" name="btn_hideall" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="393,79" size="320,73">
+      <relation target="" sidePair="right-right,top-top"/>
+      <Button title="隐藏所有" titleFontSize="26"/>
+    </component>
+    <component id="n4_zmnj" name="btn_closeone" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="46,174" size="320,73">
+      <relation target="" sidePair="left-left,top-top"/>
+      <Button title="关闭前一个" titleFontSize="26"/>
+    </component>
+    <component id="n5_zmnj" name="btn_closeall" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="393,174" size="320,73">
+      <relation target="" sidePair="right-right,top-top"/>
+      <Button title="关闭所有" titleFontSize="26"/>
+    </component>
+    <component id="n24_j2i4" name="btn_normal1" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="46,274" size="320,73">
+      <relation target="" sidePair="left-left,top-top"/>
+      <Button title="正常1" titleFontSize="26"/>
+    </component>
+    <component id="n25_j2i4" name="btn_normal2" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="393,274" size="320,73">
+      <relation target="" sidePair="right-right,top-top"/>
+      <Button title="正常2" titleFontSize="26"/>
+    </component>
+    <component id="n1_zmnj" name="btn_header1" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="55,700" size="320,73">
+      <relation target="" sidePair="left-left,top-top"/>
+      <Button title="header1" titleFontSize="26"/>
+    </component>
+    <component id="n12_wx4p" name="btn_header2" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="403,699" size="320,73">
+      <relation target="" sidePair="left-left,top-top"/>
+      <Button title="header2" titleFontSize="26"/>
+    </component>
+    <component id="n3_zmnj" name="btn_empty" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="60,814" size="320,73">
+      <relation target="" sidePair="left-left,top-top"/>
+      <Button title="没有header" titleFontSize="26"/>
+    </component>
+    <component id="n22_sf8l" name="btn_close" src="ukhni" fileName="btns/btn_close.xml" pkg="mkwn34a7" xy="323,1154">
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+    </component>
+    <component id="n23_h2xj" name="btn_sameitem" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="405,818" size="320,73">
+      <relation target="" sidePair="left-left,top-top"/>
+      <Button title="同名组件测试" titleFontSize="26"/>
+    </component>
+  </displayList>
+</component>

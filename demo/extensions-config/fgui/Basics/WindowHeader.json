@@ -1,0 +1,11 @@
+{
+    "props": {
+        "btn_close": {
+            "name": "n0",
+            "idPath": "n0_g5jd",
+            "namePath": "n0"
+        }
+    },
+    "callbacks": {},
+    "__version__": "0.0.1"
+}

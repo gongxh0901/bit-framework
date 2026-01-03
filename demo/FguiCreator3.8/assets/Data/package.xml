@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="87hfwn3d">
+  <resources>
+    <component id="rrvv1" name="DataWindow.xml" path="/" exported="true"/>
+    <component id="c2y12" name="DataItem.xml" path="/"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>

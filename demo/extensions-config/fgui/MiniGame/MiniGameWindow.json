@@ -1,0 +1,37 @@
+{
+    "props": {
+        "btn_close": {
+            "name": "btn_close",
+            "idPath": "n24_jevi",
+            "namePath": "btn_close"
+        },
+        "lab_adid": {
+            "name": "lab_adid",
+            "idPath": "n25_jevi",
+            "namePath": "lab_adid"
+        },
+        "lab_payQuantity": {
+            "name": "lab_pay",
+            "idPath": "n28_jevi",
+            "namePath": "lab_pay"
+        }
+    },
+    "callbacks": {
+        "onClickBtnPay": {
+            "name": "btn_pay",
+            "idPath": "n22_jevi",
+            "namePath": "btn_pay"
+        },
+        "onClickBtnInitAds": {
+            "name": "btn_ads",
+            "idPath": "n1_zmnj",
+            "namePath": "btn_ads"
+        },
+        "onClickBtnClose": {
+            "name": "btn_close",
+            "idPath": "n24_jevi",
+            "namePath": "btn_close"
+        }
+    },
+    "__version__": "0.0.1"
+}

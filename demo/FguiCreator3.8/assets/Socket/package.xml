@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="ni6vjfub">
+  <resources>
+    <component id="jwlwu" name="SocketTestWindow.xml" path="/" exported="true"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>

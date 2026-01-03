@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="750,1334">
+  <displayList>
+    <graph id="n0_73ie" name="n0" xy="0,0" size="750,1334" type="rect" lineSize="5" lineColor="#ffff0000" fillColor="#ff003333" corner="20">
+      <relation target="" sidePair="width-width,height-height,center-center,middle-middle"/>
+    </graph>
+    <text id="n21_jevi" name="lab_title" xy="247,46" size="256,49" fontSize="36" color="#ffffff" text="小游戏接口测试">
+      <relation target="" sidePair="center-center,top-top"/>
+    </text>
+    <component id="n1_zmnj" name="btn_ads" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="36,190" size="320,73">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="展示广告" titleFontSize="26"/>
+    </component>
+    <component id="n22_jevi" name="btn_pay" src="kofe0" fileName="btns/button1.xml" pkg="mkwn34a7" xy="395,190" size="320,73">
+      <relation target="" sidePair="center-center,top-top"/>
+      <Button title="拉起支付" titleFontSize="26"/>
+    </component>
+    <text id="n23_jevi" name="lab_desc" xy="31,768" size="688,420" fontSize="24" color="#ffffff" vAlign="middle" autoSize="shrink" text="展示一些信息">
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+    </text>
+    <component id="n24_jevi" name="btn_close" src="ukhni" fileName="btns/btn_close.xml" pkg="mkwn34a7" xy="323,1204">
+      <relation target="" sidePair="center-center,bottom-bottom"/>
+    </component>
+    <graph id="n26_jevi" name="n26" xy="39,110" size="310,70" type="rect" lineSize="4" corner="5">
+      <relation target="n1_zmnj" sidePair="center-center,bottom-top"/>
+    </graph>
+    <graph id="n27_jevi" name="n27" xy="402,107" size="310,70" type="rect" lineSize="4" corner="5">
+      <relation target="n22_jevi" sidePair="center-center,bottom-top"/>
+    </graph>
+    <text id="n25_jevi" name="lab_adid" xy="42,112" size="303,65" fontSize="24" align="center" vAlign="middle" ubb="true" autoSize="none" text="" input="true" prompt="[color=#666666]输入广告ID[/color]">
+      <relation target="n26_jevi" sidePair="center-center,middle-middle"/>
+    </text>
+    <text id="n28_jevi" name="lab_pay" xy="405,109" size="303,65" fontSize="22" align="center" vAlign="middle" autoSize="none" singleLine="true" text="" input="true" prompt="[color=#666666]输入1元兑换的游戏币数量[/color]" keyboardType="1">
+      <relation target="n27_jevi" sidePair="center-center,middle-middle"/>
+    </text>
+  </displayList>
+</component>

@@ -1,111 +1,77 @@
-## 资源加载
-**!!! 注意：资源加载多次和一次效果一样 !!!**
+# bit-assets
 
+基于 Cocos Creator 的资源加载管理库，提供简单易用的资源加载和批量管理功能。
 
-### 特点
-  * 通过`路径`或者`uuid`获取资源
+## 简介
 
-  * 只适合手动管理资源，无论加载多少次，卸载一次后删除
+`bit-assets` 是一个专为 Cocos Creator 设计的资源管理库，支持通过路径或 UUID 加载资源，提供批量加载、并行控制、失败重试等功能。资源加载采用手动管理模式，支持按批次卸载资源，适合需要精细控制资源生命周期的场景（如战斗场景切换）。
 
-  * 可根据 `new AssetLoader("batchName")` 传入的 `batchName`批量卸载资源
+**核心特性**：
+- 📦 支持路径和 UUID 两种方式获取资源
+- 🔄 资源加载多次等同于加载一次，避免重复加载
+- 🎯 按批次管理资源，支持批量卸载
+- ⚡ 支持并行加载控制和失败重试
+- 📊 提供加载进度、完成、失败回调
 
-    > 比如进入战斗时，创建了多个new AssetLoader("batchName") 来加载资源，传入的batchName相同
-    >
-    > 等退出战斗后，可以通过 AssetPool.releaseBatchAssets("batchName") 一键释放batchName的资源
-
-### 安装
+## 安装
 
 ```bash
-npm install kunpocc-assets
+npm install @gongxh/bit-assets
 ```
 
-### 使用
+## 使用说明
 
-```typescript
-    let paths: IAssetConfig[] = [
-        { path: "ui/manual", type: cc.Asset },
-        { path: "prefab", type: cc.Prefab },
-        { path: "icon", type: cc.SpriteFrame },
-        { path: "texture/6101/spriteFrame", type: cc.SpriteFrame, isFile: true },
-        { path: "pet", type: cc.SpriteFrame, bundle: "bundle_res" },
-    ];
+### 资源加载器 (AssetLoader)
 
-    let loader = new KunpoAssets.AssetLoader("batchName");
-    // 设置最大并行数量 默认:10
-    loader.parallel = 10;
-    // 设置失败重试次数 默认:0
-    loader.retry = 3;
-    // 设置回调函数
-    loader.setCallbacks({
-        complete: () => {
-            console.log("加载成功");
-        },
-        fail: (code: number, msg: string) => {
-            console.log("加载失败:", code, msg);
-        },
-        progress: (percent: number) => {
-            console.log("加载进度:", percent);
-        }
-    });
-    loader.start(paths);
-```
+用于加载资源，支持配置加载参数和回调：
 
-### 接口
-#### *资源加载器*
+- `start(configs)` - 开始加载资源列表
+- `retryDownLoadFailedAssets()` - 重试加载失败的资源
+- `parallel` - 设置最大并行加载数量（默认：10）
+- `retry` - 设置失败重试次数（默认：0）
+- `setCallbacks()` - 设置加载进度、完成、失败回调
 
-```typescript
-interface IAssetConfig {
-    /** 资源路径 必填 */
-    path: string;
-    /** 资源类型 默认:cc.Asset 可选 */
-    type?: typeof Asset;
-    /** 是否是单个文件 默认:false 可选 */
-    isFile?: boolean;
-    /** 资源bundle名 默认:resources 可选 */
-    bundle?: string;
-}
+**资源配置 (IAssetConfig)**：
+- `path` - 资源路径（必填）
+- `type` - 资源类型（可选，默认 `cc.Asset`）
+- `isFile` - 是否为单个文件（可选，默认 `false`）
+- `bundle` - 资源 bundle 名称（可选，默认 `"resources"`）
 
-/**
- * 开始加载资源
- * @param {IAssetConfig[]} configs 资源配置
- */
-public start(configs: IAssetConfig[]): void
+### 资源池 (AssetPool)
 
-/** 重试 重新加载失败的资源 */
-public retryDownLoadFailedAssets(): void
-```
+全局资源管理，提供资源获取和释放功能：
 
-#### *资源池*
+**资源获取**：
+- `has(path, bundlename?)` - 检查资源是否已加载
+- `get<T>(path, bundlename?)` - 按路径获取资源
+- `hasUUID(uuid)` - 按 UUID 检查资源
+- `getByUUID<T>(uuid)` - 按 UUID 获取资源
 
-```typescript
-/** 资源是否已加载 */
-public static has(path: string, bundlename: string = "resources"): boolean
+**资源释放**：
+- `releasePath(path, bundlename?)` - 按路径释放资源
+- `releaseDir(dir, bundlename?, asset?)` - 按文件夹释放资源
+- `releaseUUID(uuid)` - 按 UUID 释放资源
+- `releaseBatchAssets(batchName)` - 按批次释放资源
+- `releaseAll()` - 释放所有加载的资源
 
-/** 获取资源 */
-public static get<T extends Asset>(path: string, bundlename: string = "resources"): T
+### 典型使用场景
 
-/** 按 uuid 判断资源是否已加载 */
-public static hasUUID(uuid: string): boolean
+**场景切换时批量加载和卸载**：
+1. 进入战斗场景时，使用 `new AssetLoader("battle")` 加载所有战斗资源
+2. 退出战斗场景时，调用 `AssetPool.releaseBatchAssets("battle")` 一键释放所有资源
 
-/** 按 uuid 获取资源 */
-public static getByUUID<T extends Asset>(uuid: string): T
+详细 API 请查看 `bit-assets.d.ts` 类型定义文件。
 
-/** 按资源路径释放资源 */
-public static releasePath(path: string, bundlename: string = "resources"): void
+## 许可证
 
-/** 按 bundle 和 文件夹释放资源 */
-public static releaseDir(dir: string, bundlename: string = "resources", asset: typeof Asset): Promise<boolean>
+MIT License
 
-/** 按 uuid 释放资源 */
-public static releaseUUID(uuid: string): void
+## 作者
 
-/** 释放所有加载的资源 */
-public static releaseAll(): void
+**bit老宫** (gongxh)  
+**邮箱**: gong.xinhai@163.com
 
-/** 
- * 按资源加载批次释放资源
- * @param batchName 资源加载批次名 对应 AssetLoader 实例化时传入的 name
- */
-public static releaseBatchAssets(batchName: string): void;
-```
+## 源码仓库
 
+- [GitHub](https://github.com/Gongxh0901/bit-framework)
+- [npm](https://www.npmjs.com/package/@gongxh/bit-assets)

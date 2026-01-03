@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="800,600">
+  <displayList>
+    <graph id="n0_hg37" name="n0" xy="0,0" size="800,600" type="rect" lineSize="6" lineColor="#ff000099" corner="20">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n1_hg37" name="n1" xy="182,268" size="436,64" fontSize="48" align="center" vAlign="middle" text="我是一个自定义组件">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </text>
+    <component id="n2_nub0" name="n2" src="ukhni" fileName="btns/btn_close.xml" pkg="mkwn34a7" xy="348,120">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </component>
+  </displayList>
+</component>
