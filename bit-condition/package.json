@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-condition",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "description": "基于creator的条件系统库",
     "main": "./dist/bit-condition.cjs",
     "module": "./dist/bit-condition.mjs",
