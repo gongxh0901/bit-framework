@@ -36,7 +36,6 @@
         "access": "public"
     },
     "dependencies": {
-        "@gongxh/bit-core": "workspace:*",
-        "fairygui-cc": "^1.2.2"
+        "@gongxh/bit-core": "workspace:*"
     }
 }

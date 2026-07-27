@@ -48,6 +48,17 @@ export abstract class System implements ISystem {
     }
 
     /**
+     * 创建额外的查询器
+     * @param setup 配置匹配规则的回调
+     * @returns 查询结果
+     */
+    protected createQuery(setup: (matcher: Matcher) => void): IQueryResult {
+        const m = this.world.matcher;
+        setup(m);
+        return m.build();
+    }
+
+    /**
      * 系统初始化
      * 在这里写匹配器规则
      */

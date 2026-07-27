@@ -5,7 +5,7 @@
     "experimentalDecorators": true,
     "strict": true,
     "strictNullChecks": false,
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "stripInternal": true,
