@@ -5,7 +5,7 @@
  */
 
 import { debug } from "@gongxh/bit-core";
-import { UIObjectFactory } from "fairygui-cc";
+import { fgui } from "../types/header";
 import { PropsHelper } from "./PropsHelper";
 import { IHeaderInfo, IWindowInfo } from "./types";
 
@@ -57,7 +57,7 @@ export class InfoPool {
             name: name
         });
         // 窗口组件扩展
-        UIObjectFactory.setExtension(`ui://${pkg}/${name}`, ctor);
+        fgui.UIObjectFactory.setExtension(`ui://${pkg}/${name}`, ctor);
 
         this.addWindowPkg(name, pkg);
         if (pkgs.length > 0) {
@@ -86,7 +86,7 @@ export class InfoPool {
             pkgName: pkg
         });
         // 窗口header扩展
-        UIObjectFactory.setExtension(`ui://${pkg}/${name}`, ctor);
+        fgui.UIObjectFactory.setExtension(`ui://${pkg}/${name}`, ctor);
     }
 
     /**
@@ -259,7 +259,7 @@ export class InfoPool {
             oldDispose.call(this);
         };
         // 自定义组件扩展
-        UIObjectFactory.setExtension(`ui://${pkg}/${name}`, ctor);
+        fgui.UIObjectFactory.setExtension(`ui://${pkg}/${name}`, ctor);
     }
 
     /** 刷新窗口需要的包名信息 */

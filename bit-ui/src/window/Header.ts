@@ -6,11 +6,11 @@
  */
 
 import { Screen } from "@gongxh/bit-core";
-import { GComponent } from "fairygui-cc";
 import { IHeader } from "../interface/IHeader";
 import { AdapterType } from "../interface/type";
+import { fgui } from "../types/header";
 
-export abstract class Header<T = any> extends GComponent implements IHeader<T> {
+export abstract class Header<T = any> extends fgui.GComponent implements IHeader<T> {
     /** 窗口适配类型 */
     public adapterType: AdapterType = AdapterType.Full;
 

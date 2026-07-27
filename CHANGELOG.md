@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.14] - 2026-07-27
+
+### Changed
+- refactor: fairygui 依赖改为 npm 包 `@gongxh/fairygui-cc`，删除根目录手写声明文件 `types/fairygui.d.ts`
+- refactor: bit-ui、bit-condition 新增 `src/types/header.ts` 统一转发 `fgui` 命名空间，源码内的 fairygui 类型引用改为 `fgui.XXX` 形式
+- chore: bit-ui、bit-condition 添加 `@gongxh/fairygui-cc` 依赖；rollup external 与 `.npmrc` hoist 规则同步为新包名
+
 ## [0.0.13] - 2026-07-27
 
 ### Changed

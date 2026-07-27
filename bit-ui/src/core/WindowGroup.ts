@@ -4,9 +4,9 @@
  * @Description: 窗口组 (在同一个窗口容器的上的窗口)
  */
 
-import { GComponent, UIPackage } from "fairygui-cc";
 import { IWindow } from "../interface/IWindow";
 import { WindowType } from "../interface/type";
+import { fgui } from "../types/header";
 import { WindowBase } from "../window/WindowBase";
 import { HeaderManager } from "./HeaderManager";
 import { PropsHelper } from "./PropsHelper";
@@ -19,7 +19,7 @@ export class WindowGroup {
     private _name: string = ""; // 窗口组的名字
 
     /** @internal */
-    private _root: GComponent; // 窗口组的根节点
+    private _root: fgui.GComponent; // 窗口组的根节点
 
     /** @internal */
     private _ignore: boolean = false; // 忽略查询
@@ -37,7 +37,7 @@ export class WindowGroup {
     public get name(): string { return this._name; }
 
     /** 获取窗口组的根节点 */
-    public get root(): GComponent { return this._root; }
+    public get root(): fgui.GComponent { return this._root; }
 
     /**
      * 获取当前窗口组中窗口的数量。
@@ -63,7 +63,7 @@ export class WindowGroup {
      * @param bgAlpha 半透明遮罩的透明度
      * @internal
      */
-    constructor(name: string, root: GComponent, ignoreQuery: boolean, swallowTouch: boolean) {
+    constructor(name: string, root: fgui.GComponent, ignoreQuery: boolean, swallowTouch: boolean) {
         this._name = name;
         this._root = root;
         this._ignore = ignoreQuery;
@@ -156,7 +156,7 @@ export class WindowGroup {
      * @internal
      */
     private createWindow(pkg: string, name: string): WindowBase {
-        let window = UIPackage.createObject(pkg, name) as WindowBase;
+        let window = fgui.UIPackage.createObject(pkg, name) as WindowBase;
         window.name = name;
         PropsHelper.serializeProps(window, pkg);
         window._init(this._swallowTouch);

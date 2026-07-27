@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-hotupdate",
-    "version": "0.0.13",
+    "version": "0.0.14",
     "description": "基于Cocos Creator的热更新库",
     "main": "./dist/bit-hotupdate.cjs",
     "module": "./dist/bit-hotupdate.mjs",

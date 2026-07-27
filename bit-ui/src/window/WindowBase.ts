@@ -5,14 +5,14 @@
  */
 
 import { Screen } from "@gongxh/bit-core";
-import { GComponent } from "fairygui-cc";
 import { HeaderManager } from "../core/HeaderManager";
 import { WindowManager } from "../core/WindowManager";
 import { IWindow } from "../interface/IWindow";
 import { AdapterType, WindowType } from "../interface/type";
+import { fgui } from "../types/header";
 import { HeaderInfo } from "./HeaderInfo";
 
-export abstract class WindowBase<T = any, U = any> extends GComponent implements IWindow<T, U> {
+export abstract class WindowBase<T = any, U = any> extends fgui.GComponent implements IWindow<T, U> {
     /** 窗口类型 */
     public type: WindowType = WindowType.Normal;
 
@@ -23,7 +23,7 @@ export abstract class WindowBase<T = any, U = any> extends GComponent implements
     public bgAlpha: number;
 
     /** @internal */
-    private _swallowNode: GComponent = null; // 吞噬触摸的节点
+    private _swallowNode: fgui.GComponent = null; // 吞噬触摸的节点
 
     /** @internal */
     private _isTop: boolean = true;
@@ -36,7 +36,7 @@ export abstract class WindowBase<T = any, U = any> extends GComponent implements
      */
     public _init(swallowTouch: boolean): void {
         // 窗口本身可能留有安全区的边, 所以需要一个全屏的节点来吞噬触摸事件
-        let bgNode = new GComponent();
+        let bgNode = new fgui.GComponent();
         bgNode.name = "swallow";
         bgNode.setPivot(0.5, 0.5, true);
         this.addChild(bgNode);

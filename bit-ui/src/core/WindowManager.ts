@@ -6,9 +6,9 @@
 
 import { Screen } from "@gongxh/bit-core";
 import { Color } from "cc";
-import { GGraph } from "fairygui-cc";
 import { IWindow } from "../interface/IWindow";
 import { MetadataKey } from "../interface/type";
+import { fgui } from "../types/header";
 import { Window } from "../window/Window";
 import { WindowBase } from "../window/WindowBase";
 import { HeaderManager } from "./HeaderManager";
@@ -32,7 +32,7 @@ export class WindowManager {
     private static _bgColor: Color = new Color(0, 0, 0, 0);
 
     /** @internal */
-    private static _alphaGraph: GGraph = null; // 半透明的遮罩
+    private static _alphaGraph: fgui.GGraph = null; // 半透明的遮罩
 
     /** @internal */
     private static _groups: Map<string, WindowGroup> = new Map(); // 窗口组
@@ -135,7 +135,7 @@ export class WindowManager {
      * @param alphaGraph 半透明遮罩
      * @internal
      */
-    public static setAlphaGraph(alphaGraph: GGraph): void {
+    public static setAlphaGraph(alphaGraph: fgui.GGraph): void {
         this._alphaGraph = alphaGraph;
     }
 

@@ -6,14 +6,14 @@
 
 import { ConditionManager } from "../ConditionManager";
 import { ConditionMode } from "../ConditionMode";
-
+import { fgui } from "../types/header";
 export abstract class ConditionNode {
     /** 条件类型 @internal */
     public _modeType: ConditionMode;
 
     /**
      * 构建红点节点
-     * @param {GObject} node 关联节点
+     * @param {fgui.GObject} node 关联节点
      * @param {...number[]} conditionTypes 条件类型
      */
     public constructor(modeType: ConditionMode, ...conditionTypes: number[]) {

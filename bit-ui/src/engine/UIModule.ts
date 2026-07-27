@@ -6,10 +6,10 @@
 import { _decorator, JsonAsset } from "cc";
 
 import { Adapter, debug, Module, Screen } from "@gongxh/bit-core";
-import { GGraph, GRoot } from "fairygui-cc";
 import { IPropsConfig, PropsHelper } from "../core/PropsHelper";
 import { ResLoader } from "../core/ResLoader";
 import { WindowManager } from "../core/WindowManager";
+import { fgui } from "../types/header";
 import { CocosWindowContainer } from "./CocosWindowContainer";
 
 const { ccclass, menu, property } = _decorator;
@@ -35,17 +35,17 @@ export class UIModule extends Module {
         WindowManager.bgAlpha = this.bgAlpha;
 
         /** 初始化窗口管理系统 */
-        GRoot.create();
+        fgui.GRoot.create();
         debug("初始化 WindowContainers");
 
-        const alphaGraph = new GGraph();
+        const alphaGraph = new fgui.GGraph();
         alphaGraph.touchable = false;
         alphaGraph.name = "bgAlpha";
         alphaGraph.setPosition(Screen.ScreenWidth * 0.5, Screen.ScreenHeight * 0.5);
         alphaGraph.setSize(Screen.ScreenWidth, Screen.ScreenHeight, true);
         alphaGraph.setPivot(0.5, 0.5, true);
         alphaGraph.visible = false;
-        GRoot.inst.addChild(alphaGraph);
+        fgui.GRoot.inst.addChild(alphaGraph);
         WindowManager.setAlphaGraph(alphaGraph);
 
         for (const container of this.getComponentsInChildren(CocosWindowContainer)) {

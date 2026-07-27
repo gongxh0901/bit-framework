@@ -4,8 +4,8 @@
  * @Description: header(资源栏)管理类
  */
 
-import { UIPackage } from "fairygui-cc";
 import { IHeader } from "../interface/IHeader";
+import { fgui } from "../types/header";
 import { Header } from "../window/Header";
 import { HeaderInfo } from "../window/HeaderInfo";
 import { WindowBase } from "../window/WindowBase";
@@ -214,7 +214,7 @@ export class HeaderManager {
     private static createHeader(headerInfo: HeaderInfo<any>): IHeader {
         // 创建header实例
         const info = InfoPool.getHeader(headerInfo.name);
-        const header = UIPackage.createObject(info.pkgName, headerInfo.name) as Header;
+        const header = fgui.UIPackage.createObject(info.pkgName, headerInfo.name) as Header;
         header.name = headerInfo.name;
         PropsHelper.serializeProps(header, info.pkgName);
         header._init();

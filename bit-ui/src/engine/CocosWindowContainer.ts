@@ -6,9 +6,9 @@
 
 import { debug, Screen } from "@gongxh/bit-core";
 import { _decorator, Component } from "cc";
-import { GComponent, GRoot } from "fairygui-cc";
 import { WindowGroup } from "../core/WindowGroup";
 import { WindowManager } from "../core/WindowManager";
+import { fgui } from "../types/header";
 const { ccclass, property, menu } = _decorator;
 @ccclass("CocosWindowContainer")
 @menu("bit/UIContainer")
@@ -23,13 +23,13 @@ export class CocosWindowContainer extends Component {
         let name = this.node.name;
         debug(`\tUIContainer name:${name} 忽略顶部窗口查询:${this.ignoreQuery} 吞噬触摸事件:${this.swallowTouch}`);
 
-        const root = new GComponent();
+        const root = new fgui.GComponent();
         root.name = name;
         root.node.name = name;
         root.visible = false;
         root.opaque = this.swallowTouch;
         root.setSize(Screen.ScreenWidth, Screen.ScreenHeight, true);
-        GRoot.inst.addChild(root);
+        fgui.GRoot.inst.addChild(root);
         WindowManager.addWindowGroup(new WindowGroup(name, root, this.ignoreQuery, this.swallowTouch));
     }
 }

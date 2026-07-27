@@ -4,7 +4,7 @@
  * @Description: 属性辅助类
  */
 
-import { GComponent } from "fairygui-cc";
+import { fgui } from "../types/header";
 export interface IPropsConfig {
     [packageName: string]: { [componentName: string]: IPropsInfo };
 }
@@ -27,7 +27,7 @@ export class PropsHelper {
     }
 
     /** 序列化属性 @internal */
-    public static serializeProps(component: GComponent, packageName: string, componentName?: string): void {
+    public static serializeProps(component: fgui.GComponent, packageName: string, componentName?: string): void {
         if (!this._config) {
             return;
         }
@@ -58,7 +58,7 @@ export class PropsHelper {
     }
 
     /** 给界面中定义的属性赋值 @internal */
-    private static serializationPropsNode(component: GComponent, props: (string | number)[]) {
+    private static serializationPropsNode(component: fgui.GComponent, props: (string | number)[]) {
         const propsCount = props.length;
         // [name1, len, ...props1, name2, len, ...props2, ...]
         let index = 0;
@@ -78,7 +78,7 @@ export class PropsHelper {
     }
 
     /** 给界面中定义的回调赋值 @internal */
-    private static serializationCallbacksNode(component: GComponent, callbacks: (string | number)[]) {
+    private static serializationCallbacksNode(component: fgui.GComponent, callbacks: (string | number)[]) {
         const propsCount = callbacks.length;
         // [name1, len, ...props1, name2, len, ...props2, ...]
         let index = 0;
@@ -100,7 +100,7 @@ export class PropsHelper {
     }
 
     /** 给界面中定义的控制器赋值 @internal */
-    private static serializationControlsNode(component: GComponent, controls: string[]) {
+    private static serializationControlsNode(component: fgui.GComponent, controls: string[]) {
         const controlsCount = controls.length;
         let index = 0;
         while (index < controlsCount) {
@@ -117,7 +117,7 @@ export class PropsHelper {
     }
 
     /** 给界面中定义的动画赋值 @internal */
-    private static serializationTransitionsNode(component: GComponent, transitions: string[]) {
+    private static serializationTransitionsNode(component: fgui.GComponent, transitions: string[]) {
         const transitionsCount = transitions.length;
         let index = 0;
         while (index < transitionsCount) {

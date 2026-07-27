@@ -4,29 +4,29 @@
  * @Description: 
  */
 
-import { GObject } from "fairygui-cc";
 import { ConditionManager } from "../ConditionManager";
 import { ConditionMode } from "../ConditionMode";
+import { fgui } from "../types/header";
 import { ConditionNode } from "./ConditionNode";
 export class ConditionFGUINode extends ConditionNode {
     /**
      * 红点节点
      * @protected
-     * @type {GObject | Node} fgui节点 或 node节点
+     * @type {fgui.GObject} fgui节点
      * @memberof NotityFGUINode
      * @internal
      */
-    protected node: GObject;
+    protected node: fgui.GObject;
 
     /** 旧的移除父节点 @internal */
     private _oldRemoveFromParent: () => void;
 
     /**
      * 构建红点节点
-     * @param {GObject} node 关联节点
+     * @param {fgui.GObject} node 关联节点
      * @param {...number[]} conditionTypes 条件类型
      */
-    public constructor(node: GObject, modeType: ConditionMode, ...conditionTypes: number[]) {
+    public constructor(node: fgui.GObject, modeType: ConditionMode, ...conditionTypes: number[]) {
         super(modeType, ...conditionTypes);
         this.node = node;
         const oldRemoveFromParent = (this._oldRemoveFromParent = node.removeFromParent);

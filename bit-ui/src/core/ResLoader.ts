@@ -5,7 +5,7 @@
  */
 
 import { assetManager, resources } from "cc";
-import { UIPackage } from "fairygui-cc";
+import { fgui } from "../types/header";
 import { InfoPool } from "./InfoPool";
 
 /** @internal */
@@ -182,7 +182,7 @@ export class ResLoader {
 
                 // 回滚：卸载已经加载成功的包
                 loadedPackages.forEach(pkg => {
-                    UIPackage.removePackage(pkg);
+                    fgui.UIPackage.removePackage(pkg);
                 });
 
                 throw err;
@@ -239,7 +239,7 @@ export class ResLoader {
             let bundleName = InfoPool.getBundleName(pkg);
             let bundle = bundleName === "resources" ? resources : assetManager.getBundle(bundleName);
 
-            UIPackage.loadPackage(bundle, InfoPool.getPackagePath(pkg), (err: any) => {
+            fgui.UIPackage.loadPackage(bundle, InfoPool.getPackagePath(pkg), (err: any) => {
                 if (err) {
                     // 调用失败回调
                     if (windowName && this._onLoadFail) {
@@ -261,7 +261,7 @@ export class ResLoader {
     private static unloadUIPackages(packages: string[]): void {
         for (const pkg of packages) {
             if (this.subRef(pkg) === 0 && this.autoRelease) {
-                UIPackage.removePackage(pkg);
+                fgui.UIPackage.removePackage(pkg);
             }
         }
     }
@@ -275,7 +275,7 @@ export class ResLoader {
         let keys = Array.from(this.pkgRefs.keys());
         for (const key of keys) {
             if (this.getRef(key) <= 0) {
-                UIPackage.removePackage(key);
+                fgui.UIPackage.removePackage(key);
                 this.pkgRefs.delete(key);
             }
         }

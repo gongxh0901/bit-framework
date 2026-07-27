@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-condition",
-    "version": "0.0.13",
+    "version": "0.0.14",
     "description": "基于creator的条件系统库",
     "main": "./dist/bit-condition.cjs",
     "module": "./dist/bit-condition.mjs",
@@ -36,6 +36,7 @@
         "access": "public"
     },
     "dependencies": {
-        "@gongxh/bit-core": "workspace:*"
+        "@gongxh/bit-core": "workspace:*",
+        "@gongxh/fairygui-cc": "^0.0.2"
     }
 }
