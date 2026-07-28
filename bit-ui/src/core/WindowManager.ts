@@ -148,6 +148,7 @@ export class WindowManager {
         // 优先使用装饰器设置的静态属性，避免代码混淆后 constructor.name 变化
         const name = (window as any)[MetadataKey.originalName];
         if (!name) {
+            // 注意: 这里必须同步抛出, 未注册属于使用错误, 不能变成 Promise rejection 被静默吞掉
             throw new Error(`窗口【${window.name}】未注册，请使用 _uidecorator.uiclass 注册窗口`);
         }
         return this.showWindowByName(name, userdata) as Promise<ExtractWindowInstance<T>>;
@@ -160,7 +161,7 @@ export class WindowManager {
      * @internal
      */
     public static showWindowByName<T = any, U = any>(name: string, userdata?: T): Promise<IWindow<T, U>> {
-        // 找到他所属的窗口组
+        // 找到他所属的窗口组 (InfoPool.get 未注册时同步抛出)
         const info = InfoPool.get(name);
         const group = this.getWindowGroup(info.group);
         return group.showWindow<T, U>(info, userdata);

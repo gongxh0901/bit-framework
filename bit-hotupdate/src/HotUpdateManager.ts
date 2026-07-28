@@ -4,10 +4,8 @@
  * @Description: 热更新管理器
  */
 
+import { ICheckUpdatePromiseResult, log, Platform } from "@gongxh/bit-core";
 import { native } from "cc";
-import { Platform } from "@gongxh/bit-core";
-import { ICheckUpdatePromiseResult } from "@gongxh/bit-core";
-import { log } from "@gongxh/bit-core";
 import { HotUpdate, HotUpdateCode } from "./HotUpdate";
 
 const TAG = "hotupdate:";
@@ -102,32 +100,24 @@ export class HotUpdateManager {
      * 提供一个对外的方法检查是否存在热更新
      * @return {Promise<ICheckUpdatePromiseResult>} 
      */
-    public checkUpdate(): Promise<ICheckUpdatePromiseResult> {
-        return new Promise((resolve, reject) => {
-            if (!Platform.isNativeMobile) {
-                reject({ code: HotUpdateCode.PlatformNotSupported, message: "当前平台不需要热更新" });
-                return;
-            }
-            if (!this._isInitialized) {
-                reject({ code: HotUpdateCode.NotInitialized, message: "未初始化, 需要先调用init方法" });
-                return;
-            }
-            if (this._updating) {
-                reject({ code: HotUpdateCode.Updating, message: "正在更新或者正在检查更新中" });
-                return;
-            }
-            this._updating = true;
+    public async checkUpdate(): Promise<ICheckUpdatePromiseResult> {
+        if (!Platform.isNativeMobile) {
+            throw { code: HotUpdateCode.PlatformNotSupported, message: "当前平台不需要热更新" };
+        }
+        if (!this._isInitialized) {
+            throw { code: HotUpdateCode.NotInitialized, message: "未初始化, 需要先调用init方法" };
+        }
+        if (this._updating) {
+            throw { code: HotUpdateCode.Updating, message: "正在更新或者正在检查更新中" };
+        }
+        this._updating = true;
+        // 这里失败后不处理, 继续抛出错误
+        try {
             this._hotUpdate = new HotUpdate();
-            this._hotUpdate.checkUpdate().then((res) => {
-                this._updating = false;
-                // 有更新
-                resolve(res);
-            }).catch((res: ICheckUpdatePromiseResult) => {
-                this._updating = false;
-                // 无更新
-                reject(res);
-            });
-        });
+            return await this._hotUpdate.checkUpdate();
+        } finally {
+            this._updating = false;
+        }
     }
 
     /**

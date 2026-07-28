@@ -87,40 +87,31 @@ export class HotUpdate {
      * 提供一个对外的方法检查是否存在热更新
      * @return {Promise<ICheckUpdatePromiseResult>} 
      */
-    public checkUpdate(): Promise<ICheckUpdatePromiseResult> {
-        let localManifest: IHotUpdateConfig = null;
-        return new Promise((resolve, reject) => {
-            this.readLocalManifest().then(res => {
-                // log(`${TAG} 读取本地manifest文件结果:${JSON.stringify(res)}`);
-                if (res.code === HotUpdateCode.Succeed) {
-                    localManifest = res.manifest;
-                    return this.loadRemoteVersionManifest();
-                } else {
-                    throw res;
-                }
-            }).then(res => {
-                // log(`${TAG} 读取远程version.manifest文件结果:${JSON.stringify(res)}`);
-                // 获取远程version.manifest文件内容的结果
-                if (res.code === HotUpdateCode.Succeed) {
-                    return this.refreshLocalManifest(localManifest, res.manifest);
-                } else {
-                    throw res;
-                }
-            }).then(res => {
-                // log(`${TAG} 刷新本地manifest文件结果:${JSON.stringify(res)}`);
-                if (res.code === HotUpdateCode.Succeed) {
-                    return this.startCheckUpdate();
-                } else {
-                    // 已经是最新版本了
-                    throw res;
-                }
-            }).then(res => {
-                // log(`${TAG} 检查更新结果:${JSON.stringify(res)}`);
-                res.code === HotUpdateCode.Succeed ? resolve(res) : reject(res);
-            }).catch(res => {
-                reject(res);
-            });
-        });
+    public async checkUpdate(): Promise<ICheckUpdatePromiseResult> {
+        // 读取本地 project.manifest
+        const localRes = await this.readLocalManifest();
+        if (localRes.code !== HotUpdateCode.Succeed) {
+            throw localRes;
+        }
+
+        // 加载远程 version.manifest
+        const remoteRes = await this.loadRemoteVersionManifest();
+        if (remoteRes.code !== HotUpdateCode.Succeed) {
+            throw remoteRes;
+        }
+
+        // 刷新本地 manifest
+        const refreshRes = await this.refreshLocalManifest(localRes.manifest, remoteRes.manifest);
+        if (refreshRes.code !== HotUpdateCode.Succeed) {
+            throw refreshRes;
+        }
+
+        // 检查更新
+        const checkRes = await this.startCheckUpdate();
+        if (checkRes.code !== HotUpdateCode.Succeed) {
+            throw checkRes;
+        }
+        return checkRes;
     }
 
     /**
@@ -214,84 +205,66 @@ export class HotUpdate {
     }
 
     /** 读取本地的project.manifest文件 */
-    private readLocalManifest(): Promise<IManifestResult> {
-        return new Promise((resolve, reject) => {
-            if (!this._am) {
-                reject({ code: HotUpdateCode.LoadManifestFailed, message: "读取本地project.manifest文件失败" });
-                return;
-            }
-            let writablePath = HotUpdateManager.getInstance().writablePath;
-            // 本地内容
-            let content = "";
-            let cacheManifestPath = writablePath + "project.manifest";
-            if (native.fileUtils.isFileExist(cacheManifestPath)) {
-                content = native.fileUtils.getStringFromFile(cacheManifestPath);
-            } else {
-                let manifestUrl = HotUpdateManager.getInstance().manifestUrl;
-                content = native.fileUtils.getStringFromFile(manifestUrl);
-            }
-            if (content) {
-                resolve({ code: HotUpdateCode.Succeed, message: "读取本地project.manifest文件成功", manifest: JSON.parse(content) });
-            } else {
-                reject({ code: HotUpdateCode.LoadManifestFailed, message: "读取本地project.manifest文件失败" });
-            }
-        });
+    private async readLocalManifest(): Promise<IManifestResult> {
+        if (!this._am) {
+            throw { code: HotUpdateCode.LoadManifestFailed, message: "读取本地project.manifest文件失败" };
+        }
+        const writablePath = HotUpdateManager.getInstance().writablePath;
+        const cacheManifestPath = writablePath + "project.manifest";
+
+        let content = "";
+        if (native.fileUtils.isFileExist(cacheManifestPath)) {
+            content = native.fileUtils.getStringFromFile(cacheManifestPath);
+        } else {
+            const manifestUrl = HotUpdateManager.getInstance().manifestUrl;
+            content = native.fileUtils.getStringFromFile(manifestUrl);
+        }
+        if (!content) {
+            throw { code: HotUpdateCode.LoadManifestFailed, message: "读取本地project.manifest文件失败" };
+        }
+        return { code: HotUpdateCode.Succeed, message: "succeed", manifest: JSON.parse(content) }
     }
 
     /** 读取远程version.manifest文件内容 */
-    private loadRemoteVersionManifest(): Promise<IManifestResult> {
-        return new Promise((resolve) => {
-            new ReadNetFile({
-                url: this.versionUrl,
-                timeout: 5,
-                responseType: "text",
-                onComplete: (data: string) => {
-                    // log(`${TAG} 下载hotconfig文件成功`);
-                    if (Utils.isJsonString(data)) {
-                        resolve({ code: HotUpdateCode.Succeed, message: "读取远程version.manifest文件成功", manifest: JSON.parse(data) });
-                    } else {
-                        warn(`${TAG} 远程version.manifest文件格式错误`);
-                        resolve({ code: HotUpdateCode.ParseVersionFailed, message: "远程version.manifest文件格式错误" });
-                    }
-                },
-                onError: (code: number, message: string) => {
-                    warn(`${TAG} 读取远程version.manifest文件失败`, code, message);
-                    resolve({ code: HotUpdateCode.LoadVersionFailed, message: "读取远程version.manifest文件失败" });
-                }
-            });
-        });
+    private async loadRemoteVersionManifest(): Promise<IManifestResult> {
+        try {
+            const content = await ReadNetFile.read<string>({ url: this.versionUrl });
+            if (Utils.isJsonString(content)) {
+                return { code: HotUpdateCode.Succeed, message: "succeed", manifest: JSON.parse(content) };
+            }
+            return { code: HotUpdateCode.ParseVersionFailed, message: "远程version.manifest文件格式错误" };
+        } catch (error: any) {
+            // { code: number, message: string }
+            warn(`${TAG} 读取远程version.manifest文件失败`, error?.code, error?.message);
+            throw { code: HotUpdateCode.LoadVersionFailed, message: "读取远程version.manifest文件失败" };
+        }
     }
 
     /** 替换project.manifest中的内容 并刷新本地manifest */
-    private refreshLocalManifest(manifest: IHotUpdateConfig, versionManifest: IHotUpdateConfig): Promise<IPromiseResult> {
-        return new Promise((resolve) => {
-            if (Utils.compareVersion(manifest.version, versionManifest.version) >= 0) {
-                resolve({ code: HotUpdateCode.LatestVersion, message: "已是最新版本" });
-            } else {
-                // 替换manifest中的内容
-                manifest.remoteManifestUrl = Utils.addUrlParam(versionManifest.remoteManifestUrl, "timeStamp", `${Time.now()}`);
-                manifest.remoteVersionUrl = Utils.addUrlParam(versionManifest.remoteVersionUrl, "timeStamp", `${Time.now()}`);
-                manifest.packageUrl = versionManifest.packageUrl;
+    private async refreshLocalManifest(manifest: IHotUpdateConfig, versionManifest: IHotUpdateConfig): Promise<IPromiseResult> {
+        if (Utils.compareVersion(manifest.version, versionManifest.version) >= 0) {
+            return { code: HotUpdateCode.LatestVersion, message: "已是最新版本" };
+        }
+        // 替换manifest中的内容
+        const now = `${Time.now()}`;
+        manifest.remoteManifestUrl = Utils.addUrlParam(versionManifest.remoteManifestUrl, "timeStamp", now);
+        manifest.remoteVersionUrl = Utils.addUrlParam(versionManifest.remoteVersionUrl, "timeStamp", now);
+        manifest.packageUrl = versionManifest.packageUrl;
 
-                // 注册本地manifest根目录
-                let manifestRoot = "";
-                let manifestUrl = HotUpdateManager.getInstance().manifestUrl;
-                let found = manifestUrl.lastIndexOf("/");
-                if (found === -1) {
-                    found = manifestUrl.lastIndexOf("\\");
-                }
-                if (found !== -1) {
-                    manifestRoot = manifestUrl.substring(0, found + 1);
-                }
-                this._am.getLocalManifest().parseJSONString(JSON.stringify(manifest), manifestRoot);
-                // log(TAG + "manifest root:" + this._am.getLocalManifest().getManifestRoot());
-                // log(TAG + "manifest packageUrl:" + this._am.getLocalManifest().getPackageUrl());
-                // log(TAG + "manifest version:" + this._am.getLocalManifest().getVersion());
-                // log(TAG + "manifest versionFileUrl:" + this._am.getLocalManifest().getVersionFileUrl());
-                // log(TAG + "manifest manifestFileUrl:" + this._am.getLocalManifest().getManifestFileUrl());
-                resolve({ code: HotUpdateCode.Succeed, message: "更新热更新配置成功" });
-            }
-        });
+        // 注册本地 manifest 根目录
+        const manifestUrl = HotUpdateManager.getInstance().manifestUrl;
+        let found = manifestUrl.lastIndexOf("/");
+        if (found === -1) {
+            found = manifestUrl.lastIndexOf("\\");
+        }
+        const manifestRoot = found !== -1 ? manifestUrl.substring(0, found + 1) : "";
+        this._am.getLocalManifest().parseJSONString(JSON.stringify(manifest), manifestRoot);
+        // log(TAG + "manifest root:" + this._am.getLocalManifest().getManifestRoot());
+        // log(TAG + "manifest packageUrl:" + this._am.getLocalManifest().getPackageUrl());
+        // log(TAG + "manifest version:" + this._am.getLocalManifest().getVersion());
+        // log(TAG + "manifest versionFileUrl:" + this._am.getLocalManifest().getVersionFileUrl());
+        // log(TAG + "manifest manifestFileUrl:" + this._am.getLocalManifest().getManifestFileUrl());
+        return { code: HotUpdateCode.Succeed, message: "succeed" };
     }
 
     /** 调用cc的接口检测更新 */
@@ -303,25 +276,26 @@ export class HotUpdate {
                 // log(`${TAG} 检查更新回调code:${eventCode}`);
                 switch (eventCode) {
                     case native.EventAssetsManager.ERROR_DOWNLOAD_MANIFEST:
-                        this._am.setEventCallback(null);
-                        resolve({ code: HotUpdateCode.LoadManifestFailed, message: "检查更新时下载manifest文件失败", size: 0 });
+                        this.finishCheckUpdate(resolve, { code: HotUpdateCode.LoadManifestFailed, message: "检查更新时下载manifest文件失败", size: 0 });
                         return;
                     case native.EventAssetsManager.ERROR_PARSE_MANIFEST:
-                        this._am.setEventCallback(null);
-                        resolve({ code: HotUpdateCode.ParseManifestFailed, message: "检查更新时解析manifest文件失败", size: 0 });
+                        this.finishCheckUpdate(resolve, { code: HotUpdateCode.ParseManifestFailed, message: "检查更新时解析manifest文件失败", size: 0 });
                         return;
                     case native.EventAssetsManager.ALREADY_UP_TO_DATE:
-                        this._am.setEventCallback(null);
-                        resolve({ code: HotUpdateCode.LatestVersion, message: "已是最新版本", size: 0 });
+                        this.finishCheckUpdate(resolve, { code: HotUpdateCode.LatestVersion, message: "已是最新版本", size: 0 });
                         return;
                     case native.EventAssetsManager.NEW_VERSION_FOUND:
                         // 发现新版本
-                        this._am.setEventCallback(null);
-                        resolve({ code: HotUpdateCode.Succeed, message: "发现新版本", size: this._am.getTotalBytes() / 1024 });
+                        this.finishCheckUpdate(resolve, { code: HotUpdateCode.Succeed, message: "发现新版本", size: this._am.getTotalBytes() / 1024 });
                         return;
                 }
             });
             this._am.checkUpdate();
         });
+    }
+
+    private finishCheckUpdate(resolve: (result: ICheckUpdatePromiseResult) => void, result: ICheckUpdatePromiseResult): void {
+        this._am.setEventCallback(null);
+        resolve(result);
     }
 }

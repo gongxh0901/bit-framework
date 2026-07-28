@@ -100,13 +100,13 @@ export class ResLoader {
      * 加载窗口需要的包
      * @param windowName 窗口名
      */
-    public static loadWindowRes(windowName: string): Promise<void> {
+    public static async loadWindowRes(windowName: string): Promise<void> {
         // 获取窗口需要的资源包
         let packageNames = InfoPool.getWindowPkg(windowName);
         if (packageNames.length <= 0) {
-            return Promise.resolve();
+            return;
         }
-        return this.loadUIPackages(packageNames, windowName);
+        await this.loadUIPackages(packageNames, windowName);
     }
 
     /**
@@ -212,20 +212,25 @@ export class ResLoader {
 
         // 顺序加载每个bundle
         for (const bundleName of unloadedBundleNames) {
-            await new Promise<void>((resolve, reject) => {
-                assetManager.loadBundle(bundleName, (err: any, bundle: any) => {
-                    if (err) {
-                        // 调用失败回调
-                        if (this._onLoadFail) {
-                            this._onLoadFail(windowName, 1, bundleName);
-                        }
-                        reject(new Error(`bundle【${bundleName}】加载失败`));
-                    } else {
-                        resolve();
-                    }
-                });
-            });
+            try {
+                await this.loadBundle(bundleName);
+            } catch (err) {
+                this._onLoadFail?.(windowName, 1, bundleName);
+                throw err;
+            }
         }
+    }
+
+    private static loadBundle(bundleName: string): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            assetManager.loadBundle(bundleName, (err: any) => {
+                if (err) {
+                    reject(new Error(`bundle【${bundleName}】加载失败`));
+                    return;
+                }
+                resolve();
+            });
+        });
     }
 
     /**
@@ -234,21 +239,19 @@ export class ResLoader {
      * @param windowName 窗口名（用于失败回调）
      * @internal
      */
-    private static loadSingleUIPackage(pkg: string, windowName?: string): Promise<void> {
-        return new Promise((resolve, reject) => {
-            let bundleName = InfoPool.getBundleName(pkg);
-            let bundle = bundleName === "resources" ? resources : assetManager.getBundle(bundleName);
-
+    private static async loadSingleUIPackage(pkg: string, windowName?: string): Promise<void> {
+        let bundleName = InfoPool.getBundleName(pkg);
+        let bundle = bundleName === "resources" ? resources : assetManager.getBundle(bundleName);
+        await new Promise<void>((resolve, reject) => {
             fgui.UIPackage.loadPackage(bundle, InfoPool.getPackagePath(pkg), (err: any) => {
                 if (err) {
-                    // 调用失败回调
                     if (windowName && this._onLoadFail) {
                         this._onLoadFail(windowName, 2, pkg);
                     }
                     reject(new Error(`UI包【${pkg}】加载失败`));
-                } else {
-                    resolve();
+                    return;
                 }
+                resolve();
             });
         });
     }

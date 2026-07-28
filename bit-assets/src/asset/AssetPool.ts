@@ -141,26 +141,12 @@ export class AssetPool {
      * @param bundlename 资源bundle名 默认 resources
      * @param asset 资源类型 不传表示所有类型的资源
      */
-    public static releaseDir(dir: string, bundlename: string = "resources", asset?: typeof Asset): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            if (bundlename == "resources") {
-                let uuids = AssetUtils.getUUIDs(dir, asset, resources);
-                for (const uuid of uuids) {
-                    this.releaseUUID(uuid);
-                }
-                resolve(true);
-            } else {
-                AssetUtils.loadBundle(bundlename).then((bundle: AssetManager.Bundle) => {
-                    let uuids = AssetUtils.getUUIDs(dir, asset, bundle);
-                    for (const uuid of uuids) {
-                        this.releaseUUID(uuid);
-                    }
-                    resolve(true);
-                }).catch((err: Error) => {
-                    reject(false);
-                });
-            }
-        });
+    public static async releaseDir(dir: string, bundlename: string = "resources", asset?: typeof Asset): Promise<void> {
+        const bundle = bundlename === "resources" ? resources : await AssetUtils.loadBundle(bundlename);
+        const uuids = AssetUtils.getUUIDs(dir, asset, bundle);
+        for (const uuid of uuids) {
+            this.releaseUUID(uuid);
+        }
     }
 
     /** 

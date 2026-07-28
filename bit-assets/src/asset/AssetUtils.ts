@@ -34,19 +34,14 @@ export class AssetUtils {
 
     /** 加载 bundle */
     public static loadBundle(bundlename: string): Promise<AssetManager.Bundle> {
-        return new Promise((resolve, reject) => {
-            let bundle = assetManager.getBundle(bundlename);
-            if (bundle) {
-                resolve(bundle);
-            } else {
-                assetManager.loadBundle(bundlename, (err: Error, bundle: AssetManager.Bundle) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(bundle);
-                    }
-                });
-            }
+        let bundle = assetManager.getBundle(bundlename);
+        if (bundle) {
+            return Promise.resolve<AssetManager.Bundle>(bundle);
+        }
+        return new Promise<AssetManager.Bundle>((resolve, reject) => {
+            assetManager.loadBundle(bundlename, (err: Error, bundle: AssetManager.Bundle) => {
+                err ? reject(err) : resolve(bundle);
+            });
         });
     }
 
