@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.1] - 2026-07-28
+
+### Changed
+- **Breaking**: `AssetPool.releaseDir` 返回类型由 `Promise<boolean>` 改为 `Promise<void>`，失败时 reject 的值由 `false` 改为真实的 `Error` 对象 (2cde224)
+- refactor: `AssetPool.releaseDir`、`AssetUtils.loadBundle` 去掉 `new Promise` 嵌套，改为 async/await 写法 (2cde224)
+- refactor: `HotUpdate` 的 `checkUpdate`、`readLocalManifest`、`loadRemoteVersionManifest`、`refreshLocalManifest` 由 Promise 链改为 async/await 顺序执行；`startCheckUpdate` 的回调清理逻辑抽取为 `finishCheckUpdate` (2cde224)
+- refactor: `HotUpdateManager.checkUpdate` 改为 async/await，`_updating` 复位改用 `try/finally`，`new HotUpdate()` 构造失败时不再残留"更新中"状态 (2cde224)
+- refactor: `ResLoader` 的 bundle 加载逻辑抽取为独立的 `loadBundle` 方法，`loadSingleUIPackage`、`loadWindowRes` 改为 async/await 写法 (2cde224)
+- refactor: `version.manifest` 的请求超时由 5 秒变为 6 秒（改用 `ReadNetFile.read` 的默认超时）(2cde224)
+
+### Added
+- feat: `ReadNetFile.read<T>(res)` 新增静态 Promise 版网络文件读取接口，`timeout` 默认 6 秒、`responseType` 默认 `text` (2cde224)
+
 ## [0.1.0] - 2026-07-28
 
 > ⚠️ 使用0.0.x 版本开发，不建议升级。
