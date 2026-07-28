@@ -5,7 +5,7 @@ description: Use when publishing a new version of bit-framework to npm. Handles 
 
 # Release
 
-执行 bit-framework 完整发版流程：升级版本号 → 生成 CHANGELOG → 构建 → 提交 → 发布 npm → 打 tag。
+执行 bit-framework 完整发版流程：升级版本号 → 生成 CHANGELOG → 构建 → 提交 → 打 tag → 提醒发布。
 
 ## 用法
 
@@ -77,41 +77,7 @@ git push
 
 `{NEW_VERSION}` 替换为实际的新版本号。
 
-### 第八步：发布到 npm
-
-> **禁止使用 `npm publish`！** 必须通过 `pnpm publish:xxx` 脚本发布。
-> 原因：`pnpm publish` 会自动将 `workspace:*` 替换为实际版本号，而 `npm publish` 会将 `workspace:*` 原样写入，导致安装方无法解析依赖。
-> 任何情况下（包括需要传递 OTP 等参数时）都不得绕过 pnpm 直接调用 npm publish。
-
-确认已登录 npm：
-```bash
-npm whoami
-```
-
-按依赖顺序发布：
-```bash
-pnpm publish:core
-pnpm publish:event
-pnpm publish:net
-pnpm publish:ecs
-pnpm publish:assets
-pnpm publish:quadtree
-pnpm publish:behaviortree
-pnpm publish:ui
-pnpm publish:condition
-pnpm publish:ec
-pnpm publish:minigame
-pnpm publish:hotupdate
-```
-
-#### OTP 处理
-
-如果发布时遇到 OTP（2FA 验证码）错误：
-1. **优先方案**：建议用户在 npmjs.com 创建 Automation token 配置到 `~/.npmrc`，彻底绕过 OTP
-2. **备选方案**：让用户在终端手动执行 `pnpm publish:all`，由 npm 交互式完成 OTP 验证
-3. **绝对禁止**：不得为了传递 `--otp` 参数而改用 `npm publish`
-
-### 第九步：打 git tag
+### 第八步：打 git tag
 
 ```bash
 git tag v{NEW_VERSION}
@@ -119,6 +85,10 @@ git push --tags
 ```
 
 `{NEW_VERSION}` 替换为实际的新版本号。
+
+### 第八步：提醒发布到 npm
+
+由于OTP限制，让用户在终端手动执行 `pnpm publish:all`，由 npm 交互式完成 OTP 验证后发布
 
 ### 完成
 
