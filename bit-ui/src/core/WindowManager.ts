@@ -72,7 +72,7 @@ export class WindowManager {
     }
 
     /** 
-     * 添加手动管理资源加载 和 卸载的包名
+     * 添加手动管理资源加载、卸载的包名
      * @param pkgName 包名
      */
     public static addManualPackage(pkgName: string): void {
@@ -83,13 +83,13 @@ export class WindowManager {
      * 提供一种特殊需求 用来手动设置包所在的 bundle名 以及包在bundle中的路径
      * @param name 窗口名称
      * @param bundleName bundle名 默认: resources
-     * @param path 包在bundle中的路径 默认: ui目录
+     * @param path 包在bundle中的路径 (不包含包名本身)
      */
-    public static setPackageInfo(pkgName: string, bundleName: string = "resources", path: string = "ui"): void {
+    public static setPackageInfo(pkgName: string, bundleName: string = "resources", path: string = ""): void {
         if (bundleName !== "resources") {
             InfoPool.addBundleName(pkgName, bundleName);
         }
-        if (path !== "ui") {
+        if (path && path !== "") {
             InfoPool.addPackagePath(pkgName, path);
         }
     }

@@ -198,7 +198,10 @@ export class InfoPool {
      * @internal
      */
     public static getPackagePath(pkg: string): string {
-        return `${this._customPackagePath.get(pkg) || 'ui'}/${pkg}`;
+        if (this._customPackagePath.has(pkg)) {
+            return `${this._customPackagePath.get(pkg)}/${pkg}`;
+        }
+        return pkg;
     }
 
     /** 

@@ -4,7 +4,7 @@
  * @Description: 资源池
  */
 
-import { Asset, AssetManager, resources } from "cc";
+import { Asset, assetManager, AssetManager, resources } from "cc";
 import { AssetUtils } from "./AssetUtils";
 
 export class AssetPool {
@@ -183,6 +183,14 @@ export class AssetPool {
         this._assets.clear();
         this._uuidToName.clear();
         this._batchAssetNames.clear();
+    }
+
+    public static getBundle(bundlename: string = "resources"): AssetManager.Bundle {
+        const bundle = assetManager.getBundle(bundlename);
+        if (!bundle) {
+            throw new Error(`获取bundle失败: bundle名 ${bundlename} 未加载`);
+        }
+        return bundle;
     }
 
     /** 
