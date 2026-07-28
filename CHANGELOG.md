@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.0] - 2026-07-28
+
+> ⚠️ 使用0.0.x 版本开发，不建议升级。
+
+### Changed
+- **Breaking**: UI 包默认路径调整 — `WindowManager.setPackageInfo` 的 `path` 参数默认值由 `"ui"` 改为 `""`，未显式设置路径时包直接从 bundle 根目录查找，不再自动拼接 `ui/` 前缀 (2638490)
+- refactor: `InfoPool.getPackagePath` 只在注册过自定义路径时拼接前缀，否则直接返回包名 (2638490)
+
+### Added
+- feat: `AssetPool.getBundle(bundlename)` 新增获取已加载 bundle 的接口，未加载时抛出异常 (2638490)
+
 ## [0.0.14] - 2026-07-27
 
 ### Changed
