@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-quadtree",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "基于TypeScript的四叉树库",
     "main": "./dist/bit-quadtree.cjs",
     "module": "./dist/bit-quadtree.mjs",

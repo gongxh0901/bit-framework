@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.2] - 2026-07-29
+
+### Added
+- feat: 新增 `WaitWindowManager` 通用等待窗管理，支持引用计数式的 `show`/`hide` 以及 `run` 包裹同步/异步任务 (ef838aa)
+- feat: `IWindowOpenOptions` 新增 `beforeLoad` 打开窗口前的异步准备钩子，在 UI 包资源加载前执行，期间自动显示通用等待窗 (ef838aa)
+
 ## [0.1.1] - 2026-07-28
 
 ### Changed

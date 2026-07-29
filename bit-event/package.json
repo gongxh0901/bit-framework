@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-event",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "bit-event",
     "main": "./dist/bit-event.min.cjs",
     "module": "./dist/bit-event.min.mjs",
