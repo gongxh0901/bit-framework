@@ -11,7 +11,8 @@ import { WindowBase } from "../window/WindowBase";
 import { HeaderManager } from "./HeaderManager";
 import { PropsHelper } from "./PropsHelper";
 import { ResLoader } from "./ResLoader";
-import { IWindowInfo } from "./types";
+import { IWindowInfo, IWindowOpenOptions } from "./types";
+import { WaitWindowManager } from "./WaitWindowManager";
 import { WindowManager } from "./WindowManager";
 
 export class WindowGroup {
@@ -77,21 +78,31 @@ export class WindowGroup {
      * @param userdata
      * @internal
      */
-    public async showWindow<T = any, U = any>(info: IWindowInfo, userdata?: T): Promise<IWindow<T, U>> {
+    public async showWindow<T = any, U = any>(info: IWindowInfo, userdata?: T, options?: IWindowOpenOptions): Promise<IWindow<T, U>> {
         let lastTopWindow = WindowManager.getTopWindow();
 
-        if (WindowManager.hasWindow(info.name)) {
-            const window = WindowManager.getWindow<IWindow>(info.name);
-            this.showAdjustment(window, userdata);
+        try {
+            if (WindowManager.hasWindow(info.name)) {
+                if (options?.beforeLoad) {
+                    await WaitWindowManager.run(() => this.runBeforeLoad(options));
+                }
+                const window = WindowManager.getWindow<IWindow>(info.name);
+                this.showAdjustment(window, userdata);
 
-            if (lastTopWindow && lastTopWindow.name !== window.name) {
-                lastTopWindow._toBottom();
-                window._toTop();
-            }
-            return window;
-        } else {
-            try {
-                await ResLoader.loadWindowRes(info.name);
+                if (lastTopWindow && lastTopWindow.name !== window.name) {
+                    lastTopWindow._toBottom();
+                    window._toTop();
+                }
+                return window;
+            } else {
+                if (options?.beforeLoad) {
+                    await WaitWindowManager.run(async () => {
+                        await this.runBeforeLoad(options);
+                        await ResLoader.loadWindowRes(info.name, false);
+                    });
+                } else {
+                    await ResLoader.loadWindowRes(info.name);
+                }
                 const window = this.createWindow(info.pkgName, info.name);
                 this.showAdjustment(window, userdata);
 
@@ -99,10 +110,21 @@ export class WindowGroup {
                     lastTopWindow._toBottom();
                 }
                 return window;
-            } catch (err: any) {
-                throw new Error(`窗口【${info.name}】打开失败: ${err.message}`);
             }
+        } catch (err: any) {
+            throw new Error(`窗口【${info.name}】打开失败: ${err.message}`);
         }
+    }
+
+    /**
+     * 执行打开窗口前的异步准备逻辑
+     * @internal
+     */
+    private async runBeforeLoad(options?: IWindowOpenOptions): Promise<void> {
+        if (!options?.beforeLoad) {
+            return;
+        }
+        await options.beforeLoad();
     }
 
     /**

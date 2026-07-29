@@ -15,17 +15,11 @@ import { HeaderManager } from "./HeaderManager";
 import { InfoPool } from "./InfoPool";
 import { IPropsConfig, PropsHelper } from "./PropsHelper";
 import { ResLoader } from "./ResLoader";
+import { IWaitWindowCallbacks, IWindowOpenOptions } from "./types";
+import { WaitWindowManager } from "./WaitWindowManager";
 import { WindowGroup } from "./WindowGroup";
 
-/**
- * 从窗口类型中提取 UserData 类型
- */
-type ExtractUserData<T> = T extends Window<infer U, any> ? U : any;
-
-/**
- * 从窗口构造函数中提取窗口实例类型
- */
-type ExtractWindowInstance<T> = T extends new () => infer R ? R : never;
+type WindowUserData<T extends new () => Window<any, any>> = InstanceType<T> extends Window<infer U, any> ? U : any;
 
 export class WindowManager {
     private static _bgAlpha: number = 0.75;
@@ -103,18 +97,19 @@ export class WindowManager {
     }
 
     /**
-     * 设置UI包加载相关回调函数
-     * @param callbacks 包含加载回调的对象
-     * @param callbacks.showWaitWindow 显示加载等待窗的回调
-     * @param callbacks.hideWaitWindow 隐藏加载等待窗的回调
-     * @param callbacks.fail 打开窗口时资源加载失败的回调 code( 1:bundle加载失败 2:包加载失败 )
+     * 设置通用等待窗回调函数
+     * @param callbacks 包含等待窗显示和隐藏回调的对象
      */
-    public static setPackageCallbacks(callbacks: {
-        showWaitWindow: () => void;
-        hideWaitWindow: () => void;
-        fail: (windowName: string, code: 1 | 2, message: string) => void;
-    }): void {
-        ResLoader.setCallbacks(callbacks);
+    public static setWaitWindowCallbacks(callbacks: IWaitWindowCallbacks): void {
+        WaitWindowManager.setCallbacks(callbacks);
+    }
+
+    /**
+     * 使用通用等待窗包裹一个同步或异步任务
+     * @param task 要执行的任务
+     */
+    public static runWithWaitWindow<T>(task: () => T | Promise<T>, context?: string): Promise<T> {
+        return WaitWindowManager.run(task, context);
     }
 
     /**
@@ -140,31 +135,30 @@ export class WindowManager {
     }
 
     /**
-     * 异步打开一个窗口 (如果UI包的资源未加载, 会自动加载 可以配合 WindowManager.setPackageCallbacks一起使用)
+     * 异步打开一个窗口 (如果UI包的资源未加载, 会自动加载 可以配合 WindowManager.setWaitWindowCallbacks一起使用)
      * @param 窗口类
      * @param userdata 用户数据
      */
-    public static showWindow<T extends new () => Window<any, any>>(window: T, userdata?: ExtractUserData<ExtractWindowInstance<T>>): Promise<ExtractWindowInstance<T>> {
+    public static showWindow<T extends new () => Window<any, any>>(window: T, userdata?: WindowUserData<T>, options?: IWindowOpenOptions): Promise<InstanceType<T>> {
         // 优先使用装饰器设置的静态属性，避免代码混淆后 constructor.name 变化
         const name = (window as any)[MetadataKey.originalName];
         if (!name) {
             // 注意: 这里必须同步抛出, 未注册属于使用错误, 不能变成 Promise rejection 被静默吞掉
             throw new Error(`窗口【${window.name}】未注册，请使用 _uidecorator.uiclass 注册窗口`);
         }
-        return this.showWindowByName(name, userdata) as Promise<ExtractWindowInstance<T>>;
+        return this.showWindowByName(name, userdata, options) as Promise<InstanceType<T>>;
     }
 
     /** 
      * 通过窗口名称打开一个窗口
      * @param name 窗口名称
      * @param userdata 用户数据
-     * @internal
      */
-    public static showWindowByName<T = any, U = any>(name: string, userdata?: T): Promise<IWindow<T, U>> {
+    public static showWindowByName<T = any, U = any>(name: string, userdata?: T, options?: IWindowOpenOptions): Promise<IWindow<T, U>> {
         // 找到他所属的窗口组 (InfoPool.get 未注册时同步抛出)
         const info = InfoPool.get(name);
         const group = this.getWindowGroup(info.group);
-        return group.showWindow<T, U>(info, userdata);
+        return group.showWindow<T, U>(info, userdata, options);
     }
 
     /**

@@ -90,17 +90,18 @@ npm install @gongxh/bit-ui
 全局窗口管理器，负责窗口的创建、显示、关闭等。
 
 **配置方法**：
-- `setPackageCallbacks(callbacks)` - 设置 UI 包加载回调
-  - `callbacks.showWaitWindow` - 显示加载等待窗口
-  - `callbacks.hideWaitWindow` - 隐藏加载等待窗口
-  - `callbacks.fail` - 加载失败回调
+- `setWaitWindowCallbacks(callbacks)` - 设置通用等待窗回调
+  - `callbacks.showWaitWindow` - 显示等待窗口
+  - `callbacks.hideWaitWindow` - 隐藏等待窗口
+- `runWithWaitWindow(task)` - 使用通用等待窗包裹一个同步或异步任务
 - `addManualPackage(pkgName)` - 添加手动管理资源的包
 - `setPackageInfo(pkgName, bundleName?, path?)` - 设置包所在的 bundle 和路径
 - `setUIConfig(config)` - 设置 UI 导出数据
 
 **窗口操作**：
-- `showWindow<T>(windowClass, userdata?)` - 异步打开窗口（自动加载资源）
+- `showWindow<T>(windowClass, userdata?, options?)` - 异步打开窗口（自动加载资源）
   - 参数是窗口类（构造函数），非窗口名称
+  - `options.beforeLoad` 可在 UI 包加载前执行额外资源加载或网络请求，执行期间复用通用等待窗
 - `closeWindow<T>(windowClass)` - 关闭窗口（通过窗口类）
 - `closeWindowByName(name)` - 关闭窗口（通过窗口名称）
 - `getWindow<T>(name)` - 获取窗口实例
@@ -136,9 +137,20 @@ npm install @gongxh/bit-ui
 1. **FairyGUI 设计** - 使用 FairyGUI 编辑器设计界面
 2. **定义窗口类** - 继承 Window 并使用 @uiclass 装饰器注册
 3. **配置属性和事件** - 使用 @uiprop 和 @uiclick 标记
-4. **配置加载回调** - 调用 `WindowManager.setPackageCallbacks()`（可选）
+4. **配置等待窗回调** - 调用 `WindowManager.setWaitWindowCallbacks()`（可选）
 5. **打开窗口** - 调用 `WindowManager.showWindow(MyWindow, userdata)`
 6. **管理生命周期** - 实现窗口生命周期方法
+
+打开窗口前需要额外加载资源或请求服务器数据时，可以使用 `beforeLoad`。该逻辑会先于 UI 包加载执行，完成后才会创建并显示窗口：
+
+```ts
+await WindowManager.showWindow(MyWindow, userdata, {
+    beforeLoad: async () => {
+        await loadExtraAsset();
+        userdata.serverData = await requestServerData();
+    },
+});
+```
 
 详细 API 请查看 `bit-ui.d.ts` 类型定义文件和 FairyGUI 官方文档。
 

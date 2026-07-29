@@ -21,3 +21,18 @@ export interface IHeaderInfo {
     /** fgui包名 */
     pkgName: string;
 }
+
+export interface IWaitWindowCallbacks {
+    /** 显示等待窗口 */
+    showWaitWindow: (context?: string) => void;
+    /** 隐藏等待窗口 */
+    hideWaitWindow: () => void;
+}
+
+export interface IWindowOpenOptions {
+    /**
+     * 打开窗口前的异步准备逻辑。
+     * 会在UI包资源加载前执行，执行期间使用通用等待窗。
+     */
+    beforeLoad?: () => void | Promise<void>;
+}
