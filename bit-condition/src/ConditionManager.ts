@@ -26,7 +26,7 @@ export class ConditionManager {
     private static _updating: boolean = false;
 
     /** 初始化所有条件，并全部更新一次 */
-    public static initCondition(): void {
+    public static init(): void {
         const conditionMaps = _conditionDecorator.getConditionMaps();
         conditionMaps.forEach((ctor, conditionType) => {
             if (!this._typeToCondition.has(conditionType)) {
@@ -50,8 +50,8 @@ export class ConditionManager {
         if (this._updating) {
             throw new Error("请不要在ConditionManager更新过程中添加要更新的条件");
         }
-        this._typeToNotifyNodes.set(condition.type, new Set<ConditionNode>());
-        this._typeToCondition.set(condition.type, condition);
+        this._typeToNotifyNodes.set(condition._type, new Set<ConditionNode>());
+        this._typeToCondition.set(condition._type, condition);
         this._needUpdateConditions.add(condition);
     }
 
@@ -95,7 +95,7 @@ export class ConditionManager {
             return;
         }
         // 添加通知类型对应节点
-        let nodes = this._typeToNotifyNodes.get(condition.type);
+        let nodes = this._typeToNotifyNodes.get(condition._type);
         if (!nodes.has(conditionNode)) {
             nodes.add(conditionNode);
         }
@@ -105,8 +105,8 @@ export class ConditionManager {
             conditionTypes = new Set<number>();
             this._nodeToConditionTypes.set(conditionNode, conditionTypes);
         }
-        if (!conditionTypes.has(condition.type)) {
-            conditionTypes.add(condition.type);
+        if (!conditionTypes.has(condition._type)) {
+            conditionTypes.add(condition._type);
         }
     }
 
@@ -173,8 +173,8 @@ export class ConditionManager {
             return;
         }
         // 条件改变，收集需要更新的通知节点
-        if (this._typeToNotifyNodes.has(condition.type)) {
-            let nodes = this._typeToNotifyNodes.get(condition.type);
+        if (this._typeToNotifyNodes.has(condition._type)) {
+            let nodes = this._typeToNotifyNodes.get(condition._type);
             let needUpdateConditionNodes = this._needUpdateNodes;
             for (const conditionNode of nodes) {
                 if (!needUpdateConditionNodes.has(conditionNode)) {

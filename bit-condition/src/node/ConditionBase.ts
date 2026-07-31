@@ -12,11 +12,15 @@ export abstract class ConditionBase {
         this.onInit();
     }
 
-    /** 条件类型 */
-    public type: number;
+    /** 
+     * 条件类型
+     * @internal
+     */
+    public _type: number;
 
     /** 是否可以通知 @internal */
     private _canNotify: boolean;
+
     /**
      * 是否可以通知
      * @returns {boolean}
@@ -26,12 +30,13 @@ export abstract class ConditionBase {
     }
 
     public tryUpdate(): void {
-        ConditionManager._addUpdateCondition(this.type);
+        ConditionManager._addUpdateCondition(this._type);
     }
 
     /**
      * 更新条件
      * @returns {boolean} 是否发生变化
+     * @internal
      */
     public _updateCondition(): boolean {
         let canNotify = this.evaluate();
