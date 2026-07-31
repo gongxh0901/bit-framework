@@ -21,12 +21,12 @@ export abstract class CocosEntry extends Component {
 
     /**
      * 虚函数，子类需要实现
-     * kunpo库初始化完成后调用
+     * bit库初始化完成后调用
      */
     public abstract onInit(): void;
 
     /**
-     * 开始初始化kunpo框架
+     * 开始初始化bit框架
      * @internal
      */
     protected start(): void {

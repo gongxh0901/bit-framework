@@ -1,6 +1,6 @@
 # 行为树使用指南
 
-本指南将详细介绍如何使用 kunpocc-behaviortree 库和行为树编辑器。
+本指南将详细介绍如何使用 bit-behaviortree 库和行为树编辑器。
 
 ## 一、开发环境
 - 引擎版本：Cocos Creator 3.8.6
@@ -11,9 +11,9 @@
 
 
 ## 二、安装
-1. 安装 kunpocc-behaviortree 
+1. 安装 bit-behaviortree 
    ```
-   npm install kunpocc-behaviortree
+   npm install bit-behaviortree
    ```
    
 2. 下载扩展插件(bt-editor)
@@ -22,7 +22,7 @@
     ```typescript
     // 比如在项目代码目录下添加一个文件 header.ts
     // 写上如下代码
-    import * as BT from "kunpocc-behaviortree";
+    import * as BT from "bit-behaviortree";
     export { BT };
     ```
     

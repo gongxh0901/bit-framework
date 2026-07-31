@@ -10,7 +10,7 @@ import { ConditionManager } from "./ConditionManager";
 const { ccclass, menu, property } = _decorator;
 
 @ccclass("ConditionModule")
-@menu("kunpo/condition/ConditionModule")
+@menu("bit/condition/ConditionModule")
 export class ConditionModule extends Module {
     @property({
         displayName: "更新间隔（秒）",

@@ -4,11 +4,9 @@
 
 ## 下载地址
 
-#### github仓库: [https://github.com/gongxh0901/kunpocc-behaviortree](https://github.com/gongxh0901/kunpocc-behaviortree)
+#### github仓库: [https://github.com/gongxh0901/bit-framework/tree/main/bit-behaviortree](https://github.com/gongxh0901/bit-framework/tree/main/bit-behaviortree)
 
-#### 可视化工具地址: 敬请期待
-
-
+#### 可视化工具地址: [Cocos Store - bt-editor](https://store.cocos.com/app/detail/8201)
 
 ## 第一部分：基础概念篇
 

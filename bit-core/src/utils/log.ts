@@ -4,7 +4,7 @@
  * @Description: log相关的api
  */
 
-import { KUNPO_DEBUG } from "../header";
+import { BIT_DEBUG } from "../header";
 
 function log(...args: any[]): void {
     console.log("bit-framework:", ...args);
@@ -15,7 +15,7 @@ function log(...args: any[]): void {
  * @param args 
  */
 function debug(...args: any[]): void {
-    KUNPO_DEBUG && console.log("bit-framework:", ...args);
+    BIT_DEBUG && console.log("bit-framework:", ...args);
 }
 
 /**
@@ -23,7 +23,7 @@ function debug(...args: any[]): void {
  * @param args 
  */
 function info(...args: any[]): void {
-    KUNPO_DEBUG && console.info("bit-framework:", ...args);
+    BIT_DEBUG && console.info("bit-framework:", ...args);
 }
 
 /**
@@ -31,7 +31,7 @@ function info(...args: any[]): void {
  * @param args 
  */
 function warn(...args: any[]): void {
-    KUNPO_DEBUG && console.warn("bit-framework:", ...args);
+    BIT_DEBUG && console.warn("bit-framework:", ...args);
 }
 
 /**
@@ -39,6 +39,6 @@ function warn(...args: any[]): void {
  * @param args 
  */
 function error(...args: any[]): void {
-    KUNPO_DEBUG && console.error("bit-framework:", ...args);
+    BIT_DEBUG && console.error("bit-framework:", ...args);
 }
 export { debug, error, info, log, warn };

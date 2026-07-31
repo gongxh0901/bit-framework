@@ -124,7 +124,7 @@ export class ECManager {
      * 创建实体
      * @param worldName 实体管理器名称
      * @param name 实体名字
-     * @returns {kunpo.Entity} 实体
+     * @returns {Entity} 实体
      */
     public static createEntity(worldName: string, name: string): Entity {
         let info = this.getEntityInfo(name);
