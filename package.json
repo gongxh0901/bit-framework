@@ -1,6 +1,6 @@
 {
   "name": "@gongxh/bit-framework",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "description": "bit-framework monorepo - Cocos Creator 游戏框架",
   "scripts": {

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.4] - 2026-07-31
+
+### Changed
+- refactor: 清理残留的 kunpo 命名，统一改为 bit（`KUNPO_DEBUG` → `BIT_DEBUG`，文档与注释中的 `kunpocc-behaviortree`/`kunpo` 引用更新为 `bit-behaviortree`/`bit`）(9d6a005)
+
 ## [0.1.3] - 2026-07-30
 
 ### Changed
