@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.5] - 2026-08-03
+
+### Added
+- feature: bit-condition 导出 `ConditionBase` (5972986)
+
+### Changed
+- refactor: bit-condition API 重命名（`type` → `_type`，`init` → `conditionClass`）(23b826b)
+
 ## [0.1.4] - 2026-07-31
 
 ### Changed
