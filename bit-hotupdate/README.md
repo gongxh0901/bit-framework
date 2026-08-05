@@ -24,61 +24,55 @@ npm install @gongxh/bit-hotupdate
 
 ### 热更新管理器 (HotUpdateManager)
 
-全局单例，负责热更新配置和实例管理。
+全局单例，是推荐使用的入口，内部会自动创建和管理 `HotUpdate` 实例。
 
-**初始化配置**：
+**初始化**：
 - `getInstance()` - 获取单例实例
-- `init(config)` - 初始化热更新系统
-  - `config.manifestUrl` - 本地 manifest 文件路径
-  - `config.writablePath` - 热更新资源存储路径
-
-**实例管理**：
-- `create()` - 创建热更新实例
-- `resVersion` - 获取当前资源版本号
-
-### 热更新实例 (HotUpdate)
-
-执行具体的更新操作。
+- `init(manifestUrl, version)` - 初始化热更新系统，游戏启动时调用一次
+  - `manifestUrl` - 本地 project.manifest 文件地址（`assets.nativeUrl`）
+  - `version` - 带 build 号的游戏版本号，如 `1.0.0.23`
 
 **检查更新**：
 - `checkUpdate()` - 检查是否有新版本
-  - 返回 `Promise<ICheckUpdatePromiseResult>`
-  - 成功：返回新版本信息和文件大小
-  - 失败：返回错误码和消息
+  - 返回 `Promise<{ needUpdate: boolean, size?: number }>`
+  - `needUpdate` - 是否需要更新
+  - `size` - 需要下载的资源大小（KB），仅 `needUpdate` 为 `true` 时有效
+  - 失败（未初始化 / 正在更新或检查中）会 `throw Error`，需自行 `try/catch`
 
 **开始更新**：
 - `startUpdate(options)` - 开始下载更新
-  - `options.skipCheck` - 是否跳过检查（默认 false）
+  - `options.skipCheck` - 是否跳过检查更新（默认 `false`）
   - `options.progress` - 进度回调 `(downloadedKB, totalKB) => void`
-  - `options.complete` - 完成回调 `(code, message) => void`
+  - `options.complete` - 结束回调 `(code: HotUpdateCode, message: string) => void`，见下方状态码说明
+  - 平台不支持 / 未初始化 / 正在更新中 会通过 `complete` 回调（未初始化除外，会 `throw Error`）通知，不会开始下载
 
 **重试更新**：
-- `retryUpdate()` - 重试失败的资源下载
+- `retryUpdate()` - 重试失败的资源下载，必须在调用过 `startUpdate()` 之后使用，否则 `throw Error`
 
 **属性**：
-- `resVersion` - 当前资源版本号
+- `writablePath` - 热更新资源存储的可写路径
+- `manifestUrl` - 本地 manifest 路径
+- `version` - 初始化时传入的游戏版本号
+- `resVersion` - 当前资源版本号（get/set），须初始化成功后再读取
+
+### 典型使用流程
+
+1. **初始化** - 游戏启动时调用 `HotUpdateManager.getInstance().init(manifestUrl, version)`
+2. **检查更新** - 调用 `checkUpdate()`，根据 `needUpdate` 和 `size` 决定是否提示用户
+3. **提示用户** - 显示更新对话框（如果需要更新）
+4. **开始更新** - 用户确认后调用 `startUpdate({ progress, complete })`
+5. **显示进度** - 在 `progress` 回调里更新进度条
+6. **处理结果** - 根据 `complete` 回调的 `code` 判断跳过还是重试；更新成功会自动重启游戏，不会触发 `complete`
 
 ### 状态码 (HotUpdateCode)
 
-定义了所有可能的更新状态：
+`complete` 回调收到的错误码，成功更新不会走这个回调（会直接重启游戏）：
 
-**成功状态**：
-- `Succeed` (0) - 更新成功
-
-**特殊状态**：
-- `PlatformNotSupported` (-1000) - 平台不支持（非原生平台）
-- `NotInitialized` (-1001) - 未初始化
-- `LatestVersion` (-1002) - 已是最新版本
-- `Updating` (-1003) - 更新中
-
-**错误状态**：
-- `LoadManifestFailed` (-1004) - 加载本地 manifest 失败
-- `ParseManifestFailed` (-1005) - 解析 manifest 文件失败
-- `LoadVersionFailed` (-1006) - 下载 version.manifest 失败
-- `ParseVersionFailed` (-1007) - 解析 version.manifest 失败
-- `UpdateFailed` (-1008) - 更新失败（可重试）
-- `UpdateError` (-1009) - 更新错误
-- `DecompressError` (-1010) - 解压错误
+- `LatestVersion` (-1001) - 已是最新版本，或当前平台不需要热更新
+- `Updating` (-1002) - 正在更新或正在检查更新中
+- `WaitRetry` (-1003) - 单次下载失败，可调用 `retryUpdate()` 重试
+- `UpdateError` (-1004) - 更新过程出现不可恢复的错误（含解压失败），一般需要重启游戏重新走一次流程
+- `CheckError` (-1005) - 检查更新阶段出错（读取本地/远程 manifest 失败等），具体原因见 `message`
 
 ### Manifest 文件
 
@@ -91,16 +85,6 @@ npm install @gongxh/bit-hotupdate
 2. **version.manifest** - 轻量级版本文件
    - 只包含版本信息
    - 用于快速检查版本
-
-### 典型使用流程
-
-1. **初始化** - 游戏启动时初始化 HotUpdateManager
-2. **创建实例** - 创建 HotUpdate 实例
-3. **检查更新** - 调用 checkUpdate() 检查新版本
-4. **提示用户** - 显示更新对话框
-5. **开始更新** - 用户确认后调用 startUpdate()
-6. **显示进度** - 更新进度条
-7. **处理结果** - 更新成功后重启游戏
 
 ### 服务端配置
 
