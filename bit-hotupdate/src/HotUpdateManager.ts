@@ -76,7 +76,7 @@ export class HotUpdateManager {
     /**
      * 1. 初始化热更新管理器
      * @param manifestUrl 传入本地manifest文件地址 资源的assets.nativeUrl
-     * @param version 游戏版本号 eg: 1.0.0
+     * @param version 带build号的游戏版本号 eg: 1.0.0.23
      */
     public init(manifestUrl: string, version: string): void {
         if (this._isInitialized) {
