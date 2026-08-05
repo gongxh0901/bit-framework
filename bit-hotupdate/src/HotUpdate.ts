@@ -23,10 +23,12 @@ export enum HotUpdateCode {
     Updating = -1002,
     /** 更新失败 等待重试 */
     WaitRetry = -1003,
-    /** 更新错误 */
-    UpdateError = -1004,
     /** 检查更新错误 */
-    CheckError = -1005,
+    CheckError = -1004,
+    /** 解压错误 */
+    DecompressError = -1005,
+    /** 更新错误 */
+    UpdateError = -1006,
 }
 
 const TAG = "hotupdate:";
@@ -150,7 +152,7 @@ export class HotUpdate {
                 }
                 case native.EventAssetsManager.ERROR_DECOMPRESS: {
                     // 解压出错了, 一般是开发中的问题, 重启游戏
-                    this._complete(HotUpdateCode.UpdateError, event.getMessage());
+                    this._complete(HotUpdateCode.DecompressError, event.getMessage());
                     break;
                 }
                 default:
