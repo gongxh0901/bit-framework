@@ -4,7 +4,7 @@
  * @Description: 热更新管理器
  */
 
-import { ICheckUpdatePromiseResult, log, Platform } from "@gongxh/bit-core";
+import { log, Platform } from "@gongxh/bit-core";
 import { native } from "cc";
 import { HotUpdate, HotUpdateCode } from "./HotUpdate";
 
@@ -98,20 +98,22 @@ export class HotUpdateManager {
     /** 
      * 检查是否存在热更新
      * 提供一个对外的方法检查是否存在热更新
-     * @return {Promise<ICheckUpdatePromiseResult>} 
+     * @return {Promise<{ needUpdate: boolean, size?: number }>} 
+     * @return {needUpdate} 是否需要更新
+     * @return {size} 需要更新的资源大小 (KB)
      */
-    public async checkUpdate(): Promise<ICheckUpdatePromiseResult> {
+    public async checkUpdate(): Promise<{ needUpdate: boolean, size?: number }> {
         if (!Platform.isNativeMobile) {
-            throw { code: HotUpdateCode.PlatformNotSupported, message: "当前平台不需要热更新" };
+            return { needUpdate: false };
         }
         if (!this._isInitialized) {
-            throw { code: HotUpdateCode.NotInitialized, message: "未初始化, 需要先调用init方法" };
+            throw new Error("未初始化, 需要先调用init方法");
         }
         if (this._updating) {
-            throw { code: HotUpdateCode.Updating, message: "正在更新或者正在检查更新中" };
+            throw new Error("正在更新或者正在检查更新中");
         }
         this._updating = true;
-        // 这里失败后不处理, 继续抛出错误
+
         try {
             this._hotUpdate = new HotUpdate();
             return await this._hotUpdate.checkUpdate();
@@ -128,38 +130,26 @@ export class HotUpdateManager {
      */
     public startUpdate(res: { skipCheck: boolean, progress: (kb: number, total: number) => void, complete: (code: HotUpdateCode, message: string) => void }): void {
         if (!Platform.isNativeMobile) {
-            res.complete(HotUpdateCode.PlatformNotSupported, "当前平台不需要热更新");
+            res.complete(HotUpdateCode.LatestVersion, "当前平台不需要热更新");
             return;
         }
         if (!this._isInitialized) {
-            res.complete(HotUpdateCode.NotInitialized, "未初始化, 需要先调用init方法");
-            return;
+            throw new Error("HotUpdateManager 未初始化, 需要先调用init方法");
         }
         if (this._updating) {
             res.complete(HotUpdateCode.Updating, "正在更新或者正在检查更新");
             return;
         }
         this._updating = true;
-        if (res.skipCheck && this._hotUpdate) {
-            this._hotUpdate.startUpdate({
-                skipCheck: res.skipCheck,
-                progress: res.progress,
-                complete: (code: HotUpdateCode, message: string) => {
-                    this._updating = false;
-                    res.complete(code, message);
-                }
-            });
-        } else {
-            this._hotUpdate = new HotUpdate();
-            this._hotUpdate.startUpdate({
-                skipCheck: false,
-                progress: res.progress,
-                complete: (code: HotUpdateCode, message: string) => {
-                    this._updating = false;
-                    res.complete(code, message);
-                }
-            });
-        }
+        this._hotUpdate = (res.skipCheck && this._hotUpdate) ? this._hotUpdate : new HotUpdate();
+        this._hotUpdate.startUpdate({
+            skipCheck: res.skipCheck || false,
+            progress: res.progress,
+            complete: (code: HotUpdateCode, message: string) => {
+                this._updating = false;
+                res.complete(code, message);
+            }
+        });
     }
 
     /** 重试失败的资源 */
