@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.1] - 2026-08-05
+
+### Changed
+- 热更新调整：`HotUpdateCode` 新增解压错误码 `DecompressError`，与更新错误码 `UpdateError` 区分开 (735691a)
+
 ## [0.2.0] - 2026-08-05
 
 ### Changed
