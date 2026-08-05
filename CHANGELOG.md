@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.0] - 2026-08-05
+
+### Changed
+- refactor: 简化 `bit-hotupdate` 错误处理，`checkUpdate` 返回结构化结果 `{needUpdate, size}` 替代抛出异常载荷 (f8cd5ec)
+- 热更新初始化注释修改 (e7cb685)
+
+### Chore
+- chore: 清理废弃的 `IPromiseResult`/`ICheckUpdatePromiseResult` 类型，同步 `bit-hotupdate` README (cde994a)
+
 ## [0.1.5] - 2026-08-03
 
 ### Added

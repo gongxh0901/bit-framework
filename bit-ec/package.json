@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-ec",
-    "version": "0.1.5",
+    "version": "0.2.0",
     "description": "基于creator的ec库",
     "main": "./dist/bit-ec.cjs",
     "module": "./dist/bit-ec.mjs",
