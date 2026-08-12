@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.2] - 2026-08-12
+
+### Added
+- feature: 支持临时替换 version.manifest 便于线上热更测试 (5619f4a)
+
 ## [0.2.1] - 2026-08-05
 
 ### Changed

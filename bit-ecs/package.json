@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-ecs",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "description": "一个ts实现的ECS系统",
     "main": "./dist/bit-ecs.cjs",
     "module": "./dist/bit-ecs.mjs",
