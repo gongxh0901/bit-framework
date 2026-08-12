@@ -5,16 +5,19 @@
  */
 
 import { log, Platform } from "@gongxh/bit-core";
-import { native } from "cc";
+import { native, sys } from "cc";
 import { HotUpdate, HotUpdateCode } from "./HotUpdate";
 
 const TAG = "hotupdate:";
+const ONCE_HOTUPDATE_TEMP_MODIFY_VERSION_MANIFEST = "bit-framework-once-hotupdate-temp-modify-version-manifest";
 
 export class HotUpdateManager {
     private static instance: HotUpdateManager;
     public static getInstance(): HotUpdateManager {
         if (!HotUpdateManager.instance) {
             HotUpdateManager.instance = new HotUpdateManager();
+            HotUpdateManager.instance.tempVersionManifestName = sys.localStorage.getItem(ONCE_HOTUPDATE_TEMP_MODIFY_VERSION_MANIFEST) || "";
+            sys.localStorage.removeItem(ONCE_HOTUPDATE_TEMP_MODIFY_VERSION_MANIFEST);
         }
         return HotUpdateManager.instance;
     }
@@ -34,6 +37,9 @@ export class HotUpdateManager {
 
     /** 更新实例 */
     private _hotUpdate: HotUpdate = null;
+
+    /** 临时用的 version.manifest 文件名 */
+    public tempVersionManifestName: string = '';
 
     /** 
      * 热更新文件存放的可写路径
@@ -158,5 +164,10 @@ export class HotUpdateManager {
             throw new Error(`${TAG} 使用前 必须使用过startUpdate方法`);
         }
         this._hotUpdate.retryUpdate();
+    }
+
+    /** 保存一个测试用的标记，下次热更新替换掉 version.manifest 文件的文件名，从读取指定的文件用来热更, 方便线上版本测试 */
+    public onceModifyVersionManifestUrlName(name: string): void {
+        sys.localStorage.setItem(ONCE_HOTUPDATE_TEMP_MODIFY_VERSION_MANIFEST, name);
     }
 }

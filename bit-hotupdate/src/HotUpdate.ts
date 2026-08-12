@@ -45,7 +45,12 @@ export class HotUpdate {
 
     /** 获取 version.manifest 文件的远程地址 */
     private get versionUrl(): string {
-        return this._am?.getLocalManifest()?.getVersionFileUrl() || "";
+        let versionFileUrl = this._am?.getLocalManifest()?.getVersionFileUrl() || "";
+        if (HotUpdateManager.getInstance().tempVersionManifestName) {
+            versionFileUrl = versionFileUrl.replace("version.manifest", HotUpdateManager.getInstance().tempVersionManifestName);
+        }
+        debug(`${TAG} version manifest路径:${versionFileUrl}`);
+        return versionFileUrl;
     }
 
     constructor() {
@@ -126,10 +131,10 @@ export class HotUpdate {
 
                     // Prepend the manifest's search path
                     let searchPaths = native.fileUtils.getSearchPaths();
-                    // log(`${TAG} 当前搜索路径:${JSON.stringify(searchPaths)}`);
+                    debug(`${TAG} 当前搜索路径:${JSON.stringify(searchPaths)}`);
 
                     let newPaths = this._am.getLocalManifest().getSearchPaths();
-                    // log(`${TAG} 新搜索路径:${JSON.stringify(newPaths)}`);
+                    debug(`${TAG} 新搜索路径:${JSON.stringify(newPaths)}`);
 
                     Array.prototype.unshift.apply(searchPaths, newPaths);
                     sys.localStorage.setItem('hotupdate::version', HotUpdateManager.getInstance().version);
@@ -213,7 +218,7 @@ export class HotUpdate {
         // 替换manifest中的内容
         const now = `${Time.now()}`;
         manifest.remoteManifestUrl = Utils.addUrlParam(versionManifest.remoteManifestUrl, "timeStamp", now);
-        manifest.remoteVersionUrl = Utils.addUrlParam(versionManifest.remoteVersionUrl, "timeStamp", now);
+        manifest.remoteVersionUrl = Utils.addUrlParam(this.versionUrl, "timeStamp", now);
         manifest.packageUrl = versionManifest.packageUrl;
 
         // 注册本地 manifest 根目录
@@ -225,10 +230,10 @@ export class HotUpdate {
         const manifestRoot = found !== -1 ? manifestUrl.substring(0, found + 1) : "";
         this._am.getLocalManifest().parseJSONString(JSON.stringify(manifest), manifestRoot);
         // log(TAG + "manifest root:" + this._am.getLocalManifest().getManifestRoot());
-        // log(TAG + "manifest packageUrl:" + this._am.getLocalManifest().getPackageUrl());
-        // log(TAG + "manifest version:" + this._am.getLocalManifest().getVersion());
-        // log(TAG + "manifest versionFileUrl:" + this._am.getLocalManifest().getVersionFileUrl());
-        // log(TAG + "manifest manifestFileUrl:" + this._am.getLocalManifest().getManifestFileUrl());
+        debug(TAG + "manifest packageUrl:" + this._am.getLocalManifest().getPackageUrl());
+        debug(TAG + "manifest version:" + this._am.getLocalManifest().getVersion());
+        debug(TAG + "manifest versionFileUrl:" + this._am.getLocalManifest().getVersionFileUrl());
+        debug(TAG + "manifest manifestFileUrl:" + this._am.getLocalManifest().getManifestFileUrl());
     }
 
     /** 调用cc的接口检测更新 */
