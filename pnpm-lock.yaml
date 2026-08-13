@@ -46,8 +46,8 @@ importers:
         specifier: workspace:*
         version: link:../bit-core
       '@gongxh/fairygui-cc':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.3
+        version: 0.0.3
 
   bit-core: {}
 
@@ -86,8 +86,8 @@ importers:
         specifier: workspace:*
         version: link:../bit-core
       '@gongxh/fairygui-cc':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.3
+        version: 0.0.3
 
 packages:
 
@@ -106,8 +106,8 @@ packages:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
 
-  '@gongxh/fairygui-cc@0.0.2':
-    resolution: {integrity: sha512-FlGir7bxn3UQpLHkGjNsxKW9VWDTyHTRCTztXMN751kxG6VqNk49JYU9WM5dadRs2IKwd4eEinWqNCmz2jdtag==}
+  '@gongxh/fairygui-cc@0.0.3':
+    resolution: {integrity: sha512-eNI9thXI4U5CbVvKgjaULR/ISFvij7zHwsWt023cdP3wsMmHEoYevASRcp4MIZvUwkh1TQZytYKUZCC6GyKVqw==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -448,7 +448,7 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  '@gongxh/fairygui-cc@0.0.2': {}
+  '@gongxh/fairygui-cc@0.0.3': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:

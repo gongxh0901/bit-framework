@@ -37,6 +37,6 @@
     },
     "dependencies": {
         "@gongxh/bit-core": "workspace:*",
-        "@gongxh/fairygui-cc": "^0.0.2"
+        "@gongxh/fairygui-cc": "^0.0.3"
     }
 }
