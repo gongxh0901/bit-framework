@@ -1,95 +1,88 @@
 ---
 name: release
-description: Use when publishing a new version of bit-framework to npm. Handles version bump, build, git commit, npm publish, and git tag in sequence.
+description: Use when publishing a new version of bit-framework to npm, including the vendor/fairygui-cc submodule.
 ---
 
 # Release
-
-执行 bit-framework 完整发版流程：升级版本号 → 生成 CHANGELOG → 构建 → 提交 → 打 tag → 提醒发布。
-
-## 用法
 
 ```
 /release [patch|minor|major]
 ```
 
-- `patch`（默认）— bug 修复，0.0.x → 0.0.x+1
-- `minor` — 新功能，0.x.0 → 0.x+1.0
-- `major` — 破坏性变更，x.0.0 → x+1.0.0
+- `patch`（默认）— 0.0.x → 0.0.x+1
+- `minor` — 0.x.0 → 0.x+1.0
+- `major` — x.0.0 → x+1.0.0
 
-## 执行步骤
+## 步骤
 
-收到 `/release` 命令后，按以下步骤执行：
+### 1. 确认类型
 
-### 第一步：确认版本类型
+未指定则询问：patch / minor / major。
 
-如果用户没有指定类型，询问：
-> 发版类型是 patch（bug修复）、minor（新功能）还是 major（破坏性变更）？
-
-### 第二步：检查当前状态
+### 2. 检查状态
 
 ```bash
 git status
 git log --oneline -5
+git -C vendor/fairygui-cc status
+git -C vendor/fairygui-cc log --oneline -5
 ```
 
-确认工作区干净（无未提交的修改）。如果有未提交内容，提示用户先提交。
+两边工作区都必须干净，否则提示先提交。
 
-### 第三步：从 package.json 获取当前版本
+### 3. 确认版本
 
-读取根目录 `package.json` 的 `version` 字段，告知用户当前版本和即将升级到的版本，请求确认。
+读取根 `package.json` 的 `version`，与 `vendor/fairygui-cc/source/package.json` 对齐。告知当前版本和目标版本，请用户确认。
 
-### 第四步：升级所有模块版本号
-
-使用 pnpm workspace 命令升级所有子模块版本号：
+### 4. 升版本
 
 ```bash
 pnpm version:{type}
 ```
 
-例如 `pnpm version:patch`。该命令会升级所有子模块（排除 bit-creator）的版本号。
+升级全部 workspace 包（含 fgui 和根 `package.json`），不自动 commit / tag。
 
-**然后必须同步升级根 `package.json` 的版本号**，使其与子模块版本一致。直接编辑根 `package.json` 中的 `"version"` 字段为新版本号。
+### 5. CHANGELOG
 
-### 第五步：生成 CHANGELOG
+调用 changelog 技能。
 
-**调用 changelog 技能**生成本次发版的 CHANGELOG 条目。
-
-注意：changelog 技能会从 `package.json` 读取版本号，此时版本号已在第四步更新，所以 CHANGELOG 条目会使用新版本号。
-
-### 第六步：构建所有模块
+### 6. 构建
 
 ```bash
-pnpm build:all
+pnpm build
 ```
 
-如果构建失败，停止流程并报告错误。
+失败则停止。
 
-### 第七步：提交代码
+### 7. 提交（先 submodule，再主仓库）
 
-版本号和 CHANGELOG 都已修改完成，现在统一提交：
+主仓库只记录 submodule 的 SHA，必须先 push submodule。
 
 ```bash
+cd vendor/fairygui-cc
+git add .
+git commit -m "chore: release v{NEW_VERSION}"
+git tag v{NEW_VERSION}
+git push origin ccc3.0
+git push origin v{NEW_VERSION}
+cd ../..
+
 git add .
 git commit -m "chore: release v{NEW_VERSION}"
 git push
 ```
 
-`{NEW_VERSION}` 替换为实际的新版本号。
-
-### 第八步：打 git tag
+### 8. 主仓库 tag
 
 ```bash
 git tag v{NEW_VERSION}
 git push --tags
 ```
 
-`{NEW_VERSION}` 替换为实际的新版本号。
+### 9. 发布
 
-### 第八步：提醒发布到 npm
-
-由于OTP限制，让用户在终端手动执行 `pnpm publish:all`，由 npm 交互式完成 OTP 验证后发布
+提醒用户在终端执行 `pnpm publish:all`（OTP）。不要代为执行。
 
 ### 完成
 
-汇报发版结果：版本号、发布的模块列表、tag。
+汇报版本号、模块列表、两边的 tag。

@@ -15,4 +15,6 @@ packages:
   - 'bit-condition'
   - 'bit-minigame'
   - 'bit-hotupdate'
+  # FairyGUI 官方 fork（git submodule，包在 source/）
+  - 'vendor/fairygui-cc/source'
 

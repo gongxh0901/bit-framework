@@ -41,6 +41,6 @@
     },
     "devDependencies": {
         "@gongxh/bit-core": "workspace:*",
-        "@gongxh/fairygui-cc": "^0.0.3"
+        "@gongxh/fairygui-cc": "workspace:*"
     }
 }

@@ -59,31 +59,8 @@ Bit Framework 包含 12 个核心模块，分为 5 大类别：
 
 ## 📚 项目文档
 
-- [架构设计文档](./ARCHITECTURE.md) - Monorepo 架构、模块分层和设计原则
-- [构建与发布指南](./COMMANDS.md) - 开发、构建、发布完整流程
-
-## 🎯 模块依赖关系
-
-```mermaid
-graph LR
-    Core[bit-core]
-    
-    UI[bit-ui] --> Core
-    Condition[bit-condition] --> Core
-    
-    EC[bit-ec] --> Event[bit-event]
-    
-    Net[bit-net]
-    HotUpdate[bit-hotupdate] --> Core
-    HotUpdate --> Net
-    
-    MiniGame[bit-minigame] --> Core
-    
-    Assets[bit-assets]
-    ECS[bit-ecs]
-    QuadTree[bit-quadtree]
-    BT[bit-behaviortree]
-```
+- [架构设计](./docs/ARCHITECTURE.md)
+- [构建与发布](./docs/COMMANDS.md)
 
 ## 🚀 快速开始
 
@@ -128,76 +105,18 @@ brew install pnpm
 pnpm --version
 ```
 
-#### 2. 克隆仓库并安装依赖
+#### 2. 克隆、安装、构建
 
 ```bash
-# 克隆仓库
-git clone https://github.com/gongxh0901/bit-framework.git
+git clone --recurse-submodules https://github.com/gongxh0901/bit-framework.git
 cd bit-framework
-
-# 安装所有依赖
 pnpm install
+pnpm build
 ```
 
-#### 3. 构建所有模块
-
-```bash
-# 构建所有库
-pnpm build:all
-```
-
-
-
-完整的开发、构建、发布流程请查看 [COMMANDS.md](./COMMANDS.md)
-
-## 📝 版本管理
-
-### 升级版本
-
-```bash
-# 升级补丁版本 (0.0.1 -> 0.0.2)
-pnpm version:patch
-
-# 升级次版本 (0.0.1 -> 0.1.0)
-pnpm version:minor
-
-# 升级主版本 (0.0.1 -> 1.0.0)
-pnpm version:major
-```
-
-### 发布到 npm
-
-```bash
-# 发布 bit-core
-pnpm publish:core
-
-# 发布 bit-ui
-pnpm publish:ui
-
-# 注意：发布前需要：
-# 1. 确保已登录 npm: npm login
-# 2. 确保代码已提交
-# 3. 确保版本号已更新
-```
-
-### 
-
-### 演示项目
-
-`demo` 文件夹包含完整的 Cocos Creator 3.8.x 示例项目，展示了各模块的实际使用方法。
+命令见 [COMMANDS.md](./docs/COMMANDS.md)。发版：AI 用 `/release`，手动步骤见该文档。
 
 ## 🔧 常见问题
-
-### Q: 模块之间有依赖关系吗？
-
-A: 部分模块有依赖关系：
-- `bit-ui` 依赖 `bit-core`
-- `bit-condition` 依赖 `bit-core`
-- `bit-hotupdate` 依赖 `bit-core` 和 `bit-net`
-- `bit-minigame` 依赖 `bit-core`
-- `bit-ec` 依赖 `bit-event`
-
-其他模块都是独立的，可以单独使用。
 
 ### Q: 为什么使用 pnpm？
 
@@ -206,17 +125,6 @@ A: pnpm 相比 npm/yarn 有以下优势：
 - 节省磁盘空间（使用硬链接）
 - 更严格的依赖管理
 - 原生支持 monorepo
-
-### Q: 支持哪些 Cocos Creator 版本？
-
-A: 
-- **推荐版本**: Cocos Creator 3.8.x
-- **最低支持**: Cocos Creator 3.7.0+
-- **理论支持**: Cocos Creator 3.0+（部分功能可能需要调整）
-
-### Q: 可以只使用部分模块吗？
-
-A: 当然可以！所有模块都是独立发布的，你可以按需安装使用。只需要注意模块间的依赖关系即可。
 
 ### Q: 如何贡献代码？
 

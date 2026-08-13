@@ -2,22 +2,23 @@
 
 ## 架构总览
 
-基于 **pnpm Monorepo** 的游戏框架集合，专为 Cocos Creator 3.x 设计。11 个独立模块，统一仓库管理，独立发布。
+基于 **pnpm Monorepo** 的游戏框架集合，专为 Cocos Creator 3.x 设计。12 个独立模块，统一仓库管理，独立发布。
 
 ```
 bit-framework/
-├── bit-core/         # 核心工具（Time, Platform, Timer, Utils）
-├── bit-ui/           # FairyGUI UI 管理（窗口、装饰器）
-├── bit-ecs/          # 高性能 ECS 架构
-├── bit-ec/           # Cocos 适配 EC 架构
-├── bit-event/        # 全局事件系统
-├── bit-net/          # HTTP + WebSocket
-├── bit-assets/       # 资源加载管理
-├── bit-quadtree/     # 四叉树碰撞检测
-├── bit-behaviortree/ # AI 行为树
-├── bit-condition/    # UI 条件显示（红点）
-├── bit-minigame/     # 小游戏平台适配
-└── bit-hotupdate/    # 热更新系统
+├── bit-core/            # 核心工具（Time, Platform, Timer, Utils）
+├── bit-ui/              # FairyGUI UI 管理（窗口、装饰器）
+├── bit-ecs/             # 高性能 ECS 架构
+├── bit-ec/              # Cocos 适配 EC 架构
+├── bit-event/           # 全局事件系统
+├── bit-net/             # HTTP + WebSocket
+├── bit-assets/          # 资源加载管理
+├── bit-quadtree/        # 四叉树碰撞检测
+├── bit-behaviortree/    # AI 行为树
+├── bit-condition/       # UI 条件显示（红点）
+├── bit-minigame/        # 小游戏平台适配
+├── bit-hotupdate/       # 热更新系统
+└── vendor/fairygui-cc/  # FairyGUI fork（git submodule，@gongxh/fairygui-cc）
 ```
 
 ## 模块依赖关系
@@ -108,4 +109,4 @@ bit-xxx/
 └── README.md
 ```
 
-添加到 `pnpm-workspace.yaml` 和根 `package.json` 的 `build:xxx` / `publish:xxx` 脚本。
+添加到 `pnpm-workspace.yaml` 和根 `package.json` 的 `build:xxx` 脚本。

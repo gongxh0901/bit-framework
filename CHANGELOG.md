@@ -2,8 +2,17 @@
 
 ## [0.4.0] - 2026-08-13
 
+### Changed
+- addPackage方法支持bundle参数 (fairygui-cc 51c2447)
+- 编译报错,添加类型断言 (fairygui-cc 05288b3)
+
+### Fixed
+- 修复 tsconfig 中的已弃用的值 (fairygui-cc 86cc1c9)
+
 ### Chore
 - chore: 内部依赖改为 peer 避免重复安装 (0dcb88c)
+- chore: 添加发版技能并透传 onUpdate dt (fairygui-cc fed1252)
+- 添加忽略 (fairygui-cc 8c5008d)
 
 ## [0.3.2] - 2026-08-13
 
