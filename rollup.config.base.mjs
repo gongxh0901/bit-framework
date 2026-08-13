@@ -67,6 +67,7 @@ export function createRollupConfig(packageName, external = ['cc']) {
     {
       // 生成声明文件的配置
       input: 'src/index.ts',
+      external,
       output: {
         file: `dist/${packageName}.d.ts`,
         format: 'es'

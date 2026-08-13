@@ -35,7 +35,10 @@
         "registry": "https://registry.npmjs.org/",
         "access": "public"
     },
-    "dependencies": {
+    "peerDependencies": {
+        "@gongxh/bit-core": "workspace:^"
+    },
+    "devDependencies": {
         "@gongxh/bit-core": "workspace:*"
     }
 }

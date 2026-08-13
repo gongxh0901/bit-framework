@@ -16,6 +16,14 @@
 
 ![编辑器截图](image/image-entity-editor.png)
 
+## 安装
+
+`bit-event` 是 peer 依赖，需由项目自行安装，保证全项目只有一份：
+
+```bash
+npm install @gongxh/bit-ec @gongxh/bit-event
+```
+
 ## 使用说明
 
 ### 组件基类 (Component)

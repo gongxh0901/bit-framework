@@ -37,7 +37,7 @@ graph LR
     BT[bit-behaviortree]
 ```
 
-| 模块 | 依赖 |
+| 模块 | 依赖（均为 peer，由消费方安装，保证单实例） |
 |------|------|
 | bit-core | 无 |
 | bit-event / bit-ecs / bit-net / bit-assets / bit-quadtree / bit-behaviortree | 无 |

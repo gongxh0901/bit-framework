@@ -324,6 +324,7 @@ export class EntityManager {
 
     /**
      * 销毁EntityManager
+     * @internal
      */
     public destroy(): void {
         if (this._isDestroyed) {

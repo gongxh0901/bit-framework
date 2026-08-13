@@ -20,8 +20,10 @@
 
 ## 安装
 
+`bit-core` 和 `@gongxh/fairygui-cc` 是 peer 依赖，需由项目自行安装，保证全项目只有一份：
+
 ```bash
-npm install @gongxh/bit-ui
+npm install @gongxh/bit-ui @gongxh/bit-core @gongxh/fairygui-cc
 ```
 
 ## 可视化编辑器

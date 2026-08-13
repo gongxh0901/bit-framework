@@ -101,14 +101,14 @@ graph LR
 # 安装核心模块
 npm install @gongxh/bit-core
 
-# 安装 UI 模块
-npm install @gongxh/bit-ui
+# 安装 UI 模块（peer：bit-core、@gongxh/fairygui-cc）
+npm install @gongxh/bit-ui @gongxh/bit-core @gongxh/fairygui-cc
 
 # 安装 ECS 模块
 npm install @gongxh/bit-ecs
 
 # 或一次性安装多个模块
-npm install @gongxh/bit-core @gongxh/bit-ui @gongxh/bit-event @gongxh/bit-net
+npm install @gongxh/bit-core @gongxh/bit-ui @gongxh/bit-event @gongxh/bit-net @gongxh/fairygui-cc
 ```
 
 ### 方式二：本地开发此框架

@@ -41,7 +41,7 @@ importers:
   bit-behaviortree: {}
 
   bit-condition:
-    dependencies:
+    devDependencies:
       '@gongxh/bit-core':
         specifier: workspace:*
         version: link:../bit-core
@@ -52,7 +52,7 @@ importers:
   bit-core: {}
 
   bit-ec:
-    dependencies:
+    devDependencies:
       '@gongxh/bit-event':
         specifier: workspace:*
         version: link:../bit-event
@@ -62,7 +62,7 @@ importers:
   bit-event: {}
 
   bit-hotupdate:
-    dependencies:
+    devDependencies:
       '@gongxh/bit-core':
         specifier: workspace:*
         version: link:../bit-core
@@ -71,7 +71,7 @@ importers:
         version: link:../bit-net
 
   bit-minigame:
-    dependencies:
+    devDependencies:
       '@gongxh/bit-core':
         specifier: workspace:*
         version: link:../bit-core
@@ -81,7 +81,7 @@ importers:
   bit-quadtree: {}
 
   bit-ui:
-    dependencies:
+    devDependencies:
       '@gongxh/bit-core':
         specifier: workspace:*
         version: link:../bit-core

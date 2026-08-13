@@ -16,8 +16,10 @@ Cocos Creator 热更新系统封装，提供简单易用的热更新接口。
 
 ## 安装
 
+`bit-core` 和 `bit-net` 是 peer 依赖，需由项目自行安装，保证全项目只有一份：
+
 ```bash
-npm install @gongxh/bit-hotupdate
+npm install @gongxh/bit-hotupdate @gongxh/bit-core @gongxh/bit-net
 ```
 
 ## 使用说明

@@ -35,7 +35,11 @@
         "registry": "https://registry.npmjs.org/",
         "access": "public"
     },
-    "dependencies": {
+    "peerDependencies": {
+        "@gongxh/bit-core": "workspace:^",
+        "@gongxh/fairygui-cc": ">=0.0.1"
+    },
+    "devDependencies": {
         "@gongxh/bit-core": "workspace:*",
         "@gongxh/fairygui-cc": "^0.0.3"
     }

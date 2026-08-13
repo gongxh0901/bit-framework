@@ -21,8 +21,10 @@
 
 ## 安装
 
+`bit-core` 是 peer 依赖，需由项目自行安装，保证全项目只有一份：
+
 ```bash
-npm install @gongxh/bit-minigame
+npm install @gongxh/bit-minigame @gongxh/bit-core
 ```
 
 ## 使用说明
