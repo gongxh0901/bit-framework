@@ -65,18 +65,22 @@ git commit -m "chore: release v{NEW_VERSION}"
 git tag v{NEW_VERSION}
 git push origin ccc3.0
 git push origin v{NEW_VERSION}
+git push gitlab ccc3.0
+git push gitlab v{NEW_VERSION}
 cd ../..
 
 git add .
 git commit -m "chore: release v{NEW_VERSION}"
-git push
+git push origin
+git push gitlab
 ```
 
 ### 8. 主仓库 tag
 
 ```bash
 git tag v{NEW_VERSION}
-git push --tags
+git push origin --tags
+git push gitlab --tags
 ```
 
 ### 9. 发布

@@ -49,14 +49,18 @@ git commit -m "chore: release vx.x.x"
 git tag vx.x.x
 git push origin ccc3.0
 git push origin vx.x.x
+git push gitlab ccc3.0
+git push gitlab vx.x.x
 cd ../..
 
 # 5. 再提交主仓库（含 CHANGELOG 和 submodule 指针）
 git add .
 git commit -m "chore: release vx.x.x"
-git push
+git push origin
+git push gitlab
 git tag vx.x.x
-git push --tags
+git push origin --tags
+git push gitlab --tags
 
 # 6. 发布（需 npm login，OTP）
 pnpm publish:all

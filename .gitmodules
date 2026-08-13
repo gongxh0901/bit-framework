@@ -1,4 +1,4 @@
 [submodule "vendor/fairygui-cc"]
 	path = vendor/fairygui-cc
-	url = git@github.com:Gongxh0901/FGUI-cc3.0.git
+	url = ../FGUI-cocoscreator.git
 	branch = ccc3.0
