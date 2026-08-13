@@ -4,6 +4,7 @@
  * @Description: 窗口组 (在同一个窗口容器的上的窗口)
  */
 
+import { log } from "@gongxh/bit-core";
 import { IWindow } from "../interface/IWindow";
 import { WindowType } from "../interface/type";
 import { fgui } from "../types/header";
@@ -112,7 +113,8 @@ export class WindowGroup {
                 return window;
             }
         } catch (err: any) {
-            throw new Error(`窗口【${info.name}】打开失败: ${err.message}`);
+            log(`窗口【${info.name}】打开失败: ${err.message}`)
+            throw err;
         }
     }
 

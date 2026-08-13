@@ -41,7 +41,7 @@ export class ReadNetFile {
                     resolve(response.data as T);
                 },
                 onError: (response: IHttpResponse) => {
-                    reject({ code: response.statusCode, message: response.message });
+                    reject(new Error(`读取网络文件失败 [${response.statusCode}] ${response.message}`));
                 }
             }, null, res.timeout || 6);
         });

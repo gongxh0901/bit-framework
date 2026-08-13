@@ -4,6 +4,7 @@
  * @Description: 
  */
 
+import { log } from "@gongxh/bit-core";
 import { assetManager, resources } from "cc";
 import { fgui } from "../types/header";
 import { InfoPool } from "./InfoPool";
@@ -165,7 +166,8 @@ export class ResLoader {
         return new Promise<void>((resolve, reject) => {
             assetManager.loadBundle(bundleName, (err: any) => {
                 if (err) {
-                    reject(new Error(`bundle【${bundleName}】加载失败`));
+                    log(`bundle【${bundleName}】加载失败`);
+                    reject(err);
                     return;
                 }
                 resolve();
@@ -184,7 +186,8 @@ export class ResLoader {
         await new Promise<void>((resolve, reject) => {
             fgui.UIPackage.loadPackage(bundle, InfoPool.getPackagePath(pkg), (err: any) => {
                 if (err) {
-                    reject(new Error(`UI包【${pkg}】加载失败`));
+                    log(`UI包【${pkg}】加载失败`);
+                    reject(err);
                     return;
                 }
                 resolve();

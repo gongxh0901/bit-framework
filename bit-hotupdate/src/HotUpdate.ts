@@ -4,7 +4,7 @@
  * @Description: 热更新实例
  */
 
-import { debug, Time, Utils } from "@gongxh/bit-core";
+import { debug, log, Time, Utils } from "@gongxh/bit-core";
 import { ReadNetFile } from "@gongxh/bit-net";
 import { game, native, sys } from "cc";
 import { HotUpdateManager } from "./HotUpdateManager";
@@ -97,20 +97,21 @@ export class HotUpdate {
         this._progress = res.progress;
         this._complete = res.complete;
 
-        if (res.skipCheck) {
-            this.startUpdateTask();
-        } else {
-            try {
+        try {
+            if (res.skipCheck) {
+                this.startUpdateTask();
+            } else {
                 const result = await this.checkUpdate();
                 if (result.needUpdate) {
                     this.startUpdateTask();
                 } else {
                     this._complete(HotUpdateCode.LatestVersion, "是最新版本");
                 }
-            } catch (error) {
-                // 检查更新失败了
-                this._complete(HotUpdateCode.CheckError, error instanceof Error ? error.message : "检查更新出错");
             }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            log(`${TAG} 热更新失败: ${message}`);
+            this._complete(res.skipCheck ? HotUpdateCode.UpdateError : HotUpdateCode.CheckError, message);
         }
     }
 
@@ -246,12 +247,12 @@ export class HotUpdate {
                 switch (eventCode) {
                     case native.EventAssetsManager.ERROR_DOWNLOAD_MANIFEST: {
                         this._am.setEventCallback(null);
-                        reject(new Error("检查更新时下载manifest文件失败"));
+                        reject(new Error(`检查更新时下载manifest文件失败: ${event.getMessage()}`));
                         break;
                     }
                     case native.EventAssetsManager.ERROR_PARSE_MANIFEST: {
                         this._am.setEventCallback(null);
-                        reject(new Error("检查更新时解析manifest文件失败"));
+                        reject(new Error(`检查更新时解析manifest文件失败: ${event.getMessage()}`));
                         break;
                     }
                     case native.EventAssetsManager.ALREADY_UP_TO_DATE: {

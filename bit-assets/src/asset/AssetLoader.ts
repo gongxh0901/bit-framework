@@ -76,7 +76,7 @@ export class AssetLoader extends AssetLoaderAgent {
                         this._retry++;
                         this.onStart();
                     } else {
-                        this.failCallback(ErrorCode.BundleLoadFailed, `加载bundle【${bundlename}】失败`);
+                        this.failCallback(ErrorCode.BundleLoadFailed, `加载bundle【${bundlename}】失败: ${err.message}`);
                     }
                 });
             }

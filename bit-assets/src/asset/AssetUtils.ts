@@ -58,19 +58,19 @@ export class AssetUtils {
                 // 加载单个资源
                 bundle.load(path, type, (error: Error, asset: Asset) => {
                     if (error) {
-                        callbacks?.fail?.(ErrorCode.FileLoadFailed, `加载资源失败【bundle:${bundle} path:${path}】`);
+                        callbacks?.fail?.(ErrorCode.FileLoadFailed, `加载资源失败【bundle:${bundle.name} path:${path}】: ${error.message}`);
                     } else {
                         callbacks?.complete?.(asset);
                     }
                 });
             }).catch((err: Error) => {
-                callbacks?.fail?.(ErrorCode.BundleLoadFailed, `加载bundle[${bundle}]失败`);
+                callbacks?.fail?.(ErrorCode.BundleLoadFailed, `加载bundle[${bundle}]失败: ${err.message}`);
             });
         } else {
             // 加载单个资源
             bundle.load(path, type, (error: Error, asset: Asset) => {
                 if (error) {
-                    callbacks?.fail?.(ErrorCode.FileLoadFailed, `加载资源失败【bundle:${bundle.name} path:${path}】`);
+                    callbacks?.fail?.(ErrorCode.FileLoadFailed, `加载资源失败【bundle:${bundle.name} path:${path}】: ${error.message}`);
                 } else {
                     callbacks?.complete?.(asset);
                 }
@@ -95,14 +95,14 @@ export class AssetUtils {
                     // 完成回调
                     (error: Error, assets: Asset[]) => {
                         if (error) {
-                            callbacks?.fail?.(ErrorCode.FileLoadFailed, `加载文件夹失败【bundle:${bundle} path:${path}】`);
+                            callbacks?.fail?.(ErrorCode.FileLoadFailed, `加载文件夹失败【bundle:${bundle.name} path:${path}】: ${error.message}`);
                         } else {
                             callbacks?.complete?.(assets);
                         }
                     }
                 );
             }).catch((err: Error) => {
-                callbacks?.fail?.(ErrorCode.BundleLoadFailed, `加载bundle[${bundle}]失败`);
+                callbacks?.fail?.(ErrorCode.BundleLoadFailed, `加载bundle[${bundle}]失败: ${err.message}`);
             });
         } else {
             bundle.loadDir(path, type,
@@ -111,7 +111,7 @@ export class AssetUtils {
                 // 完成回调
                 (error: Error, assets: Asset[]) => {
                     if (error) {
-                        callbacks?.fail?.(ErrorCode.FileLoadFailed, `加载文件夹失败【bundle:${bundle} path:${path}】`);
+                        callbacks?.fail?.(ErrorCode.FileLoadFailed, `加载文件夹失败【bundle:${bundle.name} path:${path}】: ${error.message}`);
                     } else {
                         callbacks?.complete?.(assets);
                     }

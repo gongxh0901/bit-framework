@@ -38,7 +38,7 @@ export class AlipayAds implements IMiniRewardAds {
             this._video_ad = this.createVideoAd();
         }
         this._video_ad.load().then(() => {
-            this._video_ad.show();
+            return this._video_ad.show();
         }).catch((res: { errorMessage: string; error: number }) => {
             this._fail(res.error, res.errorMessage);
             this.reset();

@@ -149,7 +149,7 @@ export class HttpRequest implements IHttpRequest, IHttpResponse {
             this._callback?.("succeed", this);
             this._clear();
         } catch (e) {
-            console.warn(`http响应数据解析错误，HttpResponseType(${this.responseType})\n    url: ${this._xhr.responseURL}\n    error: ` + e);
+            console.warn(`http响应数据解析错误，HttpResponseType(${this.responseType})\n    url: ${this._xhr.responseURL}`, e);
             this.onError();
         }
     }
