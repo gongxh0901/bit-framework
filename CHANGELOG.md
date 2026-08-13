@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.1] - 2026-08-13
+
+### Chore
+- chore: 将 FairyGUI 以 submodule 纳入 workspace (99004e6)
+- chore: 版本与 bit-framework 对齐为 0.4.0，发版改走主仓库 (fairygui-cc 175331a)
+
 ## [0.4.0] - 2026-08-13
 
 ### Changed
