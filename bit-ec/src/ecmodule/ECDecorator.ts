@@ -122,6 +122,18 @@ export namespace _ecdecorator {
     }
 
     /**
+     * 通过组件构造函数获取注册名称
+     * @param ctor 组件构造函数
+     */
+    export function getComponentName(ctor: new () => unknown): string {
+        const info = eclassMap.get(ctor);
+        if (!info) {
+            throw new Error(`组件（${ctor.name}）未注册，使用组件装饰器 ecclass 注册组件`);
+        }
+        return info.name;
+    }
+
+    /**
      * 实体组件装饰器
      * @param {string} res.describe 组件组描述
      */

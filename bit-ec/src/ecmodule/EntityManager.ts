@@ -2,6 +2,7 @@ import { EventManager } from "@gongxh/bit-event";
 import { Component } from "./Component";
 import { ComponentManager } from "./ComponentManager";
 import { ComponentPool } from "./ComponentPool";
+import { _ecdecorator } from "./ECDecorator";
 import { EntityId, entityIdString, EntityIndexBits, getEntityIndex, getEntityVersion, MaxEntityCount } from "./ECType";
 import { Entity } from "./Entity";
 
@@ -266,7 +267,16 @@ export class EntityManager {
      * @param {string} componentName 组件名
      * @returns {T} 创建的组件
      */
-    public createComponent<T extends Component>(componentName: string): T {
+    public createComponent<T extends Component>(componentName: string): T;
+    /**
+     * 创建组件
+     * @template T 组件类型
+     * @param {new () => T} ctor 组件类
+     * @returns {T} 创建的组件
+     */
+    public createComponent<T extends Component>(ctor: new () => T): T;
+    public createComponent<T extends Component>(nameOrCtor: string | (new () => T)): T {
+        const componentName = typeof nameOrCtor === "string" ? nameOrCtor : _ecdecorator.getComponentName(nameOrCtor);
         return this.componentManager.createComponent<T>(componentName);
     }
 
