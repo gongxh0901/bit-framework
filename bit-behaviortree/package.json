@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-behaviortree",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "行为树库",
     "main": "./dist/bit-behaviortree.cjs",
     "module": "./dist/bit-behaviortree.mjs",

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1] - 2026-08-14
+
+### Chore
+- chore: 发布改由 CI 完成，npmjs 走 trusted publishing (07795d0)
+- chore: 添加 npmjs trusted publishing workflow (fairygui-cc 2d6f00b)
+
 ## [0.5.0] - 2026-08-14
 
 ### Added
