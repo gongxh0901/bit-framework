@@ -1,6 +1,16 @@
 # Changelog
 
+## [0.5.2] - 2026-08-14
+
+### Fixed
+- fix: 收紧 fgui peer 范围，发布时移除 devDeps 的 workspace 协议 (e667e25)
+
 ## [0.5.1] - 2026-08-14
+
+### Fixed
+- fix: GitLab CI 加 docker 标签 (c5e37c8)
+- fix: 去掉 setup-node 的 registry-url (5285659)
+- fix: 去掉 setup-node 的 registry-url (fairygui-cc 260f5ed)
 
 ### Chore
 - chore: 发布改由 CI 完成，npmjs 走 trusted publishing (07795d0)
