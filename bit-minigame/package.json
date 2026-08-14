@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-minigame",
-    "version": "0.4.1",
+    "version": "0.5.0",
     "description": "小游戏平台适配库（支持微信、支付宝、字节跳动）",
     "main": "./dist/bit-minigame.cjs",
     "module": "./dist/bit-minigame.mjs",

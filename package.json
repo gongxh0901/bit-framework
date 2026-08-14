@@ -1,12 +1,11 @@
 {
   "name": "@gongxh/bit-framework",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": true,
   "description": "bit-framework monorepo - Cocos Creator 游戏框架",
   "scripts": {
     "clean": "pnpm -r --parallel --filter='!@gongxh/fairygui-cc' clean",
     "build": "pnpm -r build",
-
     "build:fgui": "pnpm --filter @gongxh/fairygui-cc build",
     "build:core": "pnpm --filter @gongxh/bit-core build",
     "build:ui": "pnpm --filter @gongxh/bit-ui build",
@@ -21,7 +20,6 @@
     "build:minigame": "pnpm --filter @gongxh/bit-minigame build",
     "build:hotupdate": "pnpm --filter @gongxh/bit-hotupdate build",
     "publish:all": "pnpm -r publish",
-
     "version:patch": "pnpm -r exec -- npm version patch --no-git-tag-version && npm version patch --no-git-tag-version",
     "version:minor": "pnpm -r exec -- npm version minor --no-git-tag-version && npm version minor --no-git-tag-version",
     "version:major": "pnpm -r exec -- npm version major --no-git-tag-version && npm version major --no-git-tag-version"

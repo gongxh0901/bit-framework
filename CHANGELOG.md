@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0] - 2026-08-14
+
+### Added
+- feature: 安全区改为四边 inset 并支持配置 (bdf1305)
+
+### Chore
+- chore: submodule 改为相对路径，GitHub/GitLab 各自解析 (af85a2e)
+
 ## [0.4.1] - 2026-08-13
 
 ### Chore
