@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 /**
- * 将 workspace 包以 @bit-cc/* 发布到公司 GitLab Package Registry
+ * 将 workspace 包发布到公司 GitLab Package Registry
  * （bit-cc/bit-framework，project 901 的项目级 registry）。
  *
- * 不改动仓库里的 package.json：发布前临时 remap，结束后还原。
- * 因为包名从 @gongxh/* 变成 @bit-cc/*，依赖声明里的包名也一并 remap，
- * 且 workspace: 协议会替换成真实版本号（npm CLI 不认识该协议）。
+ * 包名与 npmjs 保持一致，都是 @gongxh/*：项目级 endpoint 不要求 scope 和
+ * GitLab namespace 同名（只有实例级 endpoint 才要求），所以不需要改 scope。
+ * 早期发的 @bit-cc/* 曾要求把包名 remap，但 dist 产物里的 import 仍写着
+ * @gongxh/*，装到 @bit-cc 下解析不到依赖——同名发布正是为了避免这个问题。
+ *
+ * 不改动仓库里的 package.json：发布前临时把 workspace: 协议替换成真实版本号
+ * （npm CLI 不认识该协议），结束后还原。
  *
  * 认证方式（二者其一）：
  *   - CI：GitLab 流水线自动注入 CI_JOB_TOKEN
@@ -24,8 +28,7 @@ const GITLAB_HOST = 'git.lanfeitech.com'
 const PROJECT_ID = '901'
 const REGISTRY_PATH = `/api/v4/projects/${PROJECT_ID}/packages/npm/`
 const GITLAB_NPM = `https://${GITLAB_HOST}${REGISTRY_PATH}`
-const FROM_SCOPE = '@gongxh/'
-const TO_SCOPE = '@bit-cc/'
+const SCOPE = '@gongxh'
 
 const DEP_FIELDS = ['dependencies', 'peerDependencies', 'optionalDependencies']
 const DRY_RUN = process.argv.includes('--dry-run')
@@ -46,12 +49,6 @@ const PACKAGES = [
     'vendor/fairygui-cc/source',
 ]
 
-function remapName(name) {
-    return typeof name === 'string' && name.startsWith(FROM_SCOPE)
-        ? TO_SCOPE + name.slice(FROM_SCOPE.length)
-        : name
-}
-
 /** workspace:^ → ^1.2.3 / workspace:~ → ~1.2.3 / workspace:* → 1.2.3 */
 function resolveRange(spec, version) {
     const rest = spec.slice('workspace:'.length)
@@ -61,7 +58,7 @@ function resolveRange(spec, version) {
     return rest
 }
 
-/** 收集 workspace 内所有包的真实版本（以原始 @gongxh 名为键） */
+/** 收集 workspace 内所有包的真实版本 */
 function collectVersions() {
     const versions = new Map()
     for (const dir of PACKAGES) {
@@ -71,30 +68,23 @@ function collectVersions() {
     return versions
 }
 
-function remapDeps(deps, versions, dir, field) {
+function resolveWorkspaceDeps(deps, versions, dir, field) {
     if (!deps || typeof deps !== 'object') return
     for (const [depName, spec] of Object.entries(deps)) {
-        const newName = remapName(depName)
-        let newSpec = spec
+        if (typeof spec !== 'string' || !spec.startsWith('workspace:')) continue
 
-        if (typeof spec === 'string' && spec.startsWith('workspace:')) {
-            const version = versions.get(depName)
-            if (!version) {
-                console.error(`${dir}: ${field}.${depName} 使用 workspace: 协议，但不在 workspace 内`)
-                process.exit(1)
-            }
-            newSpec = resolveRange(spec, version)
+        const version = versions.get(depName)
+        if (!version) {
+            console.error(`${dir}: ${field}.${depName} 使用 workspace: 协议，但不在 workspace 内`)
+            process.exit(1)
         }
-
-        if (newName !== depName) delete deps[depName]
-        deps[newName] = newSpec
+        deps[depName] = resolveRange(spec, version)
     }
 }
 
-function applyRemap(pkg, versions, dir) {
-    pkg.name = remapName(pkg.name)
+function preparePkg(pkg, versions, dir) {
     for (const field of DEP_FIELDS) {
-        remapDeps(pkg[field], versions, dir, field)
+        resolveWorkspaceDeps(pkg[field], versions, dir, field)
     }
     // devDependencies 不影响消费者，但 workspace: 协议会让 npm 校验失败
     if (pkg.devDependencies) {
@@ -114,7 +104,7 @@ function writeNpmrc() {
     const jobToken = process.env.CI_JOB_TOKEN
     const personalToken = process.env.GITLAB_TOKEN
 
-    const lines = [`${TO_SCOPE.slice(0, -1)}:registry=${GITLAB_NPM}`]
+    const lines = [`${SCOPE}:registry=${GITLAB_NPM}`]
     if (jobToken) {
         // CI：job token 必须用 Job-Token header 语义，npm 侧等价于 _authToken
         lines.push(`//${GITLAB_HOST}${REGISTRY_PATH}:_authToken=${jobToken}`)
@@ -141,11 +131,10 @@ function publishOne(relDir, versions, npmrcPath) {
         return true
     }
 
-    applyRemap(pkg, versions, relDir)
-    const gitlabName = pkg.name
+    preparePkg(pkg, versions, relDir)
     writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
 
-    console.log(`\n>>> ${DRY_RUN ? '校验' : '发布'} ${gitlabName}@${pkg.version}`)
+    console.log(`\n>>> ${DRY_RUN ? '校验' : '发布'} ${pkg.name}@${pkg.version}`)
     const args = ['publish', '--userconfig', npmrcPath, '--registry', GITLAB_NPM]
     if (DRY_RUN) args.push('--dry-run')
     const result = spawnSync('npm', args, {
@@ -157,7 +146,7 @@ function publishOne(relDir, versions, npmrcPath) {
     writeFileSync(pkgPath, original)
 
     if (result.status !== 0) {
-        console.error(`失败: ${gitlabName}`)
+        console.error(`失败: ${pkg.name}`)
         return false
     }
     return true
@@ -180,7 +169,7 @@ function main() {
         console.error(`\n以下包发布失败:\n${failed.map((d) => `  - ${d}`).join('\n')}`)
         process.exit(1)
     }
-    console.log(`\n${DRY_RUN ? '校验完成（未上传）' : '全部发布完成'} → @bit-cc/* @ ${GITLAB_NPM}`)
+    console.log(`\n${DRY_RUN ? '校验完成（未上传）' : '全部发布完成'} → ${SCOPE}/* @ ${GITLAB_NPM}`)
 }
 
 main()

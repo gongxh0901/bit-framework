@@ -22,7 +22,7 @@ description: Use when publishing a new version of bit-framework. Bumps versions,
 |------|------|--------|------|
 | npmjs `@gongxh/bit-*` | GitHub `v*` tag | 主仓库 `.github/workflows/publish.yml` | trusted publishing（OIDC，无 token） |
 | npmjs `@gongxh/fairygui-cc` | GitHub `v*` tag | **FGUI-cocoscreator 仓库**自己的 workflow | trusted publishing（OIDC） |
-| GitLab 901 `@bit-cc/*`（含 fgui） | GitLab `v*` tag | 主仓库 `.gitlab-ci.yml` | `CI_JOB_TOKEN` |
+| GitLab 901 `@gongxh/*`（含 fgui） | GitLab `v*` tag | 主仓库 `.gitlab-ci.yml` | `CI_JOB_TOKEN` |
 
 `@gongxh/fairygui-cc` 必须由 FGUI-cocoscreator 仓库发布：trusted publishing 要求包
 `repository.url` 与签发 OIDC 的仓库一致。GitLab 侧无此限制，fgui 跟主仓库一起发。

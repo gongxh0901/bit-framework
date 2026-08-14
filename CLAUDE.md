@@ -46,7 +46,7 @@ bit-framework/
 
 ## 约定
 
-- npm scope: `@gongxh/bit-*`（npmjs）；GitLab 内网发布时 remap 成 `@bit-cc/*`
+- npm scope: `@gongxh/bit-*`，npmjs 和 GitLab 901 用同一套包名（不再 remap 成 `@bit-cc/*`）
 - workspace 依赖: `peerDependencies` 用 `workspace:^`，`devDependencies` 用 `workspace:*`
   （发布时由 `scripts/prepare-npm-publish.mjs` 把 peer 转成 `^x.y.z`、删掉 devDeps 的 workspace 条目）
 - 只改 `src/`，不要改 `dist/`

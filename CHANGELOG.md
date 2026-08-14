@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.3] - 2026-08-14
+
+### Changed
+- GitLab 发布改用 @gongxh/*，去掉 @bit-cc remap
+
+### Documentation
+- docs: 补齐发布文档并新增 npm 应急发包脚本 (70077cc)
+
 ## [0.5.2] - 2026-08-14
 
 ### Fixed

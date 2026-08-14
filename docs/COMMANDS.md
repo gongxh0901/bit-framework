@@ -36,7 +36,7 @@ fgui 的 `source/dist` 入库。三条 CI 对它的处理不同：
 |------|------|------|------|
 | npmjs `@gongxh/bit-*` | GitHub `v*` tag | `.github/workflows/publish.yml` | trusted publishing（OIDC） |
 | npmjs `@gongxh/fairygui-cc` | GitHub `v*` tag | FGUI-cocoscreator 仓库自己的 workflow | trusted publishing（OIDC） |
-| GitLab 901 `@bit-cc/*`（含 fgui） | GitLab `v*` tag | `.gitlab-ci.yml` | `CI_JOB_TOKEN` |
+| GitLab 901 `@gongxh/*`（含 fgui） | GitLab `v*` tag | `.gitlab-ci.yml` | `CI_JOB_TOKEN` |
 
 ```bash
 pnpm version:patch | version:minor | version:major
@@ -116,18 +116,24 @@ pnpm publish:npm             # 逐包发到 npmjs
 ⚠️ 手动发 npmjs 的包**不带 provenance** —— SLSA 证明只能由 CI 的 OIDC 流程生成。
 仅在 GitHub Actions 不可用时使用，事后建议补发一个走 CI 的版本。
 
-## 内网安装 @bit-cc/*
+## 内网安装（GitLab 901）
 
-消费项目的 `.npmrc`：
+包名与 npmjs 完全一致（都是 `@gongxh/*`），只需把 scope 的 registry 指向内网：
 
 ```
-@bit-cc:registry=https://git.lanfeitech.com/api/v4/projects/901/packages/npm/
+@gongxh:registry=https://git.lanfeitech.com/api/v4/projects/901/packages/npm/
 //git.lanfeitech.com/api/v4/projects/901/packages/npm/:_authToken=${GITLAB_TOKEN}
 ```
 
 ```bash
-pnpm add @bit-cc/bit-core @bit-cc/bit-ui
+pnpm add @gongxh/bit-core @gongxh/bit-ui
 ```
+
+> 该配置会让项目里**所有** `@gongxh/*` 都从 901 解析。若某个包只在 npmjs 上，
+> 单独覆盖：`@gongxh/xxx:registry=https://registry.npmjs.org/`。
+>
+> 旧的 `@bit-cc/*` 已废弃：包名 remap 后，dist 产物里的 `import ... from '@gongxh/bit-core'`
+> 仍指向原 scope，装到 `@bit-cc` 下解析不到依赖。
 
 ## Workspace
 
