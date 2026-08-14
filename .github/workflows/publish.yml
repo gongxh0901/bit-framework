@@ -25,13 +25,14 @@ jobs:
           version: 10
 
       # trusted publishing 要求 npm >= 11.5.1、Node >= 22.14.0
+      # 不设 registry-url：它会写一份带 ${NODE_AUTH_TOKEN} 的 .npmrc，
+      # 而 trusted publishing 不用 token，空值会让后续 npm 命令鉴权失败。
       - uses: actions/setup-node@v4
         with:
           node-version: '22.14.0'
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Upgrade npm
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
 
       - name: Verify npm version
         run: npm -v
