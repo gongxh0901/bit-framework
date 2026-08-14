@@ -19,7 +19,10 @@ bit-framework/
 ├── bit-minigame/       # 小游戏适配
 ├── bit-hotupdate/      # 热更新
 ├── vendor/fairygui-cc/ # FairyGUI fork（git submodule）
+├── scripts/            # 发布辅助脚本
 ├── docs/
+├── .github/workflows/  # tag v* → npmjs（trusted publishing）
+├── .gitlab-ci.yml      # tag v* → GitLab 901 registry
 └── rollup.config.base.mjs
 ```
 
@@ -31,6 +34,9 @@ bit-framework/
 | pnpm 脚本 | 根 `package.json` |
 | 模块依赖 | `docs/ARCHITECTURE.md` |
 | 构建/发布命令 | `docs/COMMANDS.md` |
+| npmjs 发布 | `.github/workflows/publish.yml` |
+| GitLab 发布 | `.gitlab-ci.yml` + `scripts/publish-gitlab.mjs` |
+| fgui 仓库的 workflow | `vendor/fairygui-cc/.github/workflows/publish.yml` |
 | 各模块入口 | `bit-xxx/src/index.ts` |
 | UI 窗口基类 | `bit-ui/src/window/` |
 | ECS | `bit-ecs/src/` |
@@ -38,10 +44,12 @@ bit-framework/
 
 ## 约定
 
-- npm scope: `@gongxh/bit-*`；workspace: `"@gongxh/bit-core": "workspace:*"`
+- npm scope: `@gongxh/bit-*`（npmjs）；GitLab 内网发布时 remap 成 `@bit-cc/*`
+- workspace 依赖: `"@gongxh/bit-core": "workspace:*"`
 - 只改 `src/`，不要改 `dist/`
 - 禁止循环依赖、`as any`、空 catch
 - commit: `feat` / `fix` / `refactor` / `docs` / `chore`
+- 发包由 CI 完成，本机不手动 publish（推 `v*` tag 触发）
 
 ## 开发
 

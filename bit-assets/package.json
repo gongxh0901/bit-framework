@@ -28,11 +28,12 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/gongxh0901/bit-framework.git",
+        "url": "git+https://github.com/gongxh0901/bit-framework.git",
         "directory": "bit-assets"
     },
     "publishConfig": {
         "registry": "https://registry.npmjs.org/",
-        "access": "public"
+        "access": "public",
+        "provenance": true
     }
 }

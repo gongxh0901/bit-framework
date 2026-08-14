@@ -35,5 +35,8 @@ pnpm-debug.log*
 .temp/
 *.tmp
 
+# 发布到 GitLab 时生成的临时认证文件
+.npmrc.gitlab-publish
+
 # 演示项目
 # demo

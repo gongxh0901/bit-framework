@@ -1,0 +1,57 @@
+name: Publish to npmjs
+
+# 推送 v* tag 时触发；不发布 @gongxh/fairygui-cc
+# （它属于 FGUI-cocoscreator 仓库，trusted publishing 要求包声明的仓库与签发 OIDC 的仓库一致）
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write # trusted publishing 需要，用于向 npm 换取 OIDC 凭证
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive # fgui 是构建 bit-ui / bit-condition 的前置依赖
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      # trusted publishing 要求 npm >= 11.5.1、Node >= 22.14.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
+      - name: Verify npm version
+        run: npm -v
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      # npm CLI 不认识 pnpm 的 workspace: 协议，发布前替换成真实版本号
+      - name: Resolve workspace protocol
+        run: node scripts/prepare-npm-publish.mjs
+
+      # 按依赖拓扑顺序逐包发布。provenance 与 access 已在各包 publishConfig 中声明。
+      - name: Publish packages
+        run: |
+          set -e
+          for pkg in bit-core bit-event bit-net bit-ecs bit-assets bit-quadtree \
+                     bit-behaviortree bit-ec bit-ui bit-condition bit-minigame \
+                     bit-hotupdate; do
+            echo "::group::publish $pkg"
+            (cd "$pkg" && npm publish)
+            echo "::endgroup::"
+          done
