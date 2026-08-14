@@ -88,6 +88,19 @@ function main() {
             }
         }
 
+        // devDependencies 不影响消费者安装，但 workspace: 协议会让解析
+        // package.json 的工具（审计、Renovate、镜像同步）报 invalid version。
+        // 直接删掉，与 publish-gitlab.mjs 的处理保持一致。
+        if (pkg.devDependencies) {
+            for (const [depName, spec] of Object.entries(pkg.devDependencies)) {
+                if (typeof spec === 'string' && spec.startsWith('workspace:')) {
+                    delete pkg.devDependencies[depName]
+                    touched = true
+                    changes.push(`${dir}: devDependencies.${depName}  ${spec} → 移除`)
+                }
+            }
+        }
+
         if (touched && !CHECK_ONLY) {
             // 保持原文件缩进风格（bit-* 用 4 空格，fgui 用 2 空格）
             const indent = /^\s{2}"/m.test(raw) && !/^\s{4}"/m.test(raw) ? 2 : 4
