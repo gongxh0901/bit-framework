@@ -131,7 +131,7 @@ npm install @gongxh/bit-ui @gongxh/bit-core @gongxh/fairygui-cc
 窗口适配类型：
 
 - `Full` - 全屏适配（默认）
-- `Bang` - 空出刘海区域
+- `Bang` - 按 `Screen` 安全区避让，窗口定位在安全区中心
 - `Fixed` - 固定尺寸，不适配
 
 ### 典型使用流程

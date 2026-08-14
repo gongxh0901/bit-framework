@@ -22,7 +22,7 @@ export enum WindowType {
 export enum AdapterType {
     /** 全屏适配 */
     Full = 0,
-    /** 空出刘海 */
+    /** 按 Screen 安全区避让 */
     Bang = 1,
     /** 固定的 不适配 */
     Fixed = 2,

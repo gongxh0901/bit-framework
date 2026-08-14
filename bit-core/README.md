@@ -102,8 +102,15 @@ npm install @gongxh/bit-core
 **属性**：
 - `ScreenWidth` / `ScreenHeight` - 屏幕宽高
 - `DesignWidth` / `DesignHeight` - 设计分辨率宽高
-- `SafeAreaHeight` - 安全区外侧高度/宽度
+- `SafeAreaTop` / `SafeAreaBottom` / `SafeAreaLeft` / `SafeAreaRight` - 四边安全区 inset
 - `SafeWidth` / `SafeHeight` - 安全区宽高
+- `SafeCenterX` / `SafeCenterY` - 安全区中心（FairyGUI 坐标）
+
+**配置**（`CocosEntry` Inspector）：
+- `safeAreaTop` - 顶部安全区。竖屏用作上侧 inset；横屏因无法区分左/右朝向，左右对称都用此值
+- `safeAreaBottom` - 底部安全区，仅竖屏生效
+
+长边/短边 ≤ 16:9 时四边 inset 清零，安全区等于全屏。
 
 ### 模块基类 (Module)
 

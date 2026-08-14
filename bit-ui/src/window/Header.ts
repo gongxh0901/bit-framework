@@ -52,16 +52,18 @@ export abstract class Header<T = any> extends fgui.GComponent implements IHeader
      * @internal
      */
     public _adapted(): void {
-        this.setPosition(Screen.ScreenWidth * 0.5, Screen.ScreenHeight * 0.5);
         this.setPivot(0.5, 0.5, true);
         switch (this.adapterType) {
             case AdapterType.Full:
+                this.setPosition(Screen.ScreenWidth * 0.5, Screen.ScreenHeight * 0.5);
                 this.setSize(Screen.ScreenWidth, Screen.ScreenHeight, true);
                 break;
             case AdapterType.Bang:
+                this.setPosition(Screen.SafeCenterX, Screen.SafeCenterY);
                 this.setSize(Screen.SafeWidth, Screen.SafeHeight, true);
                 break;
             default:
+                this.setPosition(Screen.ScreenWidth * 0.5, Screen.ScreenHeight * 0.5);
                 break;
         }
         this.onAdapted();

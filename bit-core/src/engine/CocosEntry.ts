@@ -18,6 +18,8 @@ const { property } = _decorator;
 export abstract class CocosEntry extends Component {
     @property({ displayName: "游戏帧率" }) fps: number = 60;
     @property({ displayName: "开启调试输出" }) enableDebug: boolean = false;
+    @property({ displayName: "顶部安全区" }) safeAreaTop: number = 60;
+    @property({ displayName: "底部安全区" }) safeAreaBottom: number = 0;
 
     /**
      * 虚函数，子类需要实现
@@ -41,7 +43,10 @@ export abstract class CocosEntry extends Component {
         // 平台信息初始化
         new PlatformInitializer();
         // 适配器
-        new CocosAdapter().init();
+        new CocosAdapter().init({
+            safeAreaTop: this.safeAreaTop,
+            safeAreaBottom: this.safeAreaBottom,
+        });
         // 时间相关
         this.initTime();
         // 初始化模块

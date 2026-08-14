@@ -57,22 +57,26 @@ export abstract class WindowBase<T = any, U = any> extends fgui.GComponent imple
      * @internal
      */
     public _adapted(): void {
-        this.setPosition(Screen.ScreenWidth * 0.5, Screen.ScreenHeight * 0.5);
         this.setPivot(0.5, 0.5, true);
         switch (this.adapterType) {
             case AdapterType.Full:
+                this.setPosition(Screen.ScreenWidth * 0.5, Screen.ScreenHeight * 0.5);
                 this.setSize(Screen.ScreenWidth, Screen.ScreenHeight, true);
                 break;
             case AdapterType.Bang:
+                this.setPosition(Screen.SafeCenterX, Screen.SafeCenterY);
                 this.setSize(Screen.SafeWidth, Screen.SafeHeight, true);
                 break;
             default:
+                this.setPosition(Screen.ScreenWidth * 0.5, Screen.ScreenHeight * 0.5);
                 break;
         }
-        // 屏幕的宽高
+        // 吞噬节点始终覆盖全屏（Bang 窗口中心可能不在屏幕中心）
         this._swallowNode.setSize(Screen.ScreenWidth, Screen.ScreenHeight, true);
-        // 位置放在窗口的中心
-        this._swallowNode.setPosition(this.width * 0.5, this.height * 0.5);
+        this._swallowNode.setPosition(
+            this.width * 0.5 + (Screen.ScreenWidth * 0.5 - this.x),
+            this.height * 0.5 + (Screen.ScreenHeight * 0.5 - this.y),
+        );
         this.onAdapted();
     }
 
