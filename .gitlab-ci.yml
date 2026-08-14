@@ -11,6 +11,11 @@ publish:gitlab:
   stage: publish
   image: node:22
 
+  # 实例级共享 runner 配置了 run_untagged=false，只接带标签的 job，
+  # 不写 tags 会一直 pending（提示 no runners online）。
+  tags:
+    - docker
+
   rules:
     - if: $CI_COMMIT_TAG =~ /^v/
 
