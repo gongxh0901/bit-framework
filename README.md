@@ -39,7 +39,7 @@ Bit Framework 包含 12 个核心模块，分为 5 大类别：
 |------|---------|------|------|
 | **bit-ecs** | [@gongxh/bit-ecs](https://www.npmjs.com/package/@gongxh/bit-ecs) | 高性能 ECS（实体组件系统）架构实现 | [README](./bit-ecs/README.md) |
 | **bit-ec** | [@gongxh/bit-ec](https://www.npmjs.com/package/@gongxh/bit-ec) | 基于 Cocos Creator 的 EC 框架实现 | [README](./bit-ec/README.md) |
-| **bit-event** | [@gongxh/bit-event](https://www.npmjs.com/package/@gongxh/bit-event) | 全局事件系统，支持优先级、批量操作等 | [README](./bit-event/README.md) |
+| **bit-event** | [@gongxh/bit-event](https://www.npmjs.com/package/@gongxh/bit-event) | 全局事件系统，支持一次性监听、按名称或目标批量移除等 | [README](./bit-event/README.md) |
 
 ### 🌐 网络与资源模块
 

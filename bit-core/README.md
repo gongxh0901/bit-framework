@@ -4,7 +4,7 @@ Bit Framework 的核心库，为 Cocos Creator 3.x 游戏开发提供基础功�
 
 ## 简介
 
-`bit-core` 是 Bit Framework 的核心库，包含平台检测、时间工具、定时器系统、数据结构、日志工具等核心功能，是整个框架的基石。所有其他模块都依赖于 `bit-core`。
+`bit-core` 是 Bit Framework 的核心库，包含平台检测、时间工具、定时器系统、数据结构、日志工具等核心功能。需要 Cocos 集成能力的模块可将其作为 peer 依赖；独立模块可按需单独使用。
 
 **核心特性**：
 - ⏰ 完整的时间处理系统（网络时间同步、格式化、时长计算）
@@ -170,21 +170,14 @@ npm install @gongxh/bit-core
 
 ## 相关模块
 
-`bit-core` 是框架的基础库，其他模块都依赖于它：
+`bit-core` 是下列模块的直接 peer 依赖：
 
-- **bit-event** - 事件系统
-- **bit-ec** - Entity-Component 架构
-- **bit-ecs** - Entity-Component-System 架构
 - **bit-ui** - UI 系统
-- **bit-net** - 网络通信
-- **bit-assets** - 资源管理
-- **bit-quadtree** - 四叉树
-- **bit-behaviortree** - 行为树
 - **bit-condition** - 条件显示系统
 - **bit-minigame** - 小游戏适配
 - **bit-hotupdate** - 热更新
 
-更多信息请参考 [根目录 README](../README.md) 和 [架构文档](../ARCHITECTURE.md)。
+其他模块没有 `bit-core` 依赖，可独立安装。更多信息请参考 [根目录 README](../README.md) 和 [架构文档](../docs/ARCHITECTURE.md)。
 
 ## 许可证
 

@@ -36,29 +36,29 @@ npm install @gongxh/bit-ui @gongxh/bit-core @gongxh/fairygui-cc
 
 ### UI 装饰器
 
-使用装饰器简化 UI 组件定义和配置。
+从包入口导入 `_uidecorator` 后使用其成员。
 
 **窗口装饰器**：
-- `@uiclass(groupName, pkgName, name, inlinePkgs?)` - 注册窗口类
+- `@_uidecorator.uiclass(groupName, pkgName, name, inlinePkgs?)` - 注册窗口类
   - `groupName` - 窗口组名称
   - `pkgName` - FairyGUI 包名
   - `name` - 组件名（必须和类名相同）
   - `inlinePkgs` - 内联的包名（可选，当前界面引用其他包资源时使用）
 
 **Header 装饰器**：
-- `@uiheader(pkgName, name)` - 注册 Header 类
+- `@_uidecorator.uiheader(pkgName, name)` - 注册 Header 类
   - 用于定义窗口顶部资源栏
 
 **UI 组件装饰器**：
-- `@uicom(pkgName, name)` - 注册自定义 UI 组件类
+- `@_uidecorator.uicom(pkgName, name)` - 注册自定义 UI 组件类
 
 **属性装饰器**：
-- `@uiprop` - 标记 FairyGUI 组件属性（按钮、文本、列表等）
-- `@uicontrol` - 标记 FairyGUI 控制器
-- `@uitransition` - 标记 FairyGUI 动画
+- `@_uidecorator.uiprop` - 标记 FairyGUI 组件属性（按钮、文本、列表等）
+- `@_uidecorator.uicontrol` - 标记 FairyGUI 控制器
+- `@_uidecorator.uitransition` - 标记 FairyGUI 动画
 
 **事件装饰器**：
-- `@uiclick` - 标记点击事件处理函数
+- `@_uidecorator.uiclick` - 标记点击事件处理函数
 
 ### 窗口基类 (Window)
 

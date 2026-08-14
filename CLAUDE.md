@@ -36,6 +36,8 @@ bit-framework/
 | 构建/发布命令 | `docs/COMMANDS.md` |
 | npmjs 发布 | `.github/workflows/publish.yml` |
 | GitLab 发布 | `.gitlab-ci.yml` + `scripts/publish-gitlab.mjs` |
+| workspace 协议转换 | `scripts/prepare-npm-publish.mjs`（npm CLI 不认 `workspace:`） |
+| 应急手动发包 | `scripts/publish-npm.mjs` / `scripts/publish-gitlab.mjs` |
 | fgui 仓库的 workflow | `vendor/fairygui-cc/.github/workflows/publish.yml` |
 | 各模块入口 | `bit-xxx/src/index.ts` |
 | UI 窗口基类 | `bit-ui/src/window/` |
@@ -45,7 +47,8 @@ bit-framework/
 ## 约定
 
 - npm scope: `@gongxh/bit-*`（npmjs）；GitLab 内网发布时 remap 成 `@bit-cc/*`
-- workspace 依赖: `"@gongxh/bit-core": "workspace:*"`
+- workspace 依赖: `peerDependencies` 用 `workspace:^`，`devDependencies` 用 `workspace:*`
+  （发布时由 `scripts/prepare-npm-publish.mjs` 把 peer 转成 `^x.y.z`、删掉 devDeps 的 workspace 条目）
 - 只改 `src/`，不要改 `dist/`
 - 禁止循环依赖、`as any`、空 catch
 - commit: `feat` / `fix` / `refactor` / `docs` / `chore`

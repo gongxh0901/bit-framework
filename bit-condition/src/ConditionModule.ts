@@ -26,6 +26,7 @@ export class ConditionModule extends Module {
     private _timer: number = 0;
     public init(): void {
         this.onInit();
+        ConditionManager.init();
 
         this._timer = InnerTimer.startTimer(() => {
             ConditionManager._update();

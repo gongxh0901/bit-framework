@@ -44,9 +44,11 @@ npm install @gongxh/bit-ecs
 
 组件基类，所有组件必须继承。
 
+从包入口导入 `_ecsdecorator` 后使用其成员。
+
 **装饰器**：
-- `@ecsclass(name)` - 注册组件类
-- `@ecsprop(config)` - 注册组件属性（用于编辑器）
+- `@_ecsdecorator.ecsclass(name)` - 注册组件类
+- `@_ecsdecorator.ecsprop(config)` - 注册组件属性（用于编辑器）
 
 **必须实现**：
 - `reset()` - 重置组件数据（用于对象池回收）
@@ -56,7 +58,7 @@ npm install @gongxh/bit-ecs
 系统基类，包含游戏逻辑。
 
 **装饰器**：
-- `@ecsystem(name, options?)` - 注册系统类
+- `@_ecsdecorator.ecsystem(name, options?)` - 注册系统类
 
 **生命周期**：
 - `onInit()` - 系统初始化（配置查询规则）

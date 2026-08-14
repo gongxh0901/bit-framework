@@ -1,6 +1,6 @@
 # 行为树深度解析
 
-
+> 本文用于讲解通用行为树概念。文中的 `ActionNode`、`ConditionNode`、`NodeStatus` 等代码均为伪代码，不是 `@gongxh/bit-behaviortree` 的公开 API。实际使用请以 [README](./README.md) 和类型定义为准：当前库使用 `LeafNode`、`Condition`、`Status`，并通过 `BehaviorTree.tick(dt)` 执行。
 
 ## 下载地址
 

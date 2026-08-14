@@ -34,7 +34,7 @@ npm install @gongxh/bit-quadtree
 
 **主要方法**：
 - `insert(shape)` - 插入形状到四叉树
-- `query(shape, mask)` - 查询与指定形状碰撞的所有形状
+- `query(shape, binaryMask?)` - 查询与指定形状碰撞、且掩码与 `binaryMask` 按位相交的所有形状
 - `update()` - 更新四叉树（在形状移动后调用）
 - `clear()` - 清空四叉树
 
@@ -42,12 +42,12 @@ npm install @gongxh/bit-quadtree
 
 提供便捷的形状创建函数：
 
-- `createBox(x, y, width, height, group)` - 创建矩形
-- `createCircle(radius, group)` - 创建圆形
-- `createPolygon(vertices, group)` - 创建凸多边形
+- `createBox(x, y, width, height, binaryMask?)` - 创建矩形
+- `createCircle(radius, binaryMask?)` - 创建圆形
+- `createPolygon(vertices, binaryMask?)` - 创建凸多边形
 
 **参数说明**：
-- `group` - 碰撞分组，用于过滤碰撞检测（相同分组的形状不会碰撞）
+- `binaryMask` - 位掩码，默认 `0xFFFFFFFF`。查询时仅返回 `binaryMask & shape.mask` 非零的形状；它不按“相同分组排除”处理碰撞。
 
 ### 工具类
 

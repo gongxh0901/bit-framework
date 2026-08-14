@@ -42,16 +42,23 @@ npm install @gongxh/bit-ec @gongxh/bit-event
 
 ### EC 装饰器
 
-提供装饰器简化组件定义和配置。
+从包入口导入 `_ecdecorator` 后使用其成员：
+
+```typescript
+import { _ecdecorator } from '@gongxh/bit-ec';
+
+@_ecdecorator.ecclass('Health', ComponentType.Health)
+class HealthComponent extends Component {}
+```
 
 **类装饰器**：
-- `@ecclass(name, type, options?)` - 注册组件类
+- `@_ecdecorator.ecclass(name, type, options?)` - 注册组件类
   - `name` - 组件名称
   - `type` - 组件类型（枚举值）
   - `options.describe` - 组件描述（可选）
 
 **属性装饰器**：
-- `@ecprop(config)` - 注册组件属性
+- `@_ecdecorator.ecprop(config)` - 注册组件属性
   - 支持类型：int, float, string, boolean, enum, entity, array, object
   - 支持 Cocos 类型：spriteframe, prefab, skeleton, particle, animation, audio, vec2, vec3, color, size
   - 支持数组和对象嵌套
@@ -77,9 +84,9 @@ npm install @gongxh/bit-ec @gongxh/bit-event
   - `worldName` - 世界名称
   - `entityName` - 实体名称（配置表中的名称）
 
-### 世界 (ECWorld)
+### 世界 (EntityManager)
 
-EC 世界实例，管理实体和组件。
+`ECManager.createECWorld()` 和 `ECManager.getECWorld()` 返回 `EntityManager` 实例，用于管理实体和组件。
 
 **主要方法**：
 - `update(dt)` - 更新世界（每帧调用）

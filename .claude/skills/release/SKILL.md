@@ -27,8 +27,9 @@ description: Use when publishing a new version of bit-framework. Bumps versions,
 `@gongxh/fairygui-cc` 必须由 FGUI-cocoscreator 仓库发布：trusted publishing 要求包
 `repository.url` 与签发 OIDC 的仓库一致。GitLab 侧无此限制，fgui 跟主仓库一起发。
 
-fgui 的 workflow 不在 CI 里跑 gulp：`source/dist` 已入库，靠第 6 步的 `pnpm build`
-在本机产出、随 submodule 一起提交。**跳过第 6 步会导致 fgui 发出旧的 dist。**
+FGUI 仓库的 workflow 不跑 gulp，只校验 dist 存在后直接发**入库的 `source/dist`**。
+那份 dist 由第 6 步的 `pnpm build` 在本机产出、随 submodule 一起提交。
+**跳过第 6 步会让 npmjs 上的 fgui 停留在旧 dist。**
 
 ## 步骤
 
@@ -114,13 +115,23 @@ git push gitlab v{NEW_VERSION}
 
 不要声称"已发布成功"——发布由 CI 完成，需用户查看流水线结果。
 
-## 应急：本机手动发 GitLab
+## 应急：CI 不可用时
 
-CI 不可用时，可本机发 GitLab（需 `GITLAB_TOKEN`）：
+**流程不变**，仍然走上面的第 1–8 步（升版本、CHANGELOG、构建、提交、推 tag）——
+版本管理和变更日志与发布渠道无关，不能省。
+
+差异只在第 9 步：不等 CI，改为本机发包。
 
 ```bash
-pnpm publish:gitlab --dry-run   # 先校验
-pnpm publish:gitlab
+# 第 9 步替换为：
+pnpm publish:gitlab --dry-run && pnpm publish:gitlab   # GitLab 901，需 GITLAB_TOKEN
+pnpm publish:npm --dry-run && pnpm publish:npm         # npmjs 13 个包，需 NPM_TOKEN
 ```
 
-npmjs 侧无本机回退路径：`provenance` 与 trusted publishing 都要求在 CI 中执行。
+`publish:npm` 含 `@gongxh/fairygui-cc`（本机走 token 路径，不受 trusted publishing
+的仓库归属限制），发布前会校验 13 个包版本一致。
+
+⚠️ 手动发 npmjs 的包**不带 provenance**（SLSA 证明只能由 CI 的 OIDC 流程生成）。
+CI 恢复后建议补发一个走 CI 的版本。
+
+只有某一侧 CI 挂了就只跑对应那条命令，另一侧照旧由 tag 触发。

@@ -62,7 +62,7 @@ npm install @gongxh/bit-behaviortree
 - `WeightDecorator` - 权重装饰，用于随机选择
 
 **叶子节点 (LeafNode)**：
-- `LeafNode` - 叶子节点基类，需实现 `tick()` 方法
+- `LeafNode` - 叶子节点基类，需实现 `tick(dt)` 方法
 - `WaitTicks` - 等待指定帧数
 - `WaitTime` - 等待指定时间
 
@@ -101,14 +101,10 @@ npm install @gongxh/bit-behaviortree
 1. **定义节点类型** - 创建自定义叶子节点和条件节点
 2. **构建行为树** - 组合节点构建树结构
 3. **设置黑板数据** - 配置初始数据
-4. **更新行为树** - 在游戏循环中调用 `tick()` 方法
+4. **更新行为树** - 在游戏循环中调用 `tick(dt)` 方法
 5. **响应结果** - 根据返回的状态处理逻辑
 
 详细 API 请查看 `bit-behaviortree.d.ts` 类型定义文件和编辑器文档。
-
-## 内置示例
-
-项目根目录下的 `bt-demo` 文件夹提供完整示例（基于 Cocos Creator 3.8.6）。
 
 ## 许可证
 

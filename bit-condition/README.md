@@ -32,7 +32,7 @@ npm install @gongxh/bit-condition @gongxh/bit-core @gongxh/fairygui-cc
 
 **使用方式**：
 - 在场景根节点或管理节点上添加 `ConditionModule` 组件
-- 组件会自动初始化所有注册的条件
+- 模块初始化时会初始化所有已注册的条件，并定时处理待更新的条件
 
 ### 条件基类 (ConditionBase)
 
@@ -45,22 +45,17 @@ npm install @gongxh/bit-condition @gongxh/bit-core @gongxh/fairygui-cc
 **可调用的方法**：
 - `tryUpdate()` - 手动触发条件更新
 
-**属性**：
-- `type` - 条件类型（自动设置）
-
 ### 条件节点 (ConditionNode)
 
-UI 节点上的组件，用于响应条件变化。
+条件节点是普通 TypeScript 对象，不是 Cocos 组件。它监听条件变化并调用 `notify(visible)`。
 
-**配置属性**：
-- `conditionTypes` - 需要监听的条件类型列表
-- `modeType` - 条件模式（Any 或 All）
-- `onNotify` - 条件变化回调函数 `(canShow: boolean) => void`
+内置的 FairyGUI 节点：
+- `ConditionAnyNode(node, ...conditionTypes)` - 任意条件满足时显示 `node`
+- `ConditionAllNode(node, ...conditionTypes)` - 所有条件满足时显示 `node`
 
 **使用方式**：
-- 在需要动态显示的 UI 节点上添加 `ConditionNode` 组件
-- 配置条件类型和模式
-- 设置回调函数处理显示逻辑
+- 在 `ConditionManager.init()` 之后创建节点
+- 节点销毁前调用 `destroy()`；`ConditionFGUINode` 会在关联的 `GObject.removeFromParent()` 时自动解绑
 
 ### 条件模式 (ConditionMode)
 
@@ -72,18 +67,18 @@ UI 节点上的组件，用于响应条件变化。
 全局条件管理，提供静态方法。
 
 **主要方法**：
-- `initCondition()` - 初始化所有条件（由 ConditionModule 自动调用）
-- `_addUpdateCondition(conditionType)` - 手动标记条件需要更新
-- `_nowUpdateConditionNode(node)` - 立即更新指定节点
+- `init()` - 初始化所有通过装饰器注册的条件（由 `ConditionModule` 自动调用）
+
+条件变化时，在 `ConditionBase` 子类中调用 `this.tryUpdate()`，由模块在下一个更新周期重新计算并通知关联节点。
 
 ### 装饰器
 
-使用 `@condition(conditionType)` 装饰器注册条件类：
+使用 `_conditionDecorator.conditionClass(conditionType)` 装饰器注册条件类：
 
 ```typescript
-import { condition, ConditionBase } from '@gongxh/bit-condition';
+import { _conditionDecorator, ConditionBase } from '@gongxh/bit-condition';
 
-@condition(ConditionType.NewMail)
+@_conditionDecorator.conditionClass(ConditionType.NewMail)
 export class NewMailCondition extends ConditionBase {
     protected onInit(): void {
         // 初始化逻辑
@@ -101,8 +96,8 @@ export class NewMailCondition extends ConditionBase {
 1. **添加模块** - 在场景中添加 `ConditionModule` 组件
 2. **定义条件类型** - 使用枚举定义条件类型
 3. **实现条件类** - 继承 `ConditionBase` 并使用装饰器注册
-4. **添加条件节点** - 在 UI 节点上添加 `ConditionNode` 组件
-5. **触发更新** - 数据变化时调用 `ConditionManager._addUpdateCondition()`
+4. **添加条件节点** - 创建 `ConditionAnyNode`、`ConditionAllNode` 或自定义 `ConditionNode`
+5. **触发更新** - 数据变化时调用条件实例的 `tryUpdate()`
 
 详细 API 请查看 `bit-condition.d.ts` 类型定义文件。
 

@@ -83,17 +83,17 @@ bit-xxx.d.ts                # TypeScript 类型定义
 
 | 模块 | 装饰器 | 用途 |
 |------|--------|------|
-| bit-ui | `@uiclass` `@uiprop` `@uiclick` | UI 窗口注册 |
-| bit-ecs | `@ecsclass` `@ecsprop` `@ecsystem` | ECS 组件/系统 |
-| bit-ec | `@ecclass` `@ecprop` | EC 组件 |
-| bit-condition | `@condition` | 条件类注册 |
+| bit-ui | `@_uidecorator.uiclass` `@_uidecorator.uiprop` `@_uidecorator.uiclick` | UI 窗口注册 |
+| bit-ecs | `@_ecsdecorator.ecsclass` `@_ecsdecorator.ecsprop` `@_ecsdecorator.ecsystem` | ECS 组件/系统 |
+| bit-ec | `@_ecdecorator.ecclass` `@_ecdecorator.ecprop` | EC 组件 |
+| bit-condition | `@_conditionDecorator.conditionClass` | 条件类注册 |
 | bit-behaviortree | `@ClassAction` `@prop` | 行为树节点 |
 
 ## 设计原则
 
 1. **单向依赖** — 禁止循环依赖，双向通信通过 bit-event
-2. **依赖最小** — 运行时零额外依赖（除引擎）
-3. **类型安全** — 禁止 `as any`，完整类型导出
+2. **依赖最小** — 仅引入各模块声明的引擎和 peer 依赖
+3. **类型安全** — 优先使用精确类型，避免不必要的 `any` 断言，并完整导出公共类型
 4. **性能优先** — 使用对象池减少 GC，密集数据结构
 5. **可扩展** — 抽象类 + 接口 + 生命周期钩子
 

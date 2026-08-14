@@ -11,9 +11,9 @@
 
 
 ## 二、安装
-1. 安装 bit-behaviortree 
+1. 安装 @gongxh/bit-behaviortree 
    ```
-   npm install bit-behaviortree
+   npm install @gongxh/bit-behaviortree
    ```
    
 2. 下载扩展插件(bt-editor)
@@ -22,7 +22,7 @@
     ```typescript
     // 比如在项目代码目录下添加一个文件 header.ts
     // 写上如下代码
-    import * as BT from "bit-behaviortree";
+    import * as BT from "@gongxh/bit-behaviortree";
     export { BT };
     ```
     

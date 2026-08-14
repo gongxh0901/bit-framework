@@ -19,6 +19,15 @@ pnpm build:net | build:assets | build:quadtree | build:behaviortree
 pnpm build:condition | build:minigame | build:hotupdate
 ```
 
+fgui 的 `source/dist` 入库。三条 CI 对它的处理不同：
+
+- **FGUI 仓库的 workflow**（实际发 `@gongxh/fairygui-cc` 的那条）不跑 gulp，
+  只校验 dist 文件存在，直接发**入库的 dist**
+- 主仓库 GitHub workflow 和 GitLab CI 会跑 `pnpm build`（含 gulp），
+  但前者不发 fgui（构建只为 bit-ui / bit-condition 提供依赖），后者是现场产出
+
+**所以发版时跳过 `pnpm build` 会让 npmjs 上的 fgui 停留在旧 dist。**
+
 ## 版本与发布
 
 发布由 CI 完成：推送 `v*` tag 后两侧自动发包，本机不再手动发。
@@ -79,14 +88,33 @@ git push gitlab vx.x.x
 - FGUI Actions: https://github.com/gongxh0901/FGUI-cocoscreator/actions
 - GitLab Pipelines: https://git.lanfeitech.com/bit-cc/bit-framework/-/pipelines
 
-## 应急：本机手动发 GitLab
+## 应急：本机手动发包
+
+CI 不可用时的回退路径。
+
+GitLab（需 `GITLAB_TOKEN`）：
 
 ```bash
 pnpm publish:gitlab --dry-run   # 只打包校验，不上传
-pnpm publish:gitlab             # 需 GITLAB_TOKEN
+pnpm publish:gitlab
 ```
 
-npmjs 侧无本机回退路径：`provenance` 与 trusted publishing 都要求在 CI 中执行。
+npmjs（需 `NPM_TOKEN`，且该 token 勾选了 Bypass 2FA）：
+
+```bash
+pnpm publish:npm --dry-run   # 只打包校验，不上传
+pnpm publish:npm             # 逐包发到 npmjs
+```
+
+脚本内部会自动跑 `prepare:npm` 转换 workspace 协议，并在结束后还原 `package.json`。
+含 `@gongxh/fairygui-cc`（13 个包）—— 它与 bit-* 版本号绑定，必须同步发布。
+发布前会校验所有包版本一致，不一致直接中止。
+
+> CI 里 fgui 由 FGUI-cocoscreator 仓库自己的 workflow 发布，因为 trusted publishing
+> 要求包声明的仓库与签发 OIDC 的仓库一致。本机走 token 路径没有这个限制。
+
+⚠️ 手动发 npmjs 的包**不带 provenance** —— SLSA 证明只能由 CI 的 OIDC 流程生成。
+仅在 GitHub Actions 不可用时使用，事后建议补发一个走 CI 的版本。
 
 ## 内网安装 @bit-cc/*
 
