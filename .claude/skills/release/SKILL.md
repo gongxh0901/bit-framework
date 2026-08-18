@@ -78,17 +78,25 @@ pnpm build
 主仓库只记录 submodule 的 SHA，必须先 push submodule。
 fgui 的 tag 会触发它自己的 GitHub workflow 发布 `@gongxh/fairygui-cc`。
 
-```bash
-cd vendor/fairygui-cc
-git add .
-git commit -m "chore: release v{NEW_VERSION}"
-git tag v{NEW_VERSION}
-git push origin ccc3.0
-git push origin v{NEW_VERSION}
-git push gitlab ccc3.0
-git push gitlab v{NEW_VERSION}
-cd ../..
+**禁止 `cd vendor/fairygui-cc`。** Bash 每次从主仓库启动，`cd` 不会带到下一条命令，
+后续 `git add` / `git commit` / `git push origin ccc3.0` 会打到主仓库。
+操作 submodule 一律用 `git -C vendor/fairygui-cc`，且必须先确认 `git -C vendor/fairygui-cc status` 成功后再 commit。
 
+```bash
+# --- 只操作 submodule，全部带 -C ---
+git -C vendor/fairygui-cc add .
+git -C vendor/fairygui-cc commit -m "chore: release v{NEW_VERSION}"
+git -C vendor/fairygui-cc tag v{NEW_VERSION}
+git -C vendor/fairygui-cc push origin ccc3.0
+git -C vendor/fairygui-cc push origin v{NEW_VERSION}
+git -C vendor/fairygui-cc push gitlab ccc3.0
+git -C vendor/fairygui-cc push gitlab v{NEW_VERSION}
+
+# --- 确认 submodule 已干净、tag 已在远端，再碰主仓库 ---
+git -C vendor/fairygui-cc status
+git status
+
+# --- 主仓库：此时才 add / commit / push 分支（先不要打主仓库 tag）---
 git add .
 git commit -m "chore: release v{NEW_VERSION}"
 git push origin
