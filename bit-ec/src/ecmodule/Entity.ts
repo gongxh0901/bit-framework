@@ -70,6 +70,8 @@ export class Entity {
         this.states && this.states.clear();
         this.active = false;
         this.entityManager = null;
+        this.id = 0;
+        this.name = "";
     }
 
     /**
