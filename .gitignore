@@ -16,7 +16,8 @@ Thumbs.db
 package-lock.json
 
 # pnpm lock 文件建议提交，保证依赖一致性
-# pnpm-lock.yaml  
+# pnpm-lock.yaml
+
 
 
 # 构建产物

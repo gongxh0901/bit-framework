@@ -1,11 +1,11 @@
 ---
 name: changelog
-description: Use when generating a CHANGELOG entry for bit-framework based on git commits since the last tag, including vendor/fairygui-cc submodule commits.
+description: Use when generating package-specific CHANGELOG entries for bit-framework from git commits and Changesets, including vendor/fairygui-cc submodule commits when relevant.
 ---
 
 # Changelog
 
-根据 git log 生成条目，插入 `CHANGELOG.md` 顶部。包含主仓库和 `vendor/fairygui-cc` 的提交；submodule 写成 `- 说明 (fairygui-cc hash)`。
+根据 Changesets 和 git log 为实际受影响的包生成 CHANGELOG 条目，写入对应包目录的 `CHANGELOG.md`。包含主仓库和相关的 `vendor/fairygui-cc` 提交；submodule 写成 `- 说明 (fairygui-cc hash)`。
 
 ## 用法
 
@@ -45,7 +45,7 @@ git -C vendor/fairygui-cc log {fgui_last_tag}..HEAD --oneline --no-merges
 
 ### 4. 版本号
 
-读取根 `package.json` 的 `version`。
+读取实际发布包的 `package.json` 的 `version`，每个包独立处理；不要读取或修改根 private 包的版本作为所有包的统一版本。
 
 ### 5. 写入
 
@@ -57,7 +57,7 @@ git -C vendor/fairygui-cc log {fgui_last_tag}..HEAD --oneline --no-merges
 - feat: xxx (fairygui-cc hash)
 ```
 
-日期用今天。已有 `CHANGELOG.md` 时，插入到第一个 `## [` 之前。
+日期用今天。已有包级 `CHANGELOG.md` 时，插入到第一个 `## [` 之前。若本次发版由 Changesets 生成日志，优先保留 Changesets 的包级结果，不再额外生成根级统一日志。
 
 ### 完成
 

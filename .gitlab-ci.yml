@@ -1,12 +1,31 @@
-# 推送 v* tag 时把所有包发布到本项目的 Package Registry
-# （bit-cc/bit-framework，project 901）。包含 vendor/fairygui-cc（submodule）。
+# Release PR 合并后的版本提交把变更包发布到本项目的 Package Registry
+# （bit-cc/bit-framework，project 901）。不发布 vendor/fairygui-cc（submodule）。
 # 包名与 npmjs 一致（@gongxh/*）：项目级 endpoint 不要求 scope 与 namespace 同名。
 #
 # npmjs 侧由 GitHub Actions 负责（npm trusted publishing 只信任 gitlab.com，
 # 不支持自建 GitLab 实例），此处只发公司内网 registry。
 
 stages:
+  - validate
   - publish
+
+validate:release:
+  stage: validate
+  image: node:22
+  tags:
+    - docker
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SUBMODULE_FORCE_HTTPS: 'true'
+  before_script:
+    - corepack enable
+    - corepack prepare pnpm@10 --activate
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm changeset status
+    - pnpm build
 
 publish:gitlab:
   stage: publish
@@ -18,7 +37,7 @@ publish:gitlab:
     - docker
 
   rules:
-    - if: $CI_COMMIT_TAG =~ /^v/
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /chore: release packages/'
 
   variables:
     # fgui 是构建 bit-ui / bit-condition 的前置依赖
@@ -33,5 +52,5 @@ publish:gitlab:
   script:
     - pnpm install --frozen-lockfile
     - pnpm build
-    # 脚本内部读取 CI_JOB_TOKEN 完成认证
-    - node scripts/publish-gitlab.mjs
+    # 脚本内部读取 CI_JOB_TOKEN，按 Release PR 生成的 Changesets 清单发布
+    - pnpm publish:gitlab

@@ -1,18 +1,40 @@
-name: Publish to npmjs
+name: Release packages
 
-# 推送 v* tag 时触发；不发布 @gongxh/fairygui-cc
-# （它属于 FGUI-cocoscreator 仓库，trusted publishing 要求包声明的仓库与签发 OIDC 的仓库一致）
+# Changesets 在 main 上创建/更新 Release PR；合并 Release PR 后发布变更包。
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  publish:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm changeset status
+      - run: pnpm build
+
+  release:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write # Changesets 发布后需要创建包级 git tag
+      pull-requests: write # Changesets 需要创建/更新 Release PR
       id-token: write # trusted publishing 需要，用于向 npm 换取 OIDC 凭证
 
     steps:
@@ -41,18 +63,12 @@ jobs:
 
       - run: pnpm build
 
-      # npm CLI 不认识 pnpm 的 workspace: 协议，发布前替换成真实版本号
-      - name: Resolve workspace protocol
-        run: node scripts/prepare-npm-publish.mjs
-
-      # 按依赖拓扑顺序逐包发布。provenance 与 access 已在各包 publishConfig 中声明。
-      - name: Publish packages
-        run: |
-          set -e
-          for pkg in bit-core bit-event bit-net bit-ecs bit-assets bit-quadtree \
-                     bit-behaviortree bit-ec bit-ui bit-condition bit-minigame \
-                     bit-hotupdate; do
-            echo "::group::publish $pkg"
-            (cd "$pkg" && npm publish)
-            echo "::endgroup::"
-          done
+      - name: Create Release PR or publish packages
+        uses: changesets/action@v1
+        with:
+          version: pnpm version:packages
+          publish: pnpm publish:npm
+          commit: 'chore: release packages'
+          title: 'chore: release packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
