@@ -19,12 +19,11 @@
     "build:condition": "pnpm --filter @gongxh/bit-condition build",
     "build:minigame": "pnpm --filter @gongxh/bit-minigame build",
     "build:hotupdate": "pnpm --filter @gongxh/bit-hotupdate build",
+    "changeset": "changeset",
+    "version:packages": "changeset version && pnpm install --lockfile-only",
     "publish:npm": "node scripts/publish-npm.mjs",
     "publish:gitlab": "node scripts/publish-gitlab.mjs",
-    "prepare:npm": "node scripts/prepare-npm-publish.mjs",
-    "version:patch": "pnpm -r exec -- npm version patch --no-git-tag-version && npm version patch --no-git-tag-version",
-    "version:minor": "pnpm -r exec -- npm version minor --no-git-tag-version && npm version minor --no-git-tag-version",
-    "version:major": "pnpm -r exec -- npm version major --no-git-tag-version && npm version major --no-git-tag-version"
+    "release": "pnpm publish:npm"
   },
   "keywords": [
     "bit-framework",
@@ -47,6 +46,7 @@
     "pnpm": ">=8.0.0"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.7",
     "@cocos/creator-types": "^3.8.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
