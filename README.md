@@ -114,7 +114,7 @@ pnpm install
 pnpm build
 ```
 
-命令见 [COMMANDS.md](./docs/COMMANDS.md)。发版：AI 用 `/release`，手动步骤见该文档。
+命令见 [COMMANDS.md](./docs/COMMANDS.md)，发版流程见该文档。
 
 ## 🔧 常见问题
 

@@ -5,6 +5,8 @@ description: Use when generating package-specific CHANGELOG entries for bit-fram
 
 # Changelog
 
+正常发版由 Changesets 的 `@changesets/cli/changelog` 自动生成包级 `CHANGELOG.md`。本技能只用于补充或修复日志、整理历史版本，或在需要纳入 FairyGUI 子模块提交时手工生成条目；不应与 Changesets 自动生成的同一版本重复写入。
+
 根据 Changesets 和 git log 为实际受影响的包生成 CHANGELOG 条目，写入对应包目录的 `CHANGELOG.md`。包含主仓库和相关的 `vendor/fairygui-cc` 提交；submodule 写成 `- 说明 (fairygui-cc hash)`。
 
 ## 用法
