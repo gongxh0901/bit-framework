@@ -44,10 +44,10 @@ function prepareRegistry(saved) {
 
 function writeNpmrc() {
     const jobToken = process.env.CI_JOB_TOKEN
-    const personalToken = process.env.GITLAB_TOKEN
+    const personalToken = process.env.GITLAB_NPM_TOKEN
     const token = jobToken || personalToken
     if (!token) {
-        console.error('缺少 CI_JOB_TOKEN 或 GITLAB_TOKEN，无法发布到 GitLab Package Registry')
+        console.error('缺少 CI_JOB_TOKEN 或 GITLAB_NPM_TOKEN，无法发布到 GitLab Package Registry')
         return null
     }
     const path = join(ROOT, '.npmrc.gitlab-publish')
@@ -56,7 +56,7 @@ function writeNpmrc() {
         `//${GITLAB_HOST}${REGISTRY_PATH}:_authToken=${token}`,
         '',
     ].join('\n'))
-    console.log(`认证：${jobToken ? 'CI_JOB_TOKEN' : 'GITLAB_TOKEN'}`)
+    console.log(`认证：${jobToken ? 'CI_JOB_TOKEN' : 'GITLAB_NPM_TOKEN'}`)
     return path
 }
 

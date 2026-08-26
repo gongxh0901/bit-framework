@@ -84,7 +84,7 @@ pnpm build         # 全部
 
 - 发版前确认目标包、版本变更级别和工作区状态；主仓库及 `vendor/fairygui-cc` 子模块都必须干净。
 - 使用 Changesets 管理独立版本：只升级有变更或因内部依赖范围变化而必须升级的包，不再统一升级所有包。
-- 合并代码后由 GitHub Changesets Action 创建或更新 Release PR；不要手动提交 `chore: version packages`。
+- 合并代码后由 GitHub Changesets Action 和 GitLab Release MR job 创建或更新 Release PR/MR；不要手动提交 `chore: version packages`。
 - 包间依赖在源码中使用 `workspace:^` 或 `workspace:~`；发布前解析为真实 semver 范围，禁止发布 `workspace:` 协议。
 - 发布前按依赖拓扑构建和校验，只发布本次变更集计算出的包。
 - npmjs 和 GitLab 使用同一组包名；CI 负责发布，本机默认不直接 publish。

@@ -7,7 +7,27 @@
 
 stages:
   - validate
+  - release
   - publish
+
+release:gitlab:
+  stage: release
+  image: node:22
+  tags:
+    - docker
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - .changeset/*.md
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SUBMODULE_FORCE_HTTPS: 'true'
+  before_script:
+    - corepack enable
+    - corepack prepare pnpm@10 --activate
+    - pnpm install --frozen-lockfile
+  script:
+    - node scripts/create-gitlab-release-mr.mjs
 
 validate:release:
   stage: validate

@@ -92,7 +92,7 @@ git push gitlab vx.x.x
 
 CI 不可用时的回退路径。
 
-GitLab（需 `GITLAB_TOKEN`）：
+GitLab（需 `GITLAB_NPM_TOKEN`）：
 
 ```bash
 pnpm publish:gitlab --dry-run   # 只打包校验，不上传
@@ -122,7 +122,7 @@ pnpm publish:npm             # 逐包发到 npmjs
 
 ```
 @gongxh:registry=https://git.lanfeitech.com/api/v4/projects/901/packages/npm/
-//git.lanfeitech.com/api/v4/projects/901/packages/npm/:_authToken=${GITLAB_TOKEN}
+//git.lanfeitech.com/api/v4/projects/901/packages/npm/:_authToken=${GITLAB_NPM_TOKEN}
 ```
 
 ```bash

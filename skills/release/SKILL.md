@@ -43,8 +43,7 @@ pnpm build
 
 ### 3. Release PR 自动生成版本和日志
 
-```bash
-此步骤由 GitHub `changesets/action` 自动完成，不再手动执行。Action 在 `main` 上检测到未消费的 changeset 后，会创建或更新 `chore: release packages` PR。
+此步骤由 GitHub `changesets/action` 和 GitLab Release MR job 自动完成，不再手动执行。两侧根据同一批 changeset 创建或更新 `chore: release packages` PR/MR。
 
 Release PR 包含：
 
@@ -61,13 +60,13 @@ pnpm install --frozen-lockfile
 pnpm build
 ```
 
-合并 Release PR 后，GitHub Action 生成 `chore: release packages` 提交并执行 npmjs 发布；GitLab 检测到同一版本提交后执行内部 registry 发布。
+分别合并 GitHub Release PR 和 GitLab Release MR 后，两个平台各自生成 `chore: release packages` 版本提交：GitHub 执行 npmjs 发布，GitLab 执行内部 registry 发布。
+
+GitLab Release MR job 需要项目 CI/CD 变量 `GITLAB_NPM_TOKEN`，至少具备 `api` 和 `write_repository` 权限。
 
 ### 4. 合并 Release PR
 
-```bash
 不再手动执行 `pnpm version:packages` 或提交 `chore: version packages`。只需审核并合并机器人创建的 `chore: release packages` PR。
-```
 
 不要提交 `dist/`，除非外部发布仓库明确要求构建产物入库。子模块按独立仓库提交，主仓库只更新其 SHA。
 
