@@ -1,0 +1,4 @@
+interface:
+  display_name: "FairyGUI 子模块发版"
+  short_description: "简化 FairyGUI 子模块版本、CHANGELOG 和 npm tag 发版"
+  default_prompt: "使用 $fairygui-release 为 FairyGUI 子模块准备一次发版"
