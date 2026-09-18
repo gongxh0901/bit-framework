@@ -121,8 +121,8 @@ export class HotUpdate {
             debug(`${TAG} 更新回调code:${eventCode}`);
             switch (eventCode) {
                 case native.EventAssetsManager.UPDATE_PROGRESSION: {
-                    let bytes = event.getDownloadedBytes() / 1024;
-                    let total = event.getTotalBytes() / 1024;
+                    let bytes = Math.round(event.getDownloadedBytes() / 1024 * 10) / 10;
+                    let total = Math.round(event.getTotalBytes() / 1024 * 10) / 10;
                     this._progress(bytes, total);
                     break;
                 }
@@ -263,7 +263,7 @@ export class HotUpdate {
                     case native.EventAssetsManager.NEW_VERSION_FOUND: {
                         // 发现新版本
                         this._am.setEventCallback(null);
-                        resolve({ needUpdate: true, size: this._am.getTotalBytes() / 1024 });
+                        resolve({ needUpdate: true, size: Math.round(this._am.getTotalBytes() / 1024 * 10) / 10 });
                         break;
                     }
                     default: {
