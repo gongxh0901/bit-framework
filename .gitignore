@@ -31,6 +31,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# mise 本地工具与缓存目录
+.mise/
+
 # 临时文件
 .cache/
 .temp/

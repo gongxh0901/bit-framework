@@ -54,7 +54,7 @@ CHANGELOG 格式：
 修改版本与 CHANGELOG 后构建：
 
 ```bash
-pnpm --filter @gongxh/fairygui-cc build
+mise run build:fgui
 test -f vendor/fairygui-cc/source/dist/fairygui.mjs
 test -f vendor/fairygui-cc/source/dist/fairygui.d.ts
 test -f vendor/fairygui-cc/source/dist/fairygui.min.mjs

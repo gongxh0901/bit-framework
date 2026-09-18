@@ -5,7 +5,7 @@
 一个模块化、类型安全、高性能的 Cocos Creator 游戏开发框架集合，提供从核心功能到高级特性的完整解决方案。
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![pnpm](https://img.shields.io/badge/maintained%20with-pnpm-cc00ff.svg)](https://pnpm.io/)
+[![mise](https://img.shields.io/badge/tasks-mise-blue.svg)](https://mise.jdx.dev/)
 
 ## ✨ 特性
 
@@ -66,8 +66,8 @@ Bit Framework 包含 12 个核心模块，分为 5 大类别：
 
 ### 环境要求
 
-- **Node.js**: >= 16.0.0
-- **pnpm**: >= 8.0.0
+- **mise**: 2026.9+
+- **Node.js / pnpm**: 由根目录 `mise.toml` 安装和固定版本
 - **Cocos Creator**: 3.7.0+ （推荐 3.8.x）
 
 ### 方式一：在 Cocos Creator 项目中使用（推荐）
@@ -92,17 +92,14 @@ npm install @gongxh/bit-core @gongxh/bit-ui @gongxh/bit-event @gongxh/bit-net @g
 
 如果你想参与框架开发或查看源码：
 
-#### 1. 安装 pnpm
+#### 1. 安装 mise
 
 ```bash
-# 使用 npm 安装
-npm install -g pnpm
+# macOS
+brew install mise
 
-# 或使用 homebrew (macOS)
-brew install pnpm
-
-# 验证安装
-pnpm --version
+# Linux / macOS 通用安装方式
+curl https://mise.run | sh
 ```
 
 #### 2. 克隆、安装、构建
@@ -110,21 +107,18 @@ pnpm --version
 ```bash
 git clone --recurse-submodules https://github.com/gongxh0901/bit-framework.git
 cd bit-framework
-pnpm install
-pnpm build
+mise install
+mise run setup
+mise run build
 ```
 
 命令见 [COMMANDS.md](./docs/COMMANDS.md)，发版流程见该文档。
 
 ## 🔧 常见问题
 
-### Q: 为什么使用 pnpm？
+### Q: 为什么使用 mise？
 
-A: pnpm 相比 npm/yarn 有以下优势：
-- 更快的安装速度
-- 节省磁盘空间（使用硬链接）
-- 更严格的依赖管理
-- 原生支持 monorepo
+A: mise 统一固定 Node.js、pnpm 版本并提供项目 task；pnpm 继续作为底层 workspace 包管理器，但日常开发和 CI 都从 `mise run ...` 进入。
 
 ### Q: 如何贡献代码？
 
@@ -138,7 +132,7 @@ A: 欢迎贡献！请按以下步骤：
 
 ## 🔗 相关资源
 
-- [pnpm 官方文档](https://pnpm.io/zh/)
+- [mise 官方文档](https://mise.jdx.dev/)
 - [pnpm workspace 文档](https://pnpm.io/zh/workspaces)
 - [Cocos Creator 文档](https://docs.cocos.com/creator/3.8/)
 - [FairyGUI 文档](https://www.fairygui.com/docs/editor)

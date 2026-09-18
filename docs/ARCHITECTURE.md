@@ -2,7 +2,7 @@
 
 ## 架构总览
 
-基于 **pnpm Monorepo** 的游戏框架集合，专为 Cocos Creator 3.x 设计。12 个独立模块，统一仓库管理，独立发布。
+基于 **mise tasks + pnpm workspace** 的游戏框架集合，专为 Cocos Creator 3.x 设计。12 个独立模块，统一仓库管理，独立发布。
 
 ```
 bit-framework/
@@ -52,7 +52,8 @@ graph LR
 | 技术 | 版本 | 用途 |
 |------|------|------|
 | TypeScript | 5.x | 开发语言 |
-| pnpm | 8.x+ | 包管理器 + workspace |
+| mise | 2026.9+ | 工具版本与任务管理 |
+| pnpm | 10.x | mise 管理的包管理器 + workspace |
 | Rollup | 4.x | 构建打包 |
 | Cocos Creator | 3.7.0+ | 游戏引擎 |
 | FairyGUI | 1.2.2 | UI 编辑器（bit-ui 使用） |
@@ -109,4 +110,4 @@ bit-xxx/
 └── README.md
 ```
 
-添加到 `pnpm-workspace.yaml` 和根 `package.json` 的 `build:xxx` 脚本。
+添加到 `pnpm-workspace.yaml`，并在根 `mise.toml` 增加 `build:xxx` task。

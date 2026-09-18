@@ -3,28 +3,6 @@
   "version": "0.5.4",
   "private": true,
   "description": "bit-framework monorepo - Cocos Creator 游戏框架",
-  "scripts": {
-    "clean": "pnpm -r --parallel --filter='!@gongxh/fairygui-cc' clean",
-    "build": "pnpm -r build",
-    "build:fgui": "pnpm --filter @gongxh/fairygui-cc build",
-    "build:core": "pnpm --filter @gongxh/bit-core build",
-    "build:ui": "pnpm --filter @gongxh/bit-ui build",
-    "build:ecs": "pnpm --filter @gongxh/bit-ecs build",
-    "build:event": "pnpm --filter @gongxh/bit-event build",
-    "build:net": "pnpm --filter @gongxh/bit-net build",
-    "build:quadtree": "pnpm --filter @gongxh/bit-quadtree build",
-    "build:assets": "pnpm --filter @gongxh/bit-assets build",
-    "build:behaviortree": "pnpm --filter @gongxh/bit-behaviortree build",
-    "build:ec": "pnpm --filter @gongxh/bit-ec build",
-    "build:condition": "pnpm --filter @gongxh/bit-condition build",
-    "build:minigame": "pnpm --filter @gongxh/bit-minigame build",
-    "build:hotupdate": "pnpm --filter @gongxh/bit-hotupdate build",
-    "changeset": "changeset",
-    "version:packages": "changeset version && pnpm install --lockfile-only",
-    "publish:npm": "node scripts/publish-npm.mjs",
-    "publish:gitlab": "node scripts/publish-gitlab.mjs",
-    "release": "pnpm publish:npm"
-  },
   "keywords": [
     "bit-framework",
     "cocos",
@@ -42,8 +20,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "pnpm": ">=8.0.0"
+    "node": ">=22.14.0",
+    "pnpm": ">=10.28.0"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",

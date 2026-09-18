@@ -60,7 +60,7 @@ async function main() {
     run('git', ['remote', 'set-url', 'origin', remoteUrl])
     run('git', ['fetch', 'origin', targetBranch])
     run('git', ['checkout', '-B', sourceBranch])
-    run('pnpm', ['version:packages'])
+    run('mise', ['run', 'version:packages'])
 
     const status = spawnSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).stdout.trim()
     if (!status) {

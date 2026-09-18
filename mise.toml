@@ -1,0 +1,104 @@
+[tools]
+node = "22.14.0"
+pnpm = "10.28.0"
+
+[tasks.setup]
+description = "安装 workspace 依赖"
+run = "pnpm install"
+
+[tasks."setup:ci"]
+description = "按锁文件安装 workspace 依赖"
+env = { CI = "true" }
+run = "pnpm install --frozen-lockfile"
+
+[tasks.clean]
+description = "清理所有 bit-* 模块的 dist 目录"
+run = "pnpm -r --parallel --filter='!@gongxh/fairygui-cc' clean"
+
+[tasks.build]
+description = "按 workspace 依赖顺序构建全部模块"
+run = "pnpm -r build"
+
+[tasks."build:fgui"]
+description = "构建 FairyGUI"
+run = "pnpm --filter @gongxh/fairygui-cc build"
+
+[tasks."build:core"]
+description = "构建 bit-core"
+run = "pnpm --filter @gongxh/bit-core build"
+
+[tasks."build:ui"]
+description = "构建 bit-ui"
+run = "pnpm --filter @gongxh/bit-ui build"
+
+[tasks."build:ecs"]
+description = "构建 bit-ecs"
+run = "pnpm --filter @gongxh/bit-ecs build"
+
+[tasks."build:event"]
+description = "构建 bit-event"
+run = "pnpm --filter @gongxh/bit-event build"
+
+[tasks."build:net"]
+description = "构建 bit-net"
+run = "pnpm --filter @gongxh/bit-net build"
+
+[tasks."build:quadtree"]
+description = "构建 bit-quadtree"
+run = "pnpm --filter @gongxh/bit-quadtree build"
+
+[tasks."build:assets"]
+description = "构建 bit-assets"
+run = "pnpm --filter @gongxh/bit-assets build"
+
+[tasks."build:behaviortree"]
+description = "构建 bit-behaviortree"
+run = "pnpm --filter @gongxh/bit-behaviortree build"
+
+[tasks."build:ec"]
+description = "构建 bit-ec"
+run = "pnpm --filter @gongxh/bit-ec build"
+
+[tasks."build:condition"]
+description = "构建 bit-condition"
+run = "pnpm --filter @gongxh/bit-condition build"
+
+[tasks."build:minigame"]
+description = "构建 bit-minigame"
+run = "pnpm --filter @gongxh/bit-minigame build"
+
+[tasks."build:hotupdate"]
+description = "构建 bit-hotupdate"
+run = "pnpm --filter @gongxh/bit-hotupdate build"
+
+[tasks.changeset]
+description = "创建 Changeset"
+run = "pnpm exec changeset"
+
+[tasks."changeset:status"]
+description = "检查 Changesets 状态"
+run = "pnpm exec changeset status"
+
+[tasks."version:packages"]
+description = "根据 Changesets 更新包版本和锁文件"
+run = "pnpm exec changeset version && pnpm install --lockfile-only"
+
+[tasks."publish:npm"]
+description = "将变更包发布到 npmjs"
+run = "node scripts/publish-npm.mjs"
+
+[tasks."publish:gitlab"]
+description = "将变更包发布到 GitLab Package Registry"
+run = "node scripts/publish-gitlab.mjs"
+
+[tasks."workspace:list"]
+description = "列出 workspace 包"
+run = "pnpm list -r --depth 0"
+
+[tasks."workspace:update"]
+description = "更新 workspace 依赖"
+run = "pnpm update -r"
+
+[tasks."workspace:outdated"]
+description = "检查过期依赖"
+run = "pnpm outdated"
