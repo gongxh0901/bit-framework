@@ -24,7 +24,8 @@ mise run changeset
 
 ### FairyGUI 子模块
 
-FairyGUI 不使用主仓库 Changesets。更新版本、CHANGELOG 和 `source/dist` 后，推送 `vX.Y.Z` tag；子模块自己的 GitHub Actions 会自动发布 `@gongxh/fairygui-cc`。
+FairyGUI 不使用主仓库 Changesets。
+更新版本、CHANGELOG 和 `source/dist` 后，推送 `vX.Y.Z` tag；子模块自己的 GitHub Actions 会自动发布 `@gongxh/fairygui-cc`。
 
 ## 2. AI Agent 发包
 

@@ -16,7 +16,6 @@ export class EntityManager {
     /**
      * 单例实体
      * @type {Entity}
-     * @internal
      */
     public readonly insEntity: Entity = new Entity();
 
