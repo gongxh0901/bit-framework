@@ -21,6 +21,8 @@ jobs:
       - uses: jdx/mise-action@v4
       - run: mise run setup:ci
       - run: mise run changeset:status
+        # Release PR 已消费 Changeset，仅普通 PR 需要检查待发布变更集。
+        if: github.head_ref != 'changeset-release/main'
       - run: mise run build
 
   release:
