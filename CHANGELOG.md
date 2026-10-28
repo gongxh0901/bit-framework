@@ -7,9 +7,6 @@
 
 ## [0.5.3] - 2026-08-14
 
-### Changed
-- GitLab 发布改用 @gongxh/*，去掉 @bit-cc remap
-
 ### Documentation
 - docs: 补齐发布文档并新增 npm 应急发包脚本 (70077cc)
 
@@ -21,7 +18,6 @@
 ## [0.5.1] - 2026-08-14
 
 ### Fixed
-- fix: GitLab CI 加 docker 标签 (c5e37c8)
 - fix: 去掉 setup-node 的 registry-url (5285659)
 - fix: 去掉 setup-node 的 registry-url (fairygui-cc 260f5ed)
 
@@ -35,7 +31,7 @@
 - feature: 安全区改为四边 inset 并支持配置 (bdf1305)
 
 ### Chore
-- chore: submodule 改为相对路径，GitHub/GitLab 各自解析 (af85a2e)
+- chore: submodule 改为相对路径 (af85a2e)
 
 ## [0.4.1] - 2026-08-13
 

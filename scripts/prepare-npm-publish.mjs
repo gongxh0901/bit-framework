@@ -90,7 +90,7 @@ function main() {
 
         // devDependencies 不影响消费者安装，但 workspace: 协议会让解析
         // package.json 的工具（审计、Renovate、镜像同步）报 invalid version。
-        // 直接删掉，与 publish-gitlab.mjs 的处理保持一致。
+        // 发布前直接删除这些开发依赖条目。
         if (pkg.devDependencies) {
             for (const [depName, spec] of Object.entries(pkg.devDependencies)) {
                 if (typeof spec === 'string' && spec.startsWith('workspace:')) {

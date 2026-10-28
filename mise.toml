@@ -87,10 +87,6 @@ run = "pnpm exec changeset version && pnpm install --lockfile-only"
 description = "将变更包发布到 npmjs"
 run = "node scripts/publish-npm.mjs"
 
-[tasks."publish:gitlab"]
-description = "将变更包发布到 GitLab Package Registry"
-run = "node scripts/publish-gitlab.mjs"
-
 [tasks."workspace:list"]
 description = "列出 workspace 包"
 run = "pnpm list -r --depth 0"
