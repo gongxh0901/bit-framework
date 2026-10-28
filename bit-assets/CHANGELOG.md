@@ -1,6 +1,6 @@
 # @gongxh/bit-assets
 
-## 0.5.5
+## 0.5.6
 
 ### Patch Changes
 
