@@ -5,8 +5,7 @@
  * 支持 null/number/string/boolean/array/object 任意嵌套组合，不要求数据结构统一（数组表、字典表、单个对象/值都适用）。
  *
  * 全程只用 Uint8Array/DataView，不依赖 TextEncoder/TextDecoder 等平台相关 API。
- * 实测（14.5MB 真实配置表，347 张）：体积为 JSON 的 28.7%，编码比 JSON.stringify 快 1.38 倍，
- * 解码比 JSON.parse 快 1.95 倍。
+ * 按字段模板创建普通对象，并按实际元素类型重建数组，减少解码后的属性存储和数值装箱。
  */
 
 /** 格式标记字节，用于识别数据是否为本格式 */
@@ -385,6 +384,11 @@ function decodeUtf8(buf: Uint8Array, start: number, end: number): string {
     return out;
 }
 
+/** 复用数值数组复制回调，避免每次解码数组时创建闭包。 */
+function copyNumber(value: number): number {
+    return value;
+}
+
 /**
  * 解析全部内容。成功返回 { v: 值 }，判定为非本格式返回 null
  *
@@ -429,7 +433,7 @@ function decode(buf: Uint8Array, view: DataView): { v: any } {
     // 值区从格式标记之后开始
     pos = 1;
     // 按 T_OBJ_NEW 出现顺序登记，和编码侧的 shapeId 一一对应
-    const shapes: string[][] = [];
+    const shapes: { keys: string[]; text: string }[] = [];
 
     function readValue(): any {
         const tag = buf[pos++];
@@ -467,10 +471,20 @@ function decode(buf: Uint8Array, view: DataView): { v: any } {
             case T_ARR: {
                 const n = readVarUint();
                 const arr: any[] = new Array(n);
+                let isNumeric = n > 0;
+                let hasFractional = false;
                 for (let i = 0; i < n; i++) {
-                    arr[i] = readValue();
+                    const value = readValue();
+                    arr[i] = value;
+                    if (typeof value !== 'number') {
+                        isNumeric = false;
+                    } else if (!Number.isInteger(value)) {
+                        hasFractional = true;
+                    }
                 }
-                return arr;
+                // 通过内置 map 为含小数的纯数字数组选择数值存储，避免混合数组共享的
+                // 分配反馈使小数逐个装箱；整数数组和非数值数组不产生额外副本。
+                return isNumeric && hasFractional ? arr.map(copyNumber) : arr;
             }
             case T_OBJ_NEW: {
                 const n = readVarUint();
@@ -478,17 +492,22 @@ function decode(buf: Uint8Array, view: DataView): { v: any } {
                 for (let i = 0; i < n; i++) {
                     keys[i] = strList[readVarUint()];
                 }
-                shapes.push(keys);
-                const obj: any = {};
+                // 同一字段结构只生成一次小模板。先创建字段齐全的空壳，避免逐字段扩容
+                // 产生外置属性数组，以及多字段对象退化为字典；实际值仍直接从二进制读取。
+                const text = '{' + keys.map(key => JSON.stringify(key) + ':null').join(',') + '}';
+                const shape = { keys, text };
+                shapes.push(shape);
+                const obj: Record<string, unknown> = n === 0 ? {} : JSON.parse(shape.text);
                 for (let i = 0; i < n; i++) {
                     obj[keys[i]] = readValue();
                 }
                 return obj;
             }
             case T_OBJ_REF: {
-                const keys = shapes[readVarUint()];
+                const shape = shapes[readVarUint()];
+                const keys = shape.keys;
                 const n = keys.length;
-                const obj: any = {};
+                const obj: Record<string, unknown> = n === 0 ? {} : JSON.parse(shape.text);
                 for (let i = 0; i < n; i++) {
                     obj[keys[i]] = readValue();
                 }
