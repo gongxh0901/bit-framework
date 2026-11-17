@@ -1,5 +1,13 @@
 # @gongxh/bit-minigame
 
+## 0.5.7
+
+### Patch Changes
+
+- 9604b69: 更新发布流程
+- Updated dependencies [9604b69]
+  - @gongxh/bit-core@0.5.7
+
 ## 0.5.6
 
 ### Patch Changes
