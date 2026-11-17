@@ -1,0 +1,58 @@
+{
+  "version": "0.6.0",
+  "packages": [
+    {
+      "name": "@gongxh/bit-assets",
+      "dir": "bit-assets"
+    },
+    {
+      "name": "@gongxh/bit-behaviortree",
+      "dir": "bit-behaviortree"
+    },
+    {
+      "name": "@gongxh/bit-condition",
+      "dir": "bit-condition"
+    },
+    {
+      "name": "@gongxh/bit-core",
+      "dir": "bit-core"
+    },
+    {
+      "name": "@gongxh/bit-ec",
+      "dir": "bit-ec"
+    },
+    {
+      "name": "@gongxh/bit-ecs",
+      "dir": "bit-ecs"
+    },
+    {
+      "name": "@gongxh/bit-event",
+      "dir": "bit-event"
+    },
+    {
+      "name": "@gongxh/bit-hotupdate",
+      "dir": "bit-hotupdate"
+    },
+    {
+      "name": "@gongxh/bit-minigame",
+      "dir": "bit-minigame"
+    },
+    {
+      "name": "@gongxh/bit-net",
+      "dir": "bit-net"
+    },
+    {
+      "name": "@gongxh/bit-quadtree",
+      "dir": "bit-quadtree"
+    },
+    {
+      "name": "@gongxh/bit-ui",
+      "dir": "bit-ui"
+    },
+    {
+      "name": "@gongxh/fairygui-cc",
+      "dir": "vendor/fairygui-cc/source"
+    }
+  ],
+  "submoduleSha": "f3f872e7f53c92a02d78cfa552e6f385b805c83a"
+}

@@ -1,5 +1,11 @@
 # @gongxh/bit-assets
 
+## 0.6.0
+
+### Minor Changes
+
+- 52af108: 简化发布流程
+
 ## 0.5.7
 
 ### Patch Changes

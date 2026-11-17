@@ -1,5 +1,17 @@
 # @gongxh/bit-condition
 
+## 0.6.0
+
+### Minor Changes
+
+- 52af108: 简化发布流程
+
+### Patch Changes
+
+- Updated dependencies [52af108]
+  - @gongxh/bit-core@0.6.0
+  - @gongxh/fairygui-cc@0.6.0
+
 ## 0.5.7
 
 ### Patch Changes

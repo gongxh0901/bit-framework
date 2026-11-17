@@ -1,6 +1,6 @@
 {
     "name": "@gongxh/bit-net",
-    "version": "0.5.7",
+    "version": "0.6.0",
     "description": "网络相关",
     "main": "./dist/bit-net.cjs",
     "module": "./dist/bit-net.mjs",
