@@ -1,5 +1,11 @@
 # @gongxh/bit-core
 
+## 1.0.0
+
+### Major Changes
+
+- 0da9c4f: 更新二进制转换
+
 ## 0.5.6
 
 ### Patch Changes

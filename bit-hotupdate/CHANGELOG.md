@@ -1,5 +1,17 @@
 # @gongxh/bit-hotupdate
 
+## 1.0.0
+
+### Major Changes
+
+- 0da9c4f: 更新二进制转换
+
+### Patch Changes
+
+- Updated dependencies [0da9c4f]
+  - @gongxh/bit-core@1.0.0
+  - @gongxh/bit-net@1.0.0
+
 ## 0.5.6
 
 ### Patch Changes
