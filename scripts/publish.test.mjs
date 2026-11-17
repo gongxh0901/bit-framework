@@ -8,6 +8,7 @@ import { requestPublish } from './publish.mjs'
 const HEAD = 'a'.repeat(40)
 const PUBLISHED_HEAD = 'b'.repeat(40)
 const CHILD_HEAD = 'c'.repeat(40)
+const PENDING_BRANCH = 'bit-framework-release/pending'
 const REQUEST_ID = 'test-request-123'
 const TITLE = `Unified release · ${REQUEST_ID}`
 const URL = 'https://github.com/gongxh0901/bit-framework/actions/runs/42'
@@ -20,10 +21,15 @@ function fixture(t) {
         watchFailure: false, runFailure: false,
         visibleAfter: 1, lists: 0, duplicates: false, noArtifact: false, badTag: false,
         actualVersion: '1.0.0', none: false, malformedResult: false,
-        dispatchedHead: HEAD, followupHead: HEAD, followupQueryError: false, authFailure: false, batchVersions: undefined,
+        dispatchedHead: undefined, followupHead: HEAD, followupQueryError: false, authFailure: false, batchVersions: undefined,
+        stages: undefined, activeRef: 'main', activeExpectedSha: HEAD, activeArtifact: undefined,
+        lastPrepared: undefined, pendingSha: undefined, pendingQueryError: false,
         secondWatchFailure: false, secondNone: false, dispatchCount: 0, requestCount: 0, activeRequestId: REQUEST_ID,
         prepareCalls: 0, planCalls: 0, packCalls: 0, ticks: 0 }
     const ok = value => ({ status: 0, stdout: typeof value === 'string' ? value : JSON.stringify(value), stderr: '' })
+    const currentStage = () => state.stages?.[state.dispatchCount - 1] || {}
+    const runSource = () => ({ headSha: currentStage().headSha || state.dispatchedHead || state.activeExpectedSha,
+        headBranch: currentStage().headBranch || state.activeRef })
     async function runCommand(bin, args, options) {
         calls.push({ bin, args, options })
         if (bin === 'gh') {
@@ -33,47 +39,60 @@ function fixture(t) {
                 return state.authFailure ? { status: 1, stdout: '', stderr: 'gh 未登录' } : ok('')
             }
             if (args[0] === 'api') {
+                if (args[1].endsWith(`/git/ref/heads/${PENDING_BRANCH}`)) return state.pendingQueryError
+                    ? { status: 1, stdout: '', stderr: 'pending 查询失败' }
+                    : ok({ object: { type: 'commit', sha: state.pendingSha || state.lastPrepared?.sourceSha } })
                 if (args[1].endsWith('/git/ref/heads/main')) return state.followupQueryError
                     ? { status: 1, stdout: '', stderr: 'GitHub 查询失败' }
                     : ok({ object: { type: 'commit', sha: state.followupHead } })
                 if (args[1].includes('/git/ref/tags/')) {
-                    const sha = args[1].includes('/bit-framework/') ? PUBLISHED_HEAD : CHILD_HEAD
-                    return ok({ object: { type: 'commit', sha: state.badTag ? HEAD : sha } })
+                    assert.equal(state.activeArtifact.status, 'published')
+                    const sha = args[1].includes('/bit-framework/') ? state.activeArtifact.sourceSha : state.activeArtifact.submoduleSha
+                    return ok({ object: { type: 'commit', sha: state.badTag ? 'e'.repeat(40) : sha } })
                 }
             }
             if (args[0] === 'workflow') {
                 state.dispatchCount++
                 state.activeRequestId = state.dispatchCount === 1 ? REQUEST_ID : `${REQUEST_ID}-${state.dispatchCount}`
-                assert.deepEqual(args, ['workflow', 'run', 'publish.yml', '--ref', 'main', '-f', `request_id=${state.activeRequestId}`, '-f', `requested_sha=${state.preparedSha}`, '--repo', 'gongxh0901/bit-framework'])
+                state.activeRef = currentStage().ref || 'main'
+                state.activeExpectedSha = currentStage().expectedSha || state.preparedSha
+                assert.deepEqual(args, ['workflow', 'run', 'publish.yml', '--ref', state.activeRef, '-f', `request_id=${state.activeRequestId}`, '-f', `requested_sha=${state.activeExpectedSha}`, '--repo', 'gongxh0901/bit-framework'])
                 assert.equal(state.packCalls, 1)
                 assert.equal(state.prepareFinished, true)
                 return ok('')
             }
             if (args[0] === 'run' && args[1] === 'list') {
                 state.lists++
+                assert.equal(args[args.indexOf('--branch') + 1], state.activeRef)
                 const unrelated = { databaseId: 99, displayTitle: 'Unified release · unrelated', headSha: HEAD, url: 'unrelated' }
                 const selected = { databaseId: 41 + state.dispatchCount, displayTitle: `Unified release · ${state.activeRequestId}`,
-                    headSha: state.dispatchedHead, url: URL.replace('/42', `/${41 + state.dispatchCount}`) }
+                    ...runSource(), url: URL.replace('/42', `/${41 + state.dispatchCount}`) }
                 return ok(state.lists < state.visibleAfter ? [unrelated] : [unrelated, selected, ...(state.duplicates ? [selected] : [])])
             }
             if (args[0] === 'run' && args[1] === 'watch') {
                 assert.equal(args[2], String(41 + state.dispatchCount))
-                return state.watchFailure || (state.secondWatchFailure && state.dispatchCount === 2)
+                return state.watchFailure || currentStage().watchFailure || (state.secondWatchFailure && state.dispatchCount === 2)
                     ? { status: 1, stdout: '', stderr: 'workflow failed' } : ok('')
             }
             if (args[0] === 'run' && args[1] === 'view') {
                 assert.equal(args[2], String(41 + state.dispatchCount))
                 return ok({ databaseId: 41 + state.dispatchCount, displayTitle: `Unified release · ${state.activeRequestId}`,
+                    ...runSource(),
                     status: 'completed', conclusion: state.runFailure ? 'failure' : 'success', url: URL.replace('/42', `/${41 + state.dispatchCount}`) })
             }
             if (args[0] === 'run' && args[1] === 'download') {
                 assert.equal(args[2], String(41 + state.dispatchCount))
                 assert.equal(args[args.indexOf('--name') + 1], 'release-result')
-                if (!state.noArtifact) {
-                    const result = state.none || (state.secondNone && state.dispatchCount === 2) ? { status: 'none' }
-                        : { status: 'published', version: state.batchVersions?.[state.dispatchCount - 1] || state.actualVersion,
-                        sourceSha: PUBLISHED_HEAD, submoduleSha: CHILD_HEAD, packages: ['@fixture/a', '@fixture/b'] }
+                if (!state.noArtifact && !currentStage().noArtifact) {
+                    const stage = currentStage()
+                    const status = stage.status || (state.none || (state.secondNone && state.dispatchCount === 2) ? 'none' : 'published')
+                    const result = status === 'none' ? { status } : {
+                        status, version: stage.version || state.batchVersions?.[state.dispatchCount - 1] || state.actualVersion,
+                        sourceSha: stage.sourceSha || state.activeExpectedSha, submoduleSha: stage.submoduleSha || CHILD_HEAD,
+                        packages: stage.packages || ['@fixture/a', '@fixture/b'] }
                     if (state.malformedResult) delete result.submoduleSha
+                    state.activeArtifact = result
+                    if (status === 'prepared') state.lastPrepared = result
                     writeFileSync(join(args[args.indexOf('--dir') + 1], 'release-result.json'), JSON.stringify(result))
                 }
                 return ok('')
@@ -278,7 +297,7 @@ test('第二次仍未发布目标版本时最多跟进一次，不重复创建 C
         const f = fixture(t)
         f.state.hasNewRelease = true
         Object.assign(f.state, change)
-        await assert.rejects(requestPublish(f.options), /已执行两次发布.*2.0.0 仍未完成/)
+        await assert.rejects(requestPublish(f.options), /已处理两个批次.*2.0.0 仍未完成/)
         assert.equal(f.dispatches().length, 2)
         assert.equal(f.state.prepareCalls, 1)
     }
@@ -290,4 +309,124 @@ test('本次有新队列但 CI 返回 none 时不假报完成', async t => {
     f.state.none = true
     await assert.rejects(requestPublish(f.options), /本次队列尚未完成/)
     assert.equal(f.dispatches().length, 1)
+})
+
+function preparedBatch(version = '2.0.0', sourceSha = PUBLISHED_HEAD) {
+    return [
+        { status: 'prepared', version, sourceSha },
+        { status: 'published', version, sourceSha, expectedSha: sourceSha, ref: PENDING_BRANCH },
+    ]
+}
+
+test('版本先准备再从 pending 新运行发布，事件来源、分支和包集合均与准备结果一致', async t => {
+    const f = fixture(t)
+    f.state.hasNewRelease = true
+    f.state.stages = preparedBatch()
+    f.state.stages[1].packages = ['@fixture/b', '@fixture/a']
+    const result = await requestPublish(f.options)
+    assert.equal(result.status, 'published')
+    assert.equal(result.sourceSha, PUBLISHED_HEAD)
+    assert.equal(result.preparation.status, 'prepared')
+    assert.equal(f.dispatches().length, 2)
+    assert.equal(f.state.prepareCalls, 1)
+    assert.ok(f.dispatches()[1].args.includes(PENDING_BRANCH))
+    assert.ok(f.dispatches()[1].args.includes(`requested_sha=${PUBLISHED_HEAD}`))
+    assert.ok(f.logs.some(message => /已准备，尚未上传 npm/.test(message)))
+    assert.equal(f.logs.filter(message => /已完成发布/.test(message)).length, 1)
+    const firstTagRead = f.calls.findIndex(({ args }) => args[0] === 'api' && args[1].includes('/git/ref/tags/'))
+    const secondDispatch = f.calls.findLastIndex(({ args }) => args[0] === 'workflow')
+    assert.ok(firstTagRead > secondDispatch)
+})
+
+test('旧批次和本次新队列各准备发布一次，总计四个精确工作流且不重复准备源码', async t => {
+    const f = fixture(t)
+    const nextSource = 'd'.repeat(40)
+    f.state.hasNewRelease = true
+    f.state.stages = [...preparedBatch('1.0.0'), ...preparedBatch('2.0.0', nextSource)]
+    const result = await requestPublish(f.options)
+    assert.equal(result.version, '2.0.0')
+    assert.equal(result.previousRelease.version, '1.0.0')
+    assert.equal(result.runId, '45')
+    assert.equal(f.dispatches().length, 4)
+    assert.equal(f.state.prepareCalls, 1)
+    assert.equal(f.state.planCalls, 1)
+    assert.equal(f.state.packCalls, 1)
+    assert.deepEqual(f.dispatches().map(({ args }) => args[args.indexOf('--ref') + 1]), ['main', PENDING_BRANCH, 'main', PENDING_BRANCH])
+    assert.deepEqual(f.dispatches().map(({ args }) => args.find(value => value.startsWith('requested_sha='))),
+        [HEAD, PUBLISHED_HEAD, HEAD, nextSource].map(sha => `requested_sha=${sha}`))
+})
+
+test('prepared 的 pending 引用发生变化或查询失败时不调度上传运行', async t => {
+    for (const change of [{ pendingSha: 'e'.repeat(40) }, { pendingQueryError: true }]) {
+        const f = fixture(t)
+        f.state.stages = preparedBatch()
+        Object.assign(f.state, change)
+        await assert.rejects(requestPublish(f.options), error => /已准备但尚未完成发布/.test(error.message) && error.message.includes(URL))
+        assert.equal(f.dispatches().length, 1)
+        assert.ok(!f.logs.some(message => /已完成发布/.test(message)))
+    }
+})
+
+test('pending 新运行必须 published 且完整身份与 prepared 一致，否则不继续第三次', async t => {
+    for (const mismatch of [
+        { status: 'prepared' }, { status: 'none' }, { version: '3.0.0' },
+        { sourceSha: 'd'.repeat(40) }, { submoduleSha: 'd'.repeat(40) }, { packages: ['@fixture/other'] },
+    ]) {
+        const f = fixture(t)
+        f.state.stages = preparedBatch()
+        Object.assign(f.state.stages[1], mismatch)
+        await assert.rejects(requestPublish(f.options), /已准备但尚未完成发布/)
+        assert.equal(f.dispatches().length, 2)
+        assert.equal(f.state.prepareCalls, 1)
+        assert.ok(!f.logs.some(message => /已完成发布/.test(message)))
+    }
+})
+
+test('pending 的运行分支或事件 SHA 不匹配时停止，不沿用 main 的来源判断', async t => {
+    for (const mismatch of [{ headSha: 'e'.repeat(40) }, { headBranch: 'main' }]) {
+        const f = fixture(t)
+        f.state.stages = preparedBatch()
+        Object.assign(f.state.stages[1], mismatch)
+        await assert.rejects(requestPublish(f.options), error => error.message.includes(`${PENDING_BRANCH} 已变化`)
+            && error.message.includes(URL.replace('/42', '/43')))
+        assert.equal(f.calls.filter(({ args }) => args[0] === 'run' && args[1] === 'watch').length, 1)
+    }
+})
+
+test('冻结运行失败或旧 workflow 没有发布 artifact 时保留两次链接且不假报已发布', async t => {
+    for (const mismatch of [{ watchFailure: true }, { noArtifact: true }]) {
+        const f = fixture(t)
+        f.state.stages = preparedBatch()
+        Object.assign(f.state.stages[1], mismatch)
+        await assert.rejects(requestPublish(f.options), error => /已准备但尚未完成发布/.test(error.message)
+            && error.message.includes(URL) && error.message.includes(URL.replace('/42', '/43')))
+        assert.equal(f.dispatches().length, 2)
+        assert.ok(!f.logs.some(message => /已完成发布/.test(message)))
+    }
+})
+
+test('prepared 缺少来源或包清单证据时不读取正式 tag 或调度下一运行', async t => {
+    const f = fixture(t)
+    f.state.stages = preparedBatch()
+    f.state.malformedResult = true
+    await assert.rejects(requestPublish(f.options), /缺少完整的版本、来源或包清单证据/)
+    assert.equal(f.dispatches().length, 1)
+    assert.ok(!f.calls.some(({ args }) => args[0] === 'api' && args[1].includes('/git/ref/tags/')))
+})
+
+test('published 来源不能与本次 workflow 事件 SHA 不同', async t => {
+    const f = fixture(t)
+    f.state.stages = [{ status: 'published', sourceSha: PUBLISHED_HEAD }]
+    await assert.rejects(requestPublish(f.options), /事件提交不一致.*provenance/)
+    assert.ok(!f.calls.some(({ args }) => args[0] === 'api' && args[1].includes('/git/ref/tags/')))
+})
+
+test('第二批交接后仍 prepared 时至多四次运行，不无限调度或重新创建 Changeset', async t => {
+    const f = fixture(t)
+    f.state.hasNewRelease = true
+    f.state.stages = [...preparedBatch('1.0.0'), ...preparedBatch('2.0.0', 'd'.repeat(40))]
+    f.state.stages[3].status = 'prepared'
+    await assert.rejects(requestPublish(f.options), /本次排队版本 2.0.0 尚未完成/)
+    assert.equal(f.dispatches().length, 4)
+    assert.equal(f.state.prepareCalls, 1)
 })

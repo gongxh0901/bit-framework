@@ -13,6 +13,7 @@ import { git, beginRelease as beginGitRelease, completeRelease as completeGitRel
 const REGISTRY = 'https://registry.npmjs.org/'
 const CANDIDATE = 'release-candidate'
 const DEP_FIELDS = ['dependencies', 'peerDependencies', 'optionalDependencies']
+export const RELEASE_PROTOCOL = 2
 
 export function runCommand(command, args, options = {}) {
     const result = spawnSync(command, args, { ...options, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 })
@@ -98,11 +99,14 @@ export function verifyRegistryPackage(expected, actual, artifact, names) {
 }
 
 /** 所有命令和 Git 副作用均可注入，测试不连接 registry。 */
-export async function publishRelease({ root = ROOT, dryRun = false, env = process.env,
+export async function publishRelease({ root = ROOT, dryRun = false, prepareOnly = false, env = process.env,
     runCommand: execute = runCommand, beginRelease = beginGitRelease, completeRelease = completeGitRelease,
     sourceSha = directory => git(directory, ['rev-parse', 'HEAD']),
     log = console.log } = {}) {
+    if (dryRun && prepareOnly) throw new Error('--prepare 与 --dry-run 不能同时使用')
     if (!dryRun && env.CI !== 'true') throw new Error('真实 npm 发布只能在 CI 中执行；本地请使用 --dry-run')
+    const provenanceError = 'npm provenance 要求事件提交与冻结版本提交一致；必须从冻结版本提交启动新 workflow，不能覆盖 GITHUB_SHA'
+    if (!dryRun && !prepareOnly && !/^[0-9a-f]{40}$/.test(env.GITHUB_SHA || '')) throw new Error(provenanceError)
     if (existsSync(join(root, '.changeset', 'pre.json'))) throw new Error('统一发布流程暂不支持 Changesets 预发布模式')
     const packages = await getReleasePackages(root)
     const version = validateReleasePackages(packages)
@@ -110,6 +114,7 @@ export async function publishRelease({ root = ROOT, dryRun = false, env = proces
     const manifest = dryRun ? undefined : readReleaseManifest(root, packages, version)
     const frozenSha = dryRun ? undefined : await sourceSha(root)
     if (!dryRun && !/^[0-9a-f]{40}$/.test(frozenSha || '')) throw new Error('无法确定本批次冻结的主仓库提交')
+    if (!dryRun && !prepareOnly && env.GITHUB_SHA !== frozenSha) throw new Error(provenanceError)
     const saved = new Map(packages.map(({ dir }) => {
         const path = join(dir, 'package.json')
         return [path, readFileSync(path, 'utf8')]
@@ -118,7 +123,7 @@ export async function publishRelease({ root = ROOT, dryRun = false, env = proces
     const scratch = mkdtempSync(join(tmpdir(), 'bit-framework-publish-'))
     const names = new Set(packages.map(({ packageJson }) => packageJson.name))
     const command = async (bin, args, cwd = root) => execute(bin, args, { cwd,
-        env: { ...env, npm_config_ignore_scripts: 'true', ...(frozenSha ? { GITHUB_SHA: frozenSha } : {}) } })
+        env: { ...env, npm_config_ignore_scripts: 'true' } })
     const required = async (bin, args, cwd = root) => {
         const result = await command(bin, args, cwd)
         if (result.status !== 0) throw new Error(`${bin} ${args.join(' ')} 失败\n${result.stderr || result.stdout || ''}`)
@@ -176,6 +181,11 @@ export async function publishRelease({ root = ROOT, dryRun = false, env = proces
 
         await beginRelease(root, version, manifest.submoduleSha)
         if (await sourceSha(root) !== frozenSha) throw new Error('来源冻结过程中主仓库 HEAD 发生变化，停止上传')
+        if (prepareOnly) {
+            log(`${packages.length} 个包已完成 ${version} 全量预检并冻结来源 ${frozenSha}，等待该提交的新 workflow 上传`)
+            return { status: 'prepared', version, sourceSha: frozenSha, submoduleSha: manifest.submoduleSha,
+                packages: [...names], dryRun: false }
+        }
         const missing = []
         for (const { packageJson } of prepared) {
             const existing = await view(packageJson.name)
@@ -209,7 +219,8 @@ export async function publishRelease({ root = ROOT, dryRun = false, env = proces
         restore()
         await completeRelease(root, version, manifest.submoduleSha)
         log(`${packages.length} 个包已完成 ${version} 全量发布和双仓 tag 验证`)
-        return { version, packages: [...names], dryRun: false }
+        return { status: 'published', version, sourceSha: frozenSha, submoduleSha: manifest.submoduleSha,
+            packages: [...names], dryRun: false }
     } finally {
         restore()
         rmSync(scratch, { recursive: true, force: true })
@@ -217,7 +228,7 @@ export async function publishRelease({ root = ROOT, dryRun = false, env = proces
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-    try { await publishRelease({ dryRun: process.argv.includes('--dry-run') }) }
+    try { await publishRelease({ dryRun: process.argv.includes('--dry-run'), prepareOnly: process.argv.includes('--prepare') }) }
     catch (error) {
         console.error(error.message)
         process.exitCode = 1

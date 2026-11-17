@@ -8,8 +8,8 @@
 
 CI 消费 Changeset，生成全部包的统一版本、包级 CHANGELOG 和锁文件，将 FairyGUI 版本提交推到子仓库专用发布分支，再将记录该 gitlink 的版本提交推到主仓库 `main`。FairyGUI 的包日志位于 `vendor/fairygui-cc/source/CHANGELOG.md`。
 
-上传 npm 前冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含对应 gitlink，必要时快进；正式分支已包含该提交的后代时保持原位，真正分叉时停止，发布源码仍固定为本批次 gitlink。全部包上传到 `release-candidate` 并校验后提升 `latest`，完成双仓库同版本 tag 后清除 pending。失败后恢复同一批次，完成前阻止下一版本。恢复 pending 且没有新改动时不生成 Changeset；有新改动可先准备入队，CI 优先恢复旧批次。
+准备运行冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含对应 gitlink，必要时快进；正式分支已包含该提交的后代时保持原位，真正分叉时停止，发布源码仍固定为本批次 gitlink。准备运行返回 `prepared`，本地入口核验 pending 后从该引用启动新的发布运行，确保 GitHub 事件 SHA、冻结 HEAD、OIDC 与 npm provenance 来源一致。全部包上传到 `release-candidate` 并校验后提升 `latest`，完成双仓库同版本 tag 后清除 pending。失败后恢复同一批次，完成前阻止下一版本。恢复 pending 且没有新改动时不生成 Changeset；有新改动可先准备入队，CI 优先恢复旧批次。
 
-本地 `publish` 已准备新版本计划且首个结果属于旧批次时，会确认远端 `main` 仍为本次队列提交，再用新请求标识、同一源码 SHA 最多追加调度一次。只有目标版本完成才返回成功；旧批次失败、远端变化或追加运行未完成目标版本时停止并报告未完成。GitHub 页面单独 `Run workflow` 只运行一次 CI，旧 pending 完成后排队批次仍需再手动调度。
+本地 `publish` 已准备新版本计划且先完成旧批次时，会确认远端 `main` 仍为本次队列提交，再处理目标版本。每批最多一次准备运行和一次发布运行，总共最多两批、四次运行，每次使用新请求标识。只有目标版本完成才返回成功；旧批次失败、来源或冻结引用变化、发布结果与准备清单不一致时停止并报告未完成。GitHub 页面单独 `Run workflow` 只运行一次 CI，返回 `prepared` 时需从 pending 引用手动启动发布运行。
 
 项目只提供 `setup`、`build`、`changeset`、`publish` 四个 mise task。实际 npm 操作由主仓库手动调度的 `.github/workflows/publish.yml` 执行。凭证和完整流程见 [构建与发布](../docs/COMMANDS.md)。

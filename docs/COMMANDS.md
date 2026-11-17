@@ -61,20 +61,23 @@ mise run publish
 3. 将 FairyGUI 的版本、日志和实际变化的 dist 提交并推送到子仓库 `bit-framework-release/<主仓库源提交 SHA>/v<版本>` 分支。
 4. 将记录该子仓库 gitlink 和完整发布清单的版本提交推送到主仓库 `main`。
 5. 冻结本批次主仓库版本提交，确保子仓库 `ccc3.0` 包含对应 gitlink，必要时快进。若正式分支已包含该版本提交并继续前进，保留其位置；真正分叉时停止，发布仍使用冻结 gitlink 的源码。
-6. 将全部预检 tgz 上传到 npm `release-candidate`，验证整批目标版本、内容 hash 和精确内部引用后，逐包提升 `latest`。
-7. 验证全部 `latest`，在两个仓库创建相同的 `vX.Y.Z` tag，最后解除冻结。
+6. 准备运行输出 `prepared` 结果；本地入口核验 pending 仍指向该版本提交，再从 `bit-framework-release/pending` 启动新的发布运行。发布运行的 GitHub 事件 SHA 必须与冻结版本提交一致。
+7. 发布运行重新构建和预检，将全部 tgz 上传到 npm `release-candidate`，验证整批目标版本、内容 hash 和精确内部引用后，逐包提升 `latest`。
+8. 验证全部 `latest`，在两个仓库创建相同的 `vX.Y.Z` tag，最后解除冻结。
 
 日志按包记录真实变化，没有实际变化的包保留统一版本条目。FairyGUI 的日志位于 `vendor/fairygui-cc/source/CHANGELOG.md`。本地自动提交准备发布的源码和 Changeset，CI 自动提交版本、日志、锁文件和 gitlink；实际 npm 上传和 dist-tag 变更只在 CI 中执行。
+
+OIDC 身份与工作流事件提交绑定，npm provenance 的来源提交必须与其一致。准备运行只生成并冻结版本，不上传 npm；发布运行保留 GitHub 提供的原始 `GITHUB_SHA`。`prepared` 表示准备完成，只有 `published` 并通过双仓 tag 核验才表示发布完成。
 
 ## 失败恢复
 
 主仓库 `refs/heads/bit-framework-release/pending` 指向被冻结的发布提交。任一步失败后保留该批次状态，恢复时使用同一主仓库 SHA、子仓库 gitlink、版本和包内容；已存在的 npm 版本通过内容校验后跳过上传。内容冲突、子仓库分叉或 tag 冲突时停止处理。
 
-再次运行 `mise run publish` 恢复批次。入口会携带本地修改做仅快进同步；分叉或无法安全恢复修改时保留现场并停止，可通过 `git status`、`git stash list` 检查恢复。一次 CI 运行优先完成被冻结的批次，完成前阻止生成下一版本。
+再次运行 `mise run publish` 恢复批次。入口会携带本地修改做仅快进同步；分叉或无法安全恢复修改时保留现场并停止，可通过 `git status`、`git stash list` 检查恢复。CI 优先处理被冻结的批次，完成前阻止生成下一版本。事件来源与冻结来源不一致时，准备运行只返回冻结批次，再由入口核验 pending 并调度该引用。
 
-如果本次入口已经准备了新版本计划，而首个 CI 结果完成的是旧 pending 版本，命令会确认远端 `main` 仍为本次已经推送的队列提交，再用新请求标识、同一源码 SHA 最多追加调度一次，发布本次目标版本。只有目标版本完成，整个命令才成功。旧批次失败、远端 `main` 变化、追加运行失败或二次结果仍非目标版本时，报告本次队列未完成并停止自动跟进。
+如果本次入口已经准备了新版本计划，而先完成的是旧 pending 版本，命令会确认远端 `main` 仍为本次已经推送的队列提交，再处理本次目标版本。每批最多进行一次准备运行和一次发布运行；一个命令最多处理旧批次及本次新批次，共四次运行，每次使用新的请求标识，不重复准备或提交本地源码。只有目标版本完成，整个命令才成功。旧批次失败、来源变化、冻结引用变化、发布运行仍返回 `prepared` 或结果与准备清单不一致时，报告未完成并停止。
 
-也可在 GitHub Actions 的 `Release packages` 工作流选择 `Run workflow`，分支选择 `main`。从页面单独调度只运行一次 CI；若该次先完成旧 pending，排队的新批次需要再手动调度一次。
+也可在 GitHub Actions 的 `Release packages` 工作流选择 `Run workflow`，分支选择 `main`。从页面单独调度只运行一次 CI；若结果为 `prepared`，从 `bit-framework-release/pending` 再手动启动发布运行。旧 pending 完成后，排队的新批次从 `main` 继续调度。
 
 npm 上传和 `latest` 更新按包执行，过程中可能短暂出现部分包已完成的状态。发布完成的依据是全量目标版本、全部 `latest`、双仓库 tag 和 CI 结果。失败恢复时不要提高版本号，也不要覆盖已经发布的版本或已有 tag。
 

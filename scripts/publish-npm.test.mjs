@@ -45,7 +45,7 @@ function simulation(files) {
     const tags = new Map()
     const calls = []
     const state = { uploads: 0, begin: 0, complete: 0, sourceReads: 0, partialFailure: false, queryError: undefined,
-        failLatest: undefined, failComplete: false, missingEntrypoint: false, corruptAfterUpload: false }
+        failLatest: undefined, failComplete: false, missingEntrypoint: false, corruptAfterUpload: false, packError: false }
     const artifact = dir => {
         const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
         const contents = Buffer.from(JSON.stringify({ pkg, code: readFileSync(join(dir, 'dist', 'index.js'), 'utf8') }))
@@ -64,8 +64,8 @@ function simulation(files) {
     async function runCommand(bin, args, { cwd, env }) {
         calls.push({ bin, args, cwd, sourceSha: env.GITHUB_SHA })
         assert.equal(env.npm_config_ignore_scripts, 'true')
-        if (state.sourceReads) assert.equal(env.GITHUB_SHA, SOURCE_SHA)
         if (bin === 'npm' && args[0] === 'pack') {
+            if (state.packError) return failure('EPACK')
             const { pkg, contents } = artifact(cwd)
             const filename = pkg.name.replace('@', '').replace('/', '-') + '.tgz'
             writeFileSync(join(args[args.indexOf('--pack-destination') + 1], filename), contents)
@@ -105,7 +105,7 @@ function simulation(files) {
         }
         assert.fail(`未模拟的命令：${bin} ${args.join(' ')}`)
     }
-    const options = { root: files.root, env: { CI: 'true', GITHUB_SHA: 'b'.repeat(40) }, runCommand, log() {},
+    const options = { root: files.root, env: { CI: 'true', GITHUB_SHA: SOURCE_SHA }, runCommand, log() {},
         sourceSha() { state.sourceReads++; return SOURCE_SHA },
         async beginRelease(root, version, submoduleSha) {
             files.restored()
@@ -213,13 +213,71 @@ test('候选上传部分失败不修改任何 latest；同版重试补齐并完�
     files.restored()
 })
 
-test('所有 npm 子进程使用冻结 HEAD 的 provenance SHA，覆盖触发事件的新提交', async t => {
+test('事件 SHA 缺失、格式无效或与冻结 HEAD 不同时，在打包及发布副作用前拒绝', async t => {
+    for (const eventSha of [undefined, 'not-a-sha', 'b'.repeat(40)]) {
+        const files = fixture(t)
+        const sim = simulation(files)
+        sim.options.env = { CI: 'true', ...(eventSha ? { GITHUB_SHA: eventSha } : {}) }
+        await assert.rejects(publishRelease(sim.options), /必须从冻结版本提交启动新 workflow/)
+        assert.equal(sim.calls.length, 0)
+        assert.equal(sim.state.begin, 0)
+        assert.equal(sim.state.complete, 0)
+        assert.equal(sim.state.uploads, 0)
+        assert.equal(sim.registry.size, 0)
+        files.restored()
+    }
+})
+
+test('事件与冻结 SHA 一致时原样继承 npm 环境，并返回已发布来源', async t => {
     const files = fixture(t)
     const sim = simulation(files)
-    await publishRelease(sim.options)
+    sim.options.env = Object.freeze({ CI: 'true', GITHUB_SHA: SOURCE_SHA })
+    const result = await publishRelease(sim.options)
     assert.equal(sim.state.sourceReads, 2)
     assert.ok(sim.calls.every(call => call.sourceSha === SOURCE_SHA))
-    assert.equal(sim.options.env.GITHUB_SHA, 'b'.repeat(40))
+    assert.deepEqual(sim.options.env, { CI: 'true', GITHUB_SHA: SOURCE_SHA })
+    assert.deepEqual({ ...result, packages: [...result.packages].sort() }, { status: 'published', version: VERSION, sourceSha: SOURCE_SHA,
+        submoduleSha: SUBMODULE_SHA, packages: files.manifest.packages.map(pkg => pkg.name).sort(), dryRun: false })
+    files.restored()
+})
+
+test('prepareOnly 允许事件来源不同，完成全量 pack 和冻结而不查询上传或打标签', async t => {
+    const files = fixture(t)
+    const sim = simulation(files)
+    sim.options.env = { CI: 'true', GITHUB_SHA: 'b'.repeat(40) }
+    const result = await publishRelease({ ...sim.options, prepareOnly: true })
+    assert.deepEqual({ ...result, packages: [...result.packages].sort() }, { status: 'prepared', version: VERSION, sourceSha: SOURCE_SHA,
+        submoduleSha: SUBMODULE_SHA, packages: files.manifest.packages.map(pkg => pkg.name).sort(), dryRun: false })
+    assert.equal(sim.calls.length, 3)
+    assert.ok(sim.calls.every(call => call.bin === 'npm' && call.args[0] === 'pack' && call.sourceSha === 'b'.repeat(40)))
+    assert.equal(sim.state.begin, 1)
+    assert.equal(sim.state.complete, 0)
+    assert.equal(sim.state.uploads, 0)
+    assert.equal(sim.registry.size, 0)
+    assert.equal(sim.tags.size, 0)
+    files.restored()
+})
+
+test('prepareOnly 打包失败时不冻结且恢复所有原始 manifest', async t => {
+    const files = fixture(t)
+    const sim = simulation(files)
+    sim.state.packError = true
+    await assert.rejects(publishRelease({ ...sim.options, prepareOnly: true }), /EPACK/)
+    assert.equal(sim.state.begin, 0)
+    assert.equal(sim.state.complete, 0)
+    assert.ok(sim.calls.every(call => call.args[0] === 'pack'))
+    assert.equal(sim.state.uploads, 0)
+    files.restored()
+})
+
+test('prepareOnly 只允许 CI，且不能与 dry-run 混用', async t => {
+    const files = fixture(t)
+    const sim = simulation(files)
+    await assert.rejects(publishRelease({ ...sim.options, env: {}, prepareOnly: true }), /只能在 CI/)
+    await assert.rejects(publishRelease({ ...sim.options, prepareOnly: true, dryRun: true }), /不能同时使用/)
+    assert.equal(sim.calls.length, 0)
+    assert.equal(sim.state.begin, 0)
+    assert.equal(sim.state.sourceReads, 0)
     files.restored()
 })
 
@@ -236,15 +294,19 @@ test('首次 candidate 发布没有 latest 时，标签查询按显式版本完�
     files.restored()
 })
 
-test('冻结过程中 HEAD 变化时禁止任何候选上传', async t => {
-    const files = fixture(t)
-    const sim = simulation(files)
-    let reads = 0
-    sim.options.sourceSha = () => ++reads === 1 ? SOURCE_SHA : 'd'.repeat(40)
-    await assert.rejects(publishRelease(sim.options), /HEAD 发生变化/)
-    assert.equal(sim.state.uploads, 0)
-    assert.equal(sim.latestChanges().length, 0)
-    files.restored()
+test('冻结过程中 HEAD 变化时禁止上传或报告准备成功', async t => {
+    for (const prepareOnly of [false, true]) {
+        const files = fixture(t)
+        const sim = simulation(files)
+        let reads = 0
+        sim.options.sourceSha = () => ++reads === 1 ? SOURCE_SHA : 'd'.repeat(40)
+        await assert.rejects(publishRelease({ ...sim.options, prepareOnly }), /HEAD 发生变化/)
+        assert.equal(sim.state.uploads, 0)
+        assert.equal(sim.latestChanges().length, 0)
+        assert.equal(sim.state.complete, 0)
+        assert.ok(sim.calls.every(call => call.args[0] === 'pack'))
+        files.restored()
+    }
 })
 
 test('只有明确 E404 可以视为未发布；网络或鉴权错误阻止上传和 latest', async t => {

@@ -39,7 +39,7 @@ GitHub CLI 需要已登录且有权调度主仓库工作流。首次认证在 `s
 
 CI 先全量构建，再消费 Changeset，生成统一版本、包级 CHANGELOG 和锁文件。FairyGUI 的版本、`source/CHANGELOG.md` 与实际变化的 dist 先提交推送到子仓库 `bit-framework-release/<主仓库源提交 SHA>/v<版本>` 分支，再将记录该 gitlink 和发布清单的版本提交推送到主仓库 `main`。
 
-上传 npm 前冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含对应 gitlink，必要时快进；已经包含该提交的后代分支保持原位，真正分叉时停止，发布仍使用冻结 gitlink，不混入后代源码。全部预检 tgz 上传到 `release-candidate` 并校验后，逐包提升 `latest`；两个仓库创建同名 `vX.Y.Z` tag，最后清除 pending。实际 npm 上传和 dist-tag 修改仅在主仓库 CI 中执行。
+准备运行冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含对应 gitlink，必要时快进；已经包含该提交的后代分支保持原位，真正分叉时停止，发布仍使用冻结 gitlink，不混入后代源码。准备运行返回 `prepared`，不上传 npm；本地入口核验 pending 仍指向该来源，再从 `bit-framework-release/pending` 启动新的发布运行。上传时 GitHub 事件 SHA 必须与冻结 HEAD 相同，保留原始 `GITHUB_SHA`，使 OIDC 与 npm provenance 来源一致。全部预检 tgz 上传到 `release-candidate` 并校验后，逐包提升 `latest`；两个仓库创建同名 `vX.Y.Z` tag，最后清除 pending。实际 npm 上传和 dist-tag 修改仅在主仓库 CI 中执行。
 
 GitHub App 使用 `RELEASE_APP_CLIENT_ID` 和 `RELEASE_APP_PRIVATE_KEY`，需要两个仓库的 Contents 读写权限。全部 npm 包的 trusted publisher 授权主仓库 `publish.yml` 的 publish 与 dist-tag 操作，CI 使用 npm 11.21.2 和 OIDC。
 
@@ -49,9 +49,9 @@ GitHub App 使用 `RELEASE_APP_CLIENT_ID` 和 `RELEASE_APP_PRIVATE_KEY`，需要
 
 失败后再次运行 `publish`，恢复 pending 固定的同一主仓库 SHA、子仓库 gitlink、版本和包内容。没有新改动时不生成 Changeset；有新改动时可以自动准备并推送入队，CI 优先完成旧批次。已存在的 npm 版本必须验证内容一致，内容冲突、子仓库分叉或 tag 冲突时停止，不通过增加版本号绕过未完成批次。
 
-当本次准备了新版本计划且首个 CI 结果属于旧 pending 版本时，入口确认远端 `main` 仍为本次队列提交，再使用新请求标识、同一源码 SHA 最多追加调度一次。目标版本完成后整个命令才成功；旧批次失败、来源变化、追加运行失败或二次结果仍非目标时，报告本次队列尚未完成并停止，不无限循环。
+当本次准备了新版本计划且先完成旧 pending 版本时，入口确认远端 `main` 仍为本次队列提交，再处理目标版本。每批最多一次准备运行和一次发布运行，总共最多两批、四次运行；每次使用新请求标识，不重复准备或提交本地源码。发布运行必须返回 `published`，版本、主子来源和包集合必须与 `prepared` 清单一致；准备结果不代表发布成功。目标版本完成后整个命令才成功；旧批次失败、来源或冻结引用变化、结果不一致时报告未完成并停止。
 
-也可从 GitHub Actions 手动运行 `Release packages`，分支选择 `main`。页面上的一次调度只运行一次 CI；若先完成旧 pending，排队 Changeset 需要再手动调度一次。
+也可从 GitHub Actions 手动运行 `Release packages`，分支选择 `main`。页面上的一次调度只运行一次 CI；返回 `prepared` 时，从 `bit-framework-release/pending` 手动启动发布运行。旧 pending 完成后，排队 Changeset 从 `main` 继续调度。
 
 ## 仅维护日志
 

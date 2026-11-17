@@ -92,11 +92,12 @@ mise run publish
 - `publish` 完成全量构建后复用已有非空 Changeset，没有可复用记录时交互填写；规划和打包检查成功后先将子仓库全部修改提交推送到 `ccc3.0`，再将主仓库全部修改和 gitlink 提交推送到 `main`。
 - `publish` 使用已登录的 `gh` 调度主仓库 `publish.yml` 并等待本次运行；正式发布由手动调度触发，普通 PR 执行校验。
 - CI 先全量构建，再消费 Changeset，统一更新版本、包级 CHANGELOG 和锁文件；FairyGUI 的版本提交先推到子仓库专用发布分支，主仓库版本提交记录该 gitlink 并推送到 `main`。
+- 生成版本的运行仅预检、冻结并返回 `prepared`；入口核验 pending 后从 `bit-framework-release/pending` 启动发布运行。npm 上传前要求 GitHub 事件 SHA 与冻结 HEAD 一致，不改写 `GITHUB_SHA`，保持 OIDC 与 provenance 来源一致。
 - CI 在上传 npm 前冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含本批次 gitlink，必要时快进；已包含该提交的后代分支保持原位，真正分叉时停止。发布仍使用冻结 gitlink，不混入后代源码。
 - 主仓库 `refs/heads/bit-framework-release/pending` 冻结正在发布的主仓库 SHA；失败后按同一 SHA、版本和产物重试，完成前阻止下一版本。
 - 发布前统一构建并检查所有包。全部上传到 npm `release-candidate` 标签并验证后，逐包提升 `latest`；双仓库同名 `vX.Y.Z` tag 完成后清除 pending 引用。
 - npm 上传和 `dist-tag` 变更只在主仓库 `.github/workflows/publish.yml` 执行，本地入口负责构建、Changeset、预检、父子仓库提交推送、调度和结果核验。
-- 恢复 pending 且没有新改动时不生成 Changeset；有新改动时可先准备入队，CI 优先完成旧批次。若本次有新版本计划且首个结果属于旧批次，入口确认远端 `main` 仍为本次队列提交后，用新请求标识、同一源码 SHA 最多追加调度一次；目标版本完成后整个命令才成功，失败、来源变化或二次结果仍非目标时停止并报告未完成。
+- 恢复 pending 且没有新改动时不生成 Changeset；有新改动时可先准备入队，CI 优先完成旧批次。若本次有新版本计划且先完成旧批次，入口确认远端 `main` 仍为本次队列提交后，再处理目标版本。每批最多一次准备运行和一次发布运行，总共最多两批、四次运行，请求标识各不相同。目标版本完成后整个命令才成功，失败、来源或冻结引用变化、发布结果与准备清单不一致时停止并报告未完成。
 - 发布凭证使用 GitHub App 的 `RELEASE_APP_CLIENT_ID` 仓库变量和 `RELEASE_APP_PRIVATE_KEY` 仓库 secret；App 需要两个仓库的 Contents 读写权限。
 - npm trusted publisher 对全部包授权主仓库 `publish.yml` 的 publish 和 dist-tag 操作；发布环境使用 npm 11.21.0 或以上版本。
 - 以全量包版本、`latest`、双仓库 tag 和 CI 结果为发布完成证据；部分成功必须报告未完成的包和步骤。

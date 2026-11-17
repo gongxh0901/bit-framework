@@ -84,9 +84,9 @@ bit 模块共用 `rollup.config.base.mjs`。FairyGUI 使用 `source/gulpfile.js`
 
 本地准备完成后，通过 GitHub CLI 调度主仓库手动发布工作流并等待结果。CI 全量构建后消费 Changeset，生成统一版本、包级 CHANGELOG 和锁文件，将 FairyGUI 版本提交推到子仓库专用发布分支，再把记录该 gitlink 的主仓库版本提交推到 `main`。
 
-上传 npm 前冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含本批次 gitlink，必要时快进；已包含该提交的后代分支保持原位，真正分叉时停止，发布源码仍固定为本批次 gitlink。pending 引用固定发布提交，失败后恢复同一批次，完成前阻止生成下一版本。所有 npm 包先上传到 `release-candidate`，全部校验后提升到 `latest`，最后在两个仓库创建相同的 `vX.Y.Z` tag。具体命令与凭证见 [COMMANDS.md](./COMMANDS.md)。
+准备运行冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含本批次 gitlink，必要时快进；已包含该提交的后代分支保持原位，真正分叉时停止，发布源码仍固定为本批次 gitlink。pending 引用固定发布提交，失败后恢复同一批次，完成前阻止生成下一版本。准备运行返回 `prepared` 后，本地入口核验 pending 引用并从该引用启动新的发布运行；上传时 GitHub 事件 SHA 必须与冻结 HEAD 一致，保留原始 `GITHUB_SHA`，使 OIDC 与 npm provenance 的来源一致。所有 npm 包先上传到 `release-candidate`，全部校验后提升到 `latest`，最后在两个仓库创建相同的 `vX.Y.Z` tag。具体命令与凭证见 [COMMANDS.md](./COMMANDS.md)。
 
-本地 `publish` 本次准备了新版本且首个 CI 先完成旧 pending 时，确认远端 `main` 仍为本次队列提交后，以新请求标识和同一源码 SHA 最多再调度一次。只有本次目标版本完成才返回成功；远端推进、运行失败或二次结果仍非目标版本时报告未完成。从 GitHub 页面单独手动调度一次只处理一个 CI 批次。
+本地 `publish` 本次准备了新版本且先完成旧 pending 时，确认远端 `main` 仍为本次队列提交后，再处理目标版本。每批最多一次准备运行和一次发布运行，总共最多两批、四次运行；每次请求标识唯一，不重复准备本地源码。只有本次目标版本完成才返回成功；来源或冻结引用变化、运行失败、结果与准备清单不一致时报告未完成。从 GitHub 页面单独手动调度一次只运行一次 CI，返回 `prepared` 时需从 pending 引用继续调度。
 
 ## TypeScript 约定
 
