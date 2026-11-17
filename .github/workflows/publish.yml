@@ -1,65 +1,140 @@
 name: Release packages
+run-name: Unified release · ${{ inputs.request_id || github.run_id }}
 
-# Changesets 在 main 上创建/更新 Release PR；合并 Release PR 后发布变更包。
+# 日常 PR 只校验，统一发版由本地 publish 或手动调度明确触发。
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      request_id:
+        description: 本地发布请求标识
+        type: string
+        required: false
+      requested_sha:
+        description: 本次请求对应的 main 提交
+        type: string
+        required: false
+
+permissions:
+  contents: read
 
 jobs:
   validate:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
       - uses: jdx/mise-action@v4
-      - run: mise run setup:ci
-      - run: mise run changeset:status
-        # Release PR 已消费 Changeset，仅普通 PR 需要检查待发布变更集。
-        if: github.head_ref != 'changeset-release/main'
+      - run: mise run setup
+      - run: mise exec -- node scripts/version-packages.mjs --status
+      - run: mise exec -- node --test scripts/*.test.mjs
       - run: mise run build
+      - run: mise exec -- node scripts/publish-npm.mjs --dry-run
 
   release:
-    if: github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-
+    concurrency:
+      group: bit-framework-release
+      cancel-in-progress: false
     permissions:
-      contents: write # Changesets 发布后需要创建包级 git tag
-      pull-requests: write # Changesets 需要创建/更新 Release PR
-      id-token: write # trusted publishing 需要，用于向 npm 换取 OIDC 凭证
-
+      contents: read
+      id-token: write # npm publish 和 dist-tag 使用 OIDC。
     steps:
+      - name: Create cross-repository token
+        uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            bit-framework
+            FGUI-cocoscreator
+          permission-contents: write
+
       - uses: actions/checkout@v4
         with:
-          submodules: recursive # fgui 是构建 bit-ui / bit-condition 的前置依赖
-
-      # trusted publishing 要求 npm >= 11.5.1、Node >= 22.14.0
-      # 不设 registry-url：它会写一份带 ${NODE_AUTH_TOKEN} 的 .npmrc，
-      # 而 trusted publishing 不用 token，空值会让后续 npm 命令鉴权失败。
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+          submodules: recursive
       - uses: jdx/mise-action@v4
 
-      - name: Upgrade npm
-        run: npm install -g npm@11
-
-      - name: Verify npm version
-        run: npm -v
-
-      - run: mise run setup:ci
-
-      - run: mise run build
-
-      - name: Create Release PR or publish packages
-        uses: changesets/action@v1
-        with:
-          version: mise run version:packages
-          publish: mise run publish:npm
-          commit: 'chore: release packages'
-          title: 'chore: release packages'
+      - name: Verify requested source
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REQUESTED_SHA: ${{ inputs.requested_sha }}
+        run: |
+          if [ -n "$REQUESTED_SHA" ] && [ "$REQUESTED_SHA" != "$(git rev-parse HEAD)" ]; then
+            echo 'main 在本地检查后发生变化，请同步后重新执行 publish'
+            exit 1
+          fi
+
+      # 恢复先于依赖安装和构建，补发始终使用原批次源码。
+      - name: Select release source
+        id: source
+        run: mise exec -- node scripts/release-git.mjs select
+
+      - name: Configure Git identity
+        if: steps.source.outputs.mode != 'none'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Upgrade npm
+        if: steps.source.outputs.mode != 'none'
+        run: npm install -g npm@11.21.2
+      - if: steps.source.outputs.mode != 'none'
+        run: mise run setup
+      - if: steps.source.outputs.mode != 'none'
+        run: mise exec -- node scripts/version-packages.mjs --status
+      - if: steps.source.outputs.mode != 'none'
+        run: mise exec -- node --test scripts/*.test.mjs
+      - if: steps.source.outputs.mode != 'none'
+        run: mise run build
+
+      # 构建成功后统一生成版本、CHANGELOG、锁文件和父子仓库版本提交。
+      - name: Generate and commit the unified version
+        if: steps.source.outputs.mode == 'version'
+        run: mise exec -- node scripts/version-packages.mjs
+
+      - name: Publish or resume the frozen batch
+        if: steps.source.outputs.mode != 'none'
+        run: mise exec -- node scripts/publish-npm.mjs
+
+      - name: Record release result
+        env:
+          RELEASE_MODE: ${{ steps.source.outputs.mode }}
+        run: |
+          mise exec -- node --input-type=module <<'JS'
+          import { mkdirSync, readFileSync, writeFileSync, appendFileSync } from 'node:fs'
+          import { join } from 'node:path'
+          import { git } from './scripts/release-git.mjs'
+          let result = { status: 'none' }
+          if (process.env.RELEASE_MODE !== 'none') {
+            const manifest = JSON.parse(readFileSync('.release/manifest.json', 'utf8'))
+            result = {
+              status: 'published',
+              version: manifest.version,
+              sourceSha: git(process.cwd(), ['rev-parse', 'HEAD']),
+              submoduleSha: manifest.submoduleSha,
+              packages: manifest.packages.map(pkg => pkg.name),
+            }
+          }
+          const directory = join(process.env.RUNNER_TEMP, 'release-result')
+          mkdirSync(directory, { recursive: true })
+          writeFileSync(join(directory, 'release-result.json'), JSON.stringify(result, null, 2) + '\n')
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, result.status === 'published'
+            ? `全部 ${result.packages.length} 个包已完成 ${result.version} 发布及双仓标签验证。\n`
+            : '没有待发布的 Changeset 或未完成批次。\n')
+          JS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-result
+          path: ${{ runner.temp }}/release-result/release-result.json
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 7

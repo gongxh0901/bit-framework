@@ -34,9 +34,9 @@ bit-framework/
 | 模块依赖 | `docs/ARCHITECTURE.md` |
 | 构建/发布命令 | `docs/COMMANDS.md` |
 | npmjs 发布 | `.github/workflows/publish.yml` |
+| 本地发布入口 | `scripts/publish.mjs` |
 | workspace 协议转换 | `scripts/prepare-npm-publish.mjs`（npm CLI 不认 `workspace:`） |
-| 应急手动发包 | `scripts/publish-npm.mjs` |
-| fgui 仓库的 workflow | `vendor/fairygui-cc/.github/workflows/publish.yml` |
+| 全量发布与失败重试 | `scripts/publish-npm.mjs` |
 | 各模块入口 | `bit-xxx/src/index.ts` |
 | UI 窗口基类 | `bit-ui/src/window/` |
 | ECS | `bit-ecs/src/` |
@@ -44,26 +44,30 @@ bit-framework/
 
 ## 约定
 
-- npm scope: `@gongxh/bit-*`，发布到 npmjs
-- workspace 依赖: `peerDependencies` 用 `workspace:^`，`devDependencies` 用 `workspace:*`
-  （发布时由 `scripts/prepare-npm-publish.mjs` 把 peer 转成 `^x.y.z`、删掉 devDeps 的 workspace 条目）
-- 只改 `src/`，不要改 `dist/`
+- npm 包：`@gongxh/bit-*` 和 `@gongxh/fairygui-cc`，发布到 npmjs。
+- 所有公开 workspace 包使用同一版本，每次发版全部发布；新增公开包自动纳入统一版本组和发布校验。
+- 包间依赖统一使用 `workspace:*`；发布时转换为本批次精确版本，移除开发依赖中的 workspace 条目。
+- 修改源码后由构建生成 `dist/`；FairyGUI 的 `source/dist` 由子仓库跟踪，发版提交包含实际变化的产物。
 - 禁止循环依赖、`as any`、空 catch
 - commit: `feat` / `fix` / `refactor` / `docs` / `chore`
-- 发包由 CI 完成，本机不手动 publish
+- npm 上传由 CI 执行，本地通过 `mise run publish` 调度并等待结果。
 
 ## 开发
 
 ```bash
-mise run build:core    # 单模块
-mise run build         # 全部
+mise run setup
+mise run build
+mise run changeset
+mise run publish
 ```
+
+只提供以上四个 mise task。`setup` 安装固定的 Node.js、pnpm 和 GitHub CLI 版本，同步子模块到主仓库记录的 gitlink 并安装依赖；CI 安装使用冻结锁文件。`changeset` 可单独记录变更。`publish` 携带本地修改进行仅快进同步、全量构建、准备 Changeset、预检并提交推送父子仓库全部可提交修改，再通过 GitHub CLI 调度发布并等待结果。
 
 ## Skills
 
 | 命令 | 用途 |
 |------|------|
-| `/release` | 发版 |
+| `$fairygui-release` | 准备包含 FairyGUI 的全量统一发版 |
 | `/changelog` | 生成 CHANGELOG |
 
 ## AI 技能规则
@@ -75,16 +79,24 @@ mise run build         # 全部
 - 根据 git log 生成 CHANGELOG 条目，包含主仓库和 `vendor/fairygui-cc` 子模块的提交。
 - 按 `feat`、`fix`、`refactor`/其他、`docs`、`chore` 分类。
 - 过滤 `chore: bump version` 和 `chore: release`。
-- 版本号读取实际发布包的 `package.json`，日期使用当天日期。
+- 版本号读取并校验所有公开包的 `package.json`，全部一致后使用该统一版本；日期使用当天日期。
 - 已有 CHANGELOG 时插入到第一个 `## [` 之前，完成后展示写入条目。
+- 包日志只记录该包的真实变化；没有实际变化的包保留统一版本条目，不虚构变更说明。
 
 ### release
 
-- 发版前确认目标包、版本变更级别和工作区状态；主仓库及 `vendor/fairygui-cc` 子模块都必须干净。
-- 使用 Changesets 管理独立版本：只升级有变更或因内部依赖范围变化而必须升级的包，不再统一升级所有包。
-- 合并代码后由 GitHub Changesets Action 创建或更新 Release PR；不要手动提交 `chore: version packages`。
-- 包间依赖在源码中使用 `workspace:^` 或 `workspace:~`；发布前解析为真实 semver 范围，禁止发布 `workspace:` 协议。
-- 发布前按依赖拓扑构建和校验，只发布本次变更集计算出的包。
-- GitHub Actions 负责发布到 npmjs，本机默认不直接 publish。
-- `vendor/fairygui-cc` 是独立子模块，涉及它的版本和发布必须先在子模块完成，再更新主仓库记录的 SHA。
-- 不得声称“已发布成功”，只能报告版本、包列表和 CI 流水线结果。
+- 执行 `mise run publish` 即授权自动提交并推送主仓库和 `vendor/fairygui-cc` 内全部可提交修改，包含已暂存、未暂存及未被 Git 忽略的未跟踪文件；不增加逐次确认步骤。
+- Changesets 按本批次最高 `patch` / `minor` / `major` 级别统一升级全部公开包，当前范围是 12 个 bit 包和 FairyGUI，共 13 个包。
+- 主仓库发布分支是 `main`，子仓库正式分支是 `ccc3.0`。使用 Git 原生 `merge --ff-only --autostash` 携带已跟踪的暂存和未暂存修改做仅快进同步；主仓库同步后，先使子模块包含主仓库 gitlink，再同步 `ccc3.0`，全部源码同步后才构建。
+- 检查 Git 冲突和自动 stash 恢复结果；分叉、恢复冲突或未跟踪文件覆盖保护等无法安全同步时停止，保留 stash 和冲突现场，通过 `git status`、`git stash list` 检查恢复，不自动 rebase、强推或清理现场。
+- `publish` 完成全量构建后复用已有非空 Changeset，没有可复用记录时交互填写；规划和打包检查成功后先将子仓库全部修改提交推送到 `ccc3.0`，再将主仓库全部修改和 gitlink 提交推送到 `main`。
+- `publish` 使用已登录的 `gh` 调度主仓库 `publish.yml` 并等待本次运行；正式发布由手动调度触发，普通 PR 执行校验。
+- CI 先全量构建，再消费 Changeset，统一更新版本、包级 CHANGELOG 和锁文件；FairyGUI 的版本提交先推到子仓库专用发布分支，主仓库版本提交记录该 gitlink 并推送到 `main`。
+- CI 在上传 npm 前冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含本批次 gitlink，必要时快进；已包含该提交的后代分支保持原位，真正分叉时停止。发布仍使用冻结 gitlink，不混入后代源码。
+- 主仓库 `refs/heads/bit-framework-release/pending` 冻结正在发布的主仓库 SHA；失败后按同一 SHA、版本和产物重试，完成前阻止下一版本。
+- 发布前统一构建并检查所有包。全部上传到 npm `release-candidate` 标签并验证后，逐包提升 `latest`；双仓库同名 `vX.Y.Z` tag 完成后清除 pending 引用。
+- npm 上传和 `dist-tag` 变更只在主仓库 `.github/workflows/publish.yml` 执行，本地入口负责构建、Changeset、预检、父子仓库提交推送、调度和结果核验。
+- 恢复 pending 且没有新改动时不生成 Changeset；有新改动时可先准备入队，CI 优先完成旧批次。若本次有新版本计划且首个结果属于旧批次，入口确认远端 `main` 仍为本次队列提交后，用新请求标识、同一源码 SHA 最多追加调度一次；目标版本完成后整个命令才成功，失败、来源变化或二次结果仍非目标时停止并报告未完成。
+- 发布凭证使用 GitHub App 的 `RELEASE_APP_CLIENT_ID` 仓库变量和 `RELEASE_APP_PRIVATE_KEY` 仓库 secret；App 需要两个仓库的 Contents 读写权限。
+- npm trusted publisher 对全部包授权主仓库 `publish.yml` 的 publish 和 dist-tag 操作；发布环境使用 npm 11.21.0 或以上版本。
+- 以全量包版本、`latest`、双仓库 tag 和 CI 结果为发布完成证据；部分成功必须报告未完成的包和步骤。

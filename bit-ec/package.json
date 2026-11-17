@@ -37,7 +37,7 @@
         "provenance": true
     },
     "peerDependencies": {
-        "@gongxh/bit-event": "workspace:^"
+        "@gongxh/bit-event": "workspace:*"
     },
     "devDependencies": {
         "@gongxh/bit-event": "workspace:*"

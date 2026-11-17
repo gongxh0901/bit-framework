@@ -1,58 +1,225 @@
 #!/usr/bin/env node
-/**
- * 使用 Changesets 将需要发布的包发布到 npmjs。
- *
- * Changesets 根据包版本和 git tag 判断发布清单，不要求所有包版本一致。
- * 发布前临时解析 workspace: 协议，结束后恢复 package.json。
- */
+/** 全量上传候选包，验证整批产物后统一切换 latest，失败时保留同版重试状态。 */
 import { spawnSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { createHash } from 'node:crypto'
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { basename, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ROOT, getReleasePackages, validateReleasePackages } from './release-workspace.mjs'
+import { prepareNpmPackages } from './prepare-npm-publish.mjs'
+import { git, beginRelease as beginGitRelease, completeRelease as completeGitRelease } from './release-git.mjs'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const PACKAGE_DIRS = [
-    'bit-core', 'bit-event', 'bit-net', 'bit-ecs', 'bit-assets',
-    'bit-quadtree', 'bit-behaviortree', 'bit-ec', 'bit-ui',
-    'bit-condition', 'bit-minigame', 'bit-hotupdate',
-    'vendor/fairygui-cc/source',
-]
-const DRY_RUN = process.argv.includes('--dry-run')
+const REGISTRY = 'https://registry.npmjs.org/'
+const CANDIDATE = 'release-candidate'
+const DEP_FIELDS = ['dependencies', 'peerDependencies', 'optionalDependencies']
 
-function snapshot() {
-    return new Map(PACKAGE_DIRS.map((dir) => {
-        const path = join(ROOT, dir, 'package.json')
-        return [path, readFileSync(path, 'utf8')]
-    }))
+export function runCommand(command, args, options = {}) {
+    const result = spawnSync(command, args, { ...options, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 })
+    if (result.error) throw result.error
+    return result
 }
 
-function restore(saved) {
-    for (const [path, content] of saved) writeFileSync(path, content)
+function parseJson(output, description) {
+    try { return JSON.parse(output) }
+    catch { throw new Error(`${description} 未返回有效 JSON`) }
 }
 
-function run(args) {
-    return spawnSync('pnpm', args, { cwd: ROOT, stdio: 'inherit', env: process.env }).status
+function singleResult(value, description) {
+    if (!Array.isArray(value)) return value
+    if (value.length !== 1) throw new Error(`${description} 必须返回唯一结果`)
+    return value[0]
 }
 
-function main() {
-    const saved = snapshot()
-    try {
-        if (DRY_RUN) {
-            console.log('模式：dry-run（只检查 Changesets 清单，不上传）')
-            process.exitCode = run(['exec', 'changeset', 'status', '--verbose'])
-            return
-        }
+function isNotFound(result) {
+    for (const output of [result.stdout, result.stderr]) {
+        try { if (JSON.parse(output).error?.code === 'E404') return true }
+        catch { /* npm 的 stderr 通常是文本，继续检查明确的错误码。 */ }
+    }
+    return /(?:^|\n)npm (?:error|ERR!) code E404(?:\s|$)/.test(result.stderr || '')
+}
 
-        if (run(['exec', 'node', 'scripts/prepare-npm-publish.mjs']) !== 0) {
-            console.error('workspace 协议转换失败')
-            process.exitCode = 1
-            return
-        }
-        process.exitCode = run(['exec', 'changeset', 'publish'])
-    } finally {
-        restore(saved)
-        console.log('\npackage.json 已还原')
+export function readReleaseManifest(root, packages, version) {
+    const path = join(root, '.release', 'manifest.json')
+    if (!existsSync(path)) throw new Error('真实发布缺少 .release/manifest.json，请先生成并提交统一版本')
+    const manifest = parseJson(readFileSync(path, 'utf8'), '发布清单')
+    if (manifest.version !== version || !/^[0-9a-f]{40}$/.test(manifest.submoduleSha || '')) {
+        throw new Error('发布清单的统一版本或子模块 SHA 无效')
+    }
+    const expected = packages.map(({ dir, packageJson }) => `${packageJson.name}\0${relative(root, dir).split(sep).join('/')}`).sort()
+    const actual = (manifest.packages || []).map(({ name, dir }) => `${name}\0${dir}`).sort()
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error('发布清单与当前 workspace 包集合不一致')
+    return manifest
+}
+
+function entrypoints(pkg) {
+    const paths = [pkg.main, pkg.module, pkg.types, pkg.typings].filter(Boolean)
+    function visit(value) {
+        if (typeof value === 'string' && value.startsWith('./')) paths.push(value)
+        else if (value && typeof value === 'object') Object.values(value).forEach(visit)
+    }
+    visit(pkg.exports)
+    return [...new Set(paths.map(path => path.replace(/^\.\//, '')))]
+}
+
+function verifyPackedFiles(pkg, packed) {
+    const paths = new Set((packed.files || []).map(file => file.path))
+    if (!paths.has('package.json')) throw new Error(`${pkg.name}: 打包清单缺少 package.json`)
+    for (const path of entrypoints(pkg)) {
+        if (!paths.has(path)) throw new Error(`${pkg.name}: 打包清单缺少入口 ${path}，请先构建全部包`)
     }
 }
 
-main()
+export function verifyRegistryPackage(expected, actual, artifact, names) {
+    if (actual.name !== expected.name || actual.version !== expected.version) {
+        throw new Error(`${expected.name}: registry 返回的包名或版本不一致`)
+    }
+    for (const field of DEP_FIELDS) {
+        const internal = pkg => Object.entries(pkg[field] || {}).filter(([name]) => names.has(name)).sort(([a], [b]) => a.localeCompare(b))
+        if (JSON.stringify(internal(expected)) !== JSON.stringify(internal(actual))) {
+            throw new Error(`${expected.name}: registry 的 ${field} 内部精确引用与发布产物不一致`)
+        }
+    }
+    let compared = false
+    if (actual.dist?.integrity) {
+        for (const token of actual.dist.integrity.split(/\s+/)) {
+            const match = /^(sha512|sha384|sha256|sha1)-([^?]+)(?:\?.*)?$/.exec(token)
+            if (!match) continue
+            compared = true
+            const expectedHash = createHash(match[1]).update(artifact.contents).digest('base64')
+            if (match[2] !== expectedHash) throw new Error(`${expected.name}: 已存在同版本产物的 integrity 不一致，禁止混用源码`)
+        }
+    }
+    if (actual.dist?.shasum) {
+        compared = true
+        if (actual.dist.shasum !== artifact.shasum) throw new Error(`${expected.name}: 已存在同版本产物的 shasum 不一致，禁止混用源码`)
+    }
+    if (!compared) throw new Error(`${expected.name}: registry 缺少可核验的产物 integrity/shasum`)
+}
+
+/** 所有命令和 Git 副作用均可注入，测试不连接 registry。 */
+export async function publishRelease({ root = ROOT, dryRun = false, env = process.env,
+    runCommand: execute = runCommand, beginRelease = beginGitRelease, completeRelease = completeGitRelease,
+    sourceSha = directory => git(directory, ['rev-parse', 'HEAD']),
+    log = console.log } = {}) {
+    if (!dryRun && env.CI !== 'true') throw new Error('真实 npm 发布只能在 CI 中执行；本地请使用 --dry-run')
+    if (existsSync(join(root, '.changeset', 'pre.json'))) throw new Error('统一发布流程暂不支持 Changesets 预发布模式')
+    const packages = await getReleasePackages(root)
+    const version = validateReleasePackages(packages)
+    if (!/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version)) throw new Error('统一发布流程只支持正式 semver 版本')
+    const manifest = dryRun ? undefined : readReleaseManifest(root, packages, version)
+    const frozenSha = dryRun ? undefined : await sourceSha(root)
+    if (!dryRun && !/^[0-9a-f]{40}$/.test(frozenSha || '')) throw new Error('无法确定本批次冻结的主仓库提交')
+    const saved = new Map(packages.map(({ dir }) => {
+        const path = join(dir, 'package.json')
+        return [path, readFileSync(path, 'utf8')]
+    }))
+    const restore = () => { for (const [path, content] of saved) writeFileSync(path, content) }
+    const scratch = mkdtempSync(join(tmpdir(), 'bit-framework-publish-'))
+    const names = new Set(packages.map(({ packageJson }) => packageJson.name))
+    const command = async (bin, args, cwd = root) => execute(bin, args, { cwd,
+        env: { ...env, npm_config_ignore_scripts: 'true', ...(frozenSha ? { GITHUB_SHA: frozenSha } : {}) } })
+    const required = async (bin, args, cwd = root) => {
+        const result = await command(bin, args, cwd)
+        if (result.status !== 0) throw new Error(`${bin} ${args.join(' ')} 失败\n${result.stderr || result.stdout || ''}`)
+        return result
+    }
+    const view = async name => {
+        const result = await command('npm', ['view', `${name}@${version}`, '--json', `--registry=${REGISTRY}`])
+        if (result.status !== 0) {
+            if (isNotFound(result)) return null
+            throw new Error(`${name}: registry 查询失败，停止发布\n${result.stderr || result.stdout || ''}`)
+        }
+        const actual = singleResult(parseJson(result.stdout, `${name} registry 查询`), `${name} registry 查询`)
+        if (!actual || typeof actual !== 'object' || actual.error) throw new Error(`${name}: registry 查询没有返回有效包清单`)
+        return actual
+    }
+    const readTag = async (name, tag) => {
+        const result = await required('npm', ['view', `${name}@${version}`, `dist-tags.${tag}`, '--json', `--registry=${REGISTRY}`])
+        if (!result.stdout.trim()) return undefined
+        const parsed = parseJson(result.stdout, `${name} ${tag}`)
+        if (Array.isArray(parsed) && parsed.length === 0) return undefined
+        const value = singleResult(parsed, `${name} ${tag}`)
+        if (value == null) return undefined
+        if (typeof value !== 'string') throw new Error(`${name}: ${tag} 查询结果不是有效版本号`)
+        return value
+    }
+    const ensureTag = async (name, tag) => {
+        if (await readTag(name, tag) !== version) {
+            await required('npm', ['dist-tag', 'add', `${name}@${version}`, tag, `--registry=${REGISTRY}`])
+        }
+        if (await readTag(name, tag) !== version) throw new Error(`${name}: ${tag} 未指向 ${version}`)
+    }
+
+    try {
+        const prepared = prepareNpmPackages(packages)
+        const artifacts = new Map()
+        for (const { dir, packageJson } of prepared) {
+            if (packageJson.publishConfig?.directory) throw new Error(`${packageJson.name}: 不支持 publishConfig.directory`)
+            if (packageJson.publishConfig?.registry && packageJson.publishConfig.registry.replace(/\/$/, '') !== REGISTRY.replace(/\/$/, '')) {
+                throw new Error(`${packageJson.name}: 只支持 npmjs registry`)
+            }
+            const result = await required('npm', ['pack', '--json', '--ignore-scripts', '--cache', join(scratch, 'cache'), '--pack-destination', scratch], dir)
+            const packed = singleResult(parseJson(result.stdout, `${packageJson.name} 打包`), `${packageJson.name} 打包`)
+            verifyPackedFiles(packageJson, packed)
+            if (!packed.filename || basename(packed.filename) !== packed.filename) throw new Error(`${packageJson.name}: 打包文件名无效`)
+            const path = join(scratch, packed.filename)
+            const contents = readFileSync(path)
+            artifacts.set(packageJson.name, { path, contents, shasum: createHash('sha1').update(contents).digest('hex') })
+        }
+        // Git 校验必须看到原始清单；临时转换不会改变任何包的版本。
+        restore()
+        if (dryRun) {
+            log(`dry-run：${packages.length} 个包的 ${version} 发布清单、精确引用和本地产物检查通过`)
+            return { version, packages: [...names], dryRun: true }
+        }
+
+        await beginRelease(root, version, manifest.submoduleSha)
+        if (await sourceSha(root) !== frozenSha) throw new Error('来源冻结过程中主仓库 HEAD 发生变化，停止上传')
+        const missing = []
+        for (const { packageJson } of prepared) {
+            const existing = await view(packageJson.name)
+            if (existing) verifyRegistryPackage(packageJson, existing, artifacts.get(packageJson.name), names)
+            else missing.push(packageJson.name)
+        }
+        // 直接上传已校验的 tarball，避免包管理器二次打包改变产物内容。
+        for (const name of missing) {
+            log(`上传候选包 ${name}@${version}`)
+            try {
+                const result = await required('npm', ['publish', artifacts.get(name).path, '--tag', CANDIDATE,
+                    '--access', 'public', '--provenance', '--ignore-scripts', `--registry=${REGISTRY}`])
+                if (result.stdout) log(result.stdout.trim())
+            } catch (error) {
+                throw new Error(`${name}@${version} 候选上传失败：${error.message}`)
+            }
+        }
+        // 所有目标版本及其内容都验证成功之后，才允许修改任何 latest。
+        for (const { packageJson } of prepared) {
+            const actual = await view(packageJson.name)
+            if (!actual) throw new Error(`${packageJson.name}@${version}: 候选上传后仍不存在`)
+            verifyRegistryPackage(packageJson, actual, artifacts.get(packageJson.name), names)
+        }
+        for (const { packageJson } of prepared) await ensureTag(packageJson.name, CANDIDATE)
+        for (const { packageJson } of prepared) await ensureTag(packageJson.name, 'latest')
+        for (const { packageJson } of prepared) {
+            verifyRegistryPackage(packageJson, await view(packageJson.name) || {}, artifacts.get(packageJson.name), names)
+            if (await readTag(packageJson.name, 'latest') !== version) throw new Error(`${packageJson.name}: latest 最终验证失败`)
+        }
+        // 清单转换不能进入 Git tag，也不能影响子模块工作区检查。
+        restore()
+        await completeRelease(root, version, manifest.submoduleSha)
+        log(`${packages.length} 个包已完成 ${version} 全量发布和双仓 tag 验证`)
+        return { version, packages: [...names], dryRun: false }
+    } finally {
+        restore()
+        rmSync(scratch, { recursive: true, force: true })
+    }
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+    try { await publishRelease({ dryRun: process.argv.includes('--dry-run') }) }
+    catch (error) {
+        console.error(error.message)
+        process.exitCode = 1
+    }
+}

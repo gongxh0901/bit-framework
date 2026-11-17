@@ -10,7 +10,7 @@
 ## ✨ 特性
 
 - 🎯 **模块化设计** - 12 个独立模块，按需使用
-- 📦 **Monorepo 架构** - 统一管理，独立发布
+- 📦 **Monorepo 架构** - 统一版本，全量发布 12 个框架模块和 FairyGUI
 - 💪 **TypeScript** - 完整的类型定义和智能提示
 - 🚀 **高性能** - 优化的数据结构和算法
 - 🔧 **零配置** - 开箱即用，简单易用
@@ -18,7 +18,7 @@
 
 ## 📦 模块总览
 
-Bit Framework 包含 12 个核心模块，分为 5 大类别：
+Bit Framework 包含 12 个核心模块，分为 5 大类别。它们与子模块中的 `@gongxh/fairygui-cc` 共 13 个 npm 包使用同一版本，每次发版全部发布；包间依赖精确关联到同一版本。
 
 ### 🏗️ 核心模块
 
@@ -67,12 +67,12 @@ Bit Framework 包含 12 个核心模块，分为 5 大类别：
 ### 环境要求
 
 - **mise**: 2026.9+
-- **Node.js / pnpm**: 由根目录 `mise.toml` 安装和固定版本
+- **Node.js / pnpm / GitHub CLI**: 由根目录 `mise.toml` 安装和固定版本
 - **Cocos Creator**: 3.7.0+ （推荐 3.8.x）
 
 ### 方式一：在 Cocos Creator 项目中使用（推荐）
 
-在你的 Cocos Creator 项目中直接安装需要的模块：
+在你的 Cocos Creator 项目中安装需要的模块。同一项目中的框架包和 `@gongxh/fairygui-cc` 使用相同版本；升级时同时更新已安装的这些包。
 
 ```bash
 # 安装核心模块
@@ -107,12 +107,11 @@ curl https://mise.run | sh
 ```bash
 git clone --recurse-submodules https://github.com/gongxh0901/bit-framework.git
 cd bit-framework
-mise install
 mise run setup
 mise run build
 ```
 
-命令见 [COMMANDS.md](./docs/COMMANDS.md)，发版流程见该文档。
+项目提供 `setup`、`build`、`changeset`、`publish` 四个 mise task。`setup` 安装工具、同步子模块并安装依赖；运行 `publish` 后自动全量构建，复用或交互生成 Changeset，预检后提交推送父子仓库全部可提交修改，再由主仓库 CI 生成统一版本和 CHANGELOG 并全量发布。`changeset` 也可单独使用。自动提交范围与分支规则见 [COMMANDS.md](./docs/COMMANDS.md)。
 
 ## 🔧 常见问题
 

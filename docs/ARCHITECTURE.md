@@ -2,7 +2,7 @@
 
 ## 架构总览
 
-基于 **mise tasks + pnpm workspace** 的游戏框架集合，专为 Cocos Creator 3.x 设计。12 个独立模块，统一仓库管理，独立发布。
+基于 **mise tasks + pnpm workspace** 的游戏框架集合，专为 Cocos Creator 3.x 设计。12 个框架模块与 FairyGUI 子模块中的 npm 包共用同一版本，由主仓库统一全量发布。
 
 ```
 bit-framework/
@@ -28,6 +28,8 @@ graph LR
     Core[bit-core]
     UI[bit-ui] --> Core
     Condition[bit-condition] --> Core
+    UI --> FairyGUI[fairygui-cc]
+    Condition --> FairyGUI
     MiniGame[bit-minigame] --> Core
     HotUpdate[bit-hotupdate] --> Core
     HotUpdate --> Net[bit-net]
@@ -47,6 +49,8 @@ graph LR
 | bit-ec | bit-event |
 | bit-hotupdate | bit-core + bit-net |
 
+公开包之间的依赖在源码中使用 `workspace:*`，npm 包中的依赖和 peer 依赖精确指向本批次统一版本。消费项目中的框架包和 `@gongxh/fairygui-cc` 应同步升级。
+
 ## 技术栈
 
 | 技术 | 版本 | 用途 |
@@ -60,7 +64,7 @@ graph LR
 
 ## 构建输出
 
-每个模块 `dist/` 目录生成：
+每个 bit 模块的 `dist/` 目录生成：
 
 ```
 bit-xxx.mjs / .cjs          # ESM / CommonJS（未压缩）
@@ -68,7 +72,21 @@ bit-xxx.min.mjs / .min.cjs  # ESM / CommonJS（压缩，生产用）
 bit-xxx.d.ts                # TypeScript 类型定义
 ```
 
-统一构建配置：`rollup.config.base.mjs`，所有模块共用。
+bit 模块共用 `rollup.config.base.mjs`。FairyGUI 使用 `source/gulpfile.js` 生成 `source/dist/fairygui.mjs`、`fairygui.min.mjs` 和 `fairygui.d.ts`，这些产物由子仓库跟踪。
+
+`mise run build` 按 workspace 依赖顺序构建全部公开包。
+
+## 统一发布
+
+项目的 mise task 为 `setup`、`build`、`changeset`、`publish`。`setup` 安装固定工具、按主仓库 gitlink 同步子模块并安装 workspace 依赖；`changeset` 是可选的独立变更记录入口。所有公开包属于同一固定版本组，以本批次最高变更级别更新全部版本。
+
+`publish` 自动检查发布分支，通过 Git 原生 `merge --ff-only --autostash` 携带已跟踪的本地修改进行仅快进同步。主仓库同步后，先使子模块包含主仓库 gitlink，再同步 `ccc3.0`，全部源码同步后全量构建并复用或交互生成 Changeset。规划和打包检查成功后，先提交推送 FairyGUI 的全部可提交修改到 `ccc3.0`，再提交推送主仓库全部可提交修改和 gitlink 到 `main`；范围包含已暂存、未暂存和未被 Git 忽略的未跟踪文件。分叉、自动恢复冲突或未跟踪文件覆盖保护等无法安全同步时停止并保留现场，可通过 `git status`、`git stash list` 检查恢复。
+
+本地准备完成后，通过 GitHub CLI 调度主仓库手动发布工作流并等待结果。CI 全量构建后消费 Changeset，生成统一版本、包级 CHANGELOG 和锁文件，将 FairyGUI 版本提交推到子仓库专用发布分支，再把记录该 gitlink 的主仓库版本提交推到 `main`。
+
+上传 npm 前冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含本批次 gitlink，必要时快进；已包含该提交的后代分支保持原位，真正分叉时停止，发布源码仍固定为本批次 gitlink。pending 引用固定发布提交，失败后恢复同一批次，完成前阻止生成下一版本。所有 npm 包先上传到 `release-candidate`，全部校验后提升到 `latest`，最后在两个仓库创建相同的 `vX.Y.Z` tag。具体命令与凭证见 [COMMANDS.md](./COMMANDS.md)。
+
+本地 `publish` 本次准备了新版本且首个 CI 先完成旧 pending 时，确认远端 `main` 仍为本次队列提交后，以新请求标识和同一源码 SHA 最多再调度一次。只有本次目标版本完成才返回成功；远端推进、运行失败或二次结果仍非目标版本时报告未完成。从 GitHub 页面单独手动调度一次只处理一个 CI 批次。
 
 ## TypeScript 约定
 
@@ -110,4 +128,4 @@ bit-xxx/
 └── README.md
 ```
 
-添加到 `pnpm-workspace.yaml`，并在根 `mise.toml` 增加 `build:xxx` task。
+添加到 `pnpm-workspace.yaml`，设置与现有公开包相同的版本，并使用 `workspace:*` 声明内部依赖。新增公开包自动进入统一版本组、构建和发布清单；同时为该包配置主仓库 workflow 的 npm trusted publisher。
