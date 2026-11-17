@@ -93,6 +93,7 @@ mise run publish
 - `publish` 使用已登录的 `gh` 调度主仓库 `publish.yml` 并等待本次运行；正式发布由手动调度触发，普通 PR 执行校验。
 - CI 先全量构建，再消费 Changeset，统一更新版本、包级 CHANGELOG 和锁文件；FairyGUI 的版本提交先推到子仓库专用发布分支，主仓库版本提交记录该 gitlink 并推送到 `main`。
 - 生成版本的运行仅预检、冻结并返回 `prepared`；入口核验 pending 后从 `bit-framework-release/pending` 启动发布运行。npm 上传前要求 GitHub 事件 SHA 与冻结 HEAD 一致，不改写 `GITHUB_SHA`，保持 OIDC 与 provenance 来源一致。
+- CI 将事件提交中的发布工具保存在检出范围外，所有包读取、构建、打包和正式标签仍使用冻结工作区。显式 `finalize_only` 维修必须指定 `frozen_sha`、保留已存在的 pending，逐包验证所有版本和内容后只收尾标签；零上传、零版本生成，成功状态为 `finalized`。
 - CI 在上传 npm 前冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含本批次 gitlink，必要时快进；已包含该提交的后代分支保持原位，真正分叉时停止。发布仍使用冻结 gitlink，不混入后代源码。
 - 主仓库 `refs/heads/bit-framework-release/pending` 冻结正在发布的主仓库 SHA；失败后按同一 SHA、版本和产物重试，完成前阻止下一版本。
 - 发布前统一构建并检查所有包。全部上传到 npm `release-candidate` 标签并验证后，逐包提升 `latest`；双仓库同名 `vX.Y.Z` tag 完成后清除 pending 引用。

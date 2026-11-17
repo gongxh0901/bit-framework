@@ -144,6 +144,42 @@ test('begin 将 ccc3.0 快进到候选并冻结主提交', async (t) => {
     assert.throws(() => assertNoPendingRelease(f.root), /必须先完成冻结批次/)
 })
 
+test('维修 begin 缺少 pending 时在子仓分支推送前拒绝且不创建新批次', async (t) => {
+    const f = await releasedFixture(t)
+    assert.throws(() => beginRelease(f.root, '0.5.7', f.manifest.submoduleSha, { requirePending: true }), /维修模式要求已存在的 pending.*禁止创建/)
+    assert.equal(remoteCommit(f.root, PENDING_REF), undefined)
+    assert.equal(remoteCommit(f.child, 'refs/heads/ccc3.0'), f.childBase)
+    assert.equal(remoteCommit(f.root, 'refs/heads/main'), f.sha)
+    assert.equal(remoteCommit(f.root, 'refs/tags/v0.5.7'), undefined)
+    assert.equal(remoteCommit(f.child, 'refs/tags/v0.5.7'), undefined)
+})
+
+test('维修 begin 遇到其他 pending SHA 时保留原错误和全部远端引用', async (t) => {
+    const f = await releasedFixture(t)
+    git(f.root, ['push', 'origin', `${f.base}:${PENDING_REF}`])
+    assert.throws(() => beginRelease(f.root, '0.5.7', f.manifest.submoduleSha, { requirePending: true }),
+        error => error.message === `本次必须使用冻结提交 ${f.base}`)
+    assert.equal(remoteCommit(f.root, PENDING_REF), f.base)
+    assert.equal(remoteCommit(f.child, 'refs/heads/ccc3.0'), f.childBase)
+    assert.equal(remoteCommit(f.root, 'refs/heads/main'), f.sha)
+})
+
+test('维修 begin 验证匹配的 pending 后可快进子仓并完成双仓标签收尾', async (t) => {
+    const f = await releasedFixture(t)
+    git(f.root, ['push', 'origin', `${f.sha}:${PENDING_REF}`])
+    // 现有 pending 只允许完成后删除，维修过程不能重写或重新创建。
+    const hook = join(f.parentOrigin, 'hooks/pre-receive')
+    await write(hook, `#!/bin/sh\nwhile read old new ref; do\n  if [ "$ref" = "${PENDING_REF}" ] && [ "$new" != "0000000000000000000000000000000000000000" ]; then exit 1; fi\ndone\nexit 0\n`)
+    await chmod(hook, 0o755)
+    beginRelease(f.root, '0.5.7', f.manifest.submoduleSha, { requirePending: true })
+    assert.equal(remoteCommit(f.root, PENDING_REF), f.sha)
+    assert.equal(remoteCommit(f.child, 'refs/heads/ccc3.0'), f.manifest.submoduleSha)
+    completeRelease(f.root, '0.5.7', f.manifest.submoduleSha)
+    assert.equal(remoteCommit(f.root, 'refs/tags/v0.5.7'), f.sha)
+    assert.equal(remoteCommit(f.child, 'refs/tags/v0.5.7'), f.manifest.submoduleSha)
+    assert.equal(remoteCommit(f.root, PENDING_REF), undefined)
+})
+
 test('首次 begin 遇子模块分叉时停止且不创建 pending', async (t) => {
     const f = await releasedFixture(t)
     await write(join(f.seed, 'unrelated-code.txt'), '正式分支独立前进\n')

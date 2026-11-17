@@ -171,12 +171,13 @@ export function finalizeVersionCommit(root, version, packages) {
     return sha
 }
 
-/** 首次上传前冻结主提交，并在快进校验通过后更新 FairyGUI 正式分支。 */
-export function beginRelease(root, version, subSha) {
+/** 首次上传前冻结主提交；维修模式只接续已有批次。 */
+export function beginRelease(root, version, subSha, { requirePending = false } = {}) {
     checkVersion(version)
     assertSource(root, subSha)
     const sha = head(root)
     const pending = remoteCommit(root, PENDING_REF)
+    if (requirePending && !pending) throw new Error('维修模式要求已存在的 pending 冻结批次，禁止创建新 pending')
     if (pending && pending !== sha) throw new Error(`本次必须使用冻结提交 ${pending}`)
     const child = join(root, SUBMODULE)
     const branch = 'refs/heads/ccc3.0'

@@ -43,6 +43,10 @@ CI 先全量构建，再消费 Changeset，生成统一版本、包级 CHANGELOG
 
 GitHub App 使用 `RELEASE_APP_CLIENT_ID` 和 `RELEASE_APP_PRIVATE_KEY`，需要两个仓库的 Contents 读写权限。全部 npm 包的 trusted publisher 授权主仓库 `publish.yml` 的 publish 与 dist-tag 操作，CI 使用 npm 11.21.2 和 OIDC。
 
+npm 发布时扫描会延迟包的可用性。上传命令成功后，整批候选最多共享二十分钟可见性等待，每十五秒重查明确不存在的包；全部版本和内容校验成功后才切换 `latest`。标签回读另有整批共享五分钟窗口，不重复上传或重复写标签。鉴权、网络、无效响应和内容冲突立即停止；等待超时保留 pending，按同版恢复，不以提高版本号处理尚未可见的包。
+
+CI 在切换包源码之前，将事件提交中的发布工具保存在 runner 临时目录，依赖解析指向冻结工作区的 node_modules；调用时显式传入冻结根目录。已上传整批包的维修使用同一个 `publish.yml`，从包含修复的 `main` 显式设置 `finalize_only=true` 和完整 `frozen_sha`。仅收尾模式必须保留匹配的既有 pending，所有目标包已存在且精确引用、产物 hash 一致；不创建 Changeset、不生成版本、不上传包，只完成 npm 标签、双仓 tag 和解除冻结，返回 `finalized`。不能通过重新运行冻结提交中的工具获取事件提交上的修复。
+
 ## 跟踪与恢复
 
 跟踪 `publish` 调度的本次运行，以全量目标版本、全部 `latest`、双仓库 tag 和 CI 结果确认整批完成。部分完成时列出实际完成和待恢复步骤。

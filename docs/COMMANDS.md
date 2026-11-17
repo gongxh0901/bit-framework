@@ -69,9 +69,15 @@ mise run publish
 
 OIDC 身份与工作流事件提交绑定，npm provenance 的来源提交必须与其一致。准备运行只生成并冻结版本，不上传 npm；发布运行保留 GitHub 提供的原始 `GITHUB_SHA`。`prepared` 表示准备完成，只有 `published` 并通过双仓 tag 核验才表示发布完成。
 
+npm 在上传后扫描包，通常约五分钟，部分情况可能超过十五分钟才可用，详见 [npm 发布时扫描说明](https://github.blog/changelog/2026-07-28-npm-publish-time-malware-scanning-and-dual-use-metadata/)。发布脚本每十五秒轮询仍未可见的候选包，整批共享二十分钟等待窗口；全部包可见并通过内容校验后才更新 `latest`。标签写入后的回读共享五分钟等待窗口，等待期间不重复上传或重复写入标签。只有明确的版本不存在或标签尚未更新会等待，鉴权、网络、无效响应和内容不一致立即停止；超时保留冻结批次，之后按同一版本恢复。
+
+每次 CI 将事件提交中的发布工具保存在 runner 临时目录，再检出和构建冻结包源码。工具显式使用冻结工作区作为根目录，依赖由该工作区的锁文件安装；npm 包内容和正式标签始终对应冻结提交。
+
 ## 失败恢复
 
 主仓库 `refs/heads/bit-framework-release/pending` 指向被冻结的发布提交。任一步失败后保留该批次状态，恢复时使用同一主仓库 SHA、子仓库 gitlink、版本和包内容；已存在的 npm 版本通过内容校验后跳过上传。内容冲突、子仓库分叉或 tag 冲突时停止处理。
+
+已上传整批包而只需完成标签时，可从包含发布工具修复的 `main` 手动调度同一个 `publish.yml`，设置 `finalize_only=true`，并用 `frozen_sha` 指定当前 pending 的完整提交 SHA。仅收尾模式不会创建 Changeset、生成版本或上传包；所有目标版本必须已经存在并通过精确依赖和产物 hash 校验，缺包或内容冲突立即停止。该模式要求 pending 已存在且匹配，不能重建已取消的批次。它允许工具事件提交与包源码提交不同，仅维护 npm 标签、双仓库 Git tag 和 pending，成功结果为 `finalized`。
 
 再次运行 `mise run publish` 恢复批次。入口会携带本地修改做仅快进同步；分叉或无法安全恢复修改时保留现场并停止，可通过 `git status`、`git stash list` 检查恢复。CI 优先处理被冻结的批次，完成前阻止生成下一版本。事件来源与冻结来源不一致时，准备运行只返回冻结批次，再由入口核验 pending 并调度该引用。
 

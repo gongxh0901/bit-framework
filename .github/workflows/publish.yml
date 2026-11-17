@@ -15,6 +15,15 @@ on:
         description: 本次请求对应的 main 提交
         type: string
         required: false
+      finalize_only:
+        description: 仅校验已上传包并完成标签，不上传或升级版本
+        type: boolean
+        default: false
+        required: false
+      frozen_sha:
+        description: 仅收尾时必须提供的冻结提交 SHA
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -73,10 +82,28 @@ jobs:
             exit 1
           fi
 
+      # 工具取自事件提交，保存在检出范围外；包源码仍按冻结提交构建。
+      - name: Preserve release tools
+        run: |
+          mkdir -p "$RUNNER_TEMP/bit-release-tools"
+          git archive "$GITHUB_SHA" scripts | tar -x -C "$RUNNER_TEMP/bit-release-tools"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/bit-release-tools/node_modules"
+
       # 恢复先于依赖安装和构建，补发始终使用原批次源码。
       - name: Select release source
         id: source
         run: mise exec -- node scripts/release-git.mjs select
+
+      - name: Verify finalize-only source
+        if: inputs.finalize_only
+        env:
+          FROZEN_SHA: ${{ inputs.frozen_sha }}
+          RELEASE_MODE: ${{ steps.source.outputs.mode }}
+        run: |
+          if ! [[ "$FROZEN_SHA" =~ ^[0-9a-f]{40}$ ]] || [ "$RELEASE_MODE" != 'publish' ] || [ "$(git rev-parse HEAD)" != "$FROZEN_SHA" ]; then
+            echo '仅收尾必须指定并检出当前未完成批次的冻结提交'
+            exit 1
+          fi
 
       - name: Configure Git identity
         if: steps.source.outputs.mode != 'none'
@@ -98,22 +125,34 @@ jobs:
 
       # 构建成功后统一生成版本、CHANGELOG、锁文件和父子仓库版本提交。
       - name: Generate and commit the unified version
-        if: steps.source.outputs.mode == 'version'
+        if: steps.source.outputs.mode == 'version' && !inputs.finalize_only
         run: mise exec -- node scripts/version-packages.mjs
 
       # OIDC 身份绑定工作流事件提交；版本提交必须在新的运行中上传。
-      - name: Publish or prepare the frozen batch
+      - name: Publish, prepare or finalize the frozen batch
         id: publish
         if: steps.source.outputs.mode != 'none'
+        env:
+          FINALIZE_ONLY: ${{ inputs.finalize_only }}
         run: |
-          if [ "$(git rev-parse HEAD)" = "$GITHUB_SHA" ]; then
-            mise exec -- node scripts/publish-npm.mjs
-            echo 'status=published' >> "$GITHUB_OUTPUT"
-          else
-            mise exec -- node --input-type=module -e "const { RELEASE_PROTOCOL } = await import('./scripts/publish-npm.mjs'); if (RELEASE_PROTOCOL !== 2) throw new Error('冻结源码不支持两阶段发布；请先恢复该批次，再提交新修改')"
-            mise exec -- node scripts/publish-npm.mjs --prepare
-            echo 'status=prepared' >> "$GITHUB_OUTPUT"
-          fi
+          mise exec -- node --input-type=module <<'JS'
+          import { appendFileSync } from 'node:fs'
+          import { join } from 'node:path'
+          import { pathToFileURL } from 'node:url'
+          const tools = join(process.env.RUNNER_TEMP, 'bit-release-tools', 'scripts')
+          const { publishRelease, RELEASE_PROTOCOL } = await import(pathToFileURL(join(tools, 'publish-npm.mjs')))
+          const { git } = await import(pathToFileURL(join(tools, 'release-git.mjs')))
+          const root = process.cwd()
+          const finalizeOnly = process.env.FINALIZE_ONLY === 'true'
+          if (finalizeOnly && RELEASE_PROTOCOL !== 3) throw new Error('当前发布工具不支持仅收尾模式')
+          const options = finalizeOnly
+            ? { finalizeOnly: true }
+            : git(root, ['rev-parse', 'HEAD']) === process.env.GITHUB_SHA
+              ? {}
+              : { prepareOnly: true }
+          const result = await publishRelease({ root, ...options })
+          appendFileSync(process.env.GITHUB_OUTPUT, `status=${result.status}\n`)
+          JS
 
       - name: Record release result
         env:
@@ -137,7 +176,7 @@ jobs:
           const directory = join(process.env.RUNNER_TEMP, 'release-result')
           mkdirSync(directory, { recursive: true })
           writeFileSync(join(directory, 'release-result.json'), JSON.stringify(result, null, 2) + '\n')
-          const summary = result.status === 'published'
+          const summary = result.status === 'published' || result.status === 'finalized'
             ? `全部 ${result.packages.length} 个包已完成 ${result.version} 发布及双仓标签验证。\n`
             : result.status === 'prepared'
               ? `${result.version} 已准备并冻结为 ${result.sourceSha}，尚未上传 npm；从 bit-framework-release/pending 启动发布运行。\n`
