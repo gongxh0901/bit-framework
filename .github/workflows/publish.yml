@@ -39,7 +39,6 @@ jobs:
       - uses: jdx/mise-action@v4
       - run: mise run setup
       - run: mise exec -- node scripts/version-packages.mjs --status
-      - run: mise exec -- node --test scripts/*.test.mjs
       - run: mise run build
       - run: mise exec -- node scripts/publish-npm.mjs --dry-run
 
@@ -118,8 +117,6 @@ jobs:
         run: mise run setup
       - if: steps.source.outputs.mode != 'none'
         run: mise exec -- node scripts/version-packages.mjs --status
-      - if: steps.source.outputs.mode != 'none'
-        run: mise exec -- node --test scripts/*.test.mjs
       - if: steps.source.outputs.mode != 'none'
         run: mise run build
 

@@ -100,7 +100,7 @@ export function verifyRegistryPackage(expected, actual, artifact, names) {
     if (!compared) throw new Error(`${expected.name}: registry 缺少可核验的产物 integrity/shasum`)
 }
 
-/** 所有命令和 Git 副作用均可注入，测试不连接 registry。 */
+/** 执行全量发布、准备或收尾，命令与 Git 操作可注入。 */
 export async function publishRelease({ root = ROOT, dryRun = false, prepareOnly = false, finalizeOnly = false, env = process.env,
     runCommand: execute = runCommand, beginRelease = beginGitRelease, completeRelease = completeGitRelease,
     sourceSha = directory => git(directory, ['rev-parse', 'HEAD']),

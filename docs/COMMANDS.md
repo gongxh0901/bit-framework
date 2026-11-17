@@ -54,7 +54,7 @@ mise run publish
 
 源码中的包间依赖使用 `workspace:*`，发布时解析为本批次精确版本。消费项目中已安装的框架包和 FairyGUI 应同步升级。
 
-普通 PR 执行校验，正式发布由本地 `publish` 或 GitHub Actions 的手动调度触发。CI 按以下顺序处理新批次：
+普通 PR 校验统一版本计划、全量构建和发布包预检；正式发布由本地 `publish` 或 GitHub Actions 的手动调度触发。CI 按以下顺序处理新批次：
 
 1. 按选定的主仓库提交和锁文件安装依赖、校验并全量构建。
 2. 消费 Changeset，生成全部包的统一版本、包级 CHANGELOG 和锁文件。
@@ -63,7 +63,7 @@ mise run publish
 5. 冻结本批次主仓库版本提交，确保子仓库 `ccc3.0` 包含对应 gitlink，必要时快进。若正式分支已包含该版本提交并继续前进，保留其位置；真正分叉时停止，发布仍使用冻结 gitlink 的源码。
 6. 准备运行输出 `prepared` 结果；本地入口核验 pending 仍指向该版本提交，再从 `bit-framework-release/pending` 启动新的发布运行。发布运行的 GitHub 事件 SHA 必须与冻结版本提交一致。
 7. 发布运行重新构建和预检，将全部 tgz 上传到 npm `release-candidate`，验证整批目标版本、内容 hash 和精确内部引用后，逐包提升 `latest`。
-8. 验证全部 `latest`，在两个仓库创建相同的 `vX.Y.Z` tag，最后解除冻结。
+8. 验证全部 `latest`，在两个仓库创建相同的 `vX.Y.Z` tag；确认后删除 FairyGUI 本批次的临时发布分支，最后删除主仓库 `bit-framework-release/pending`。
 
 日志按包记录真实变化，没有实际变化的包保留统一版本条目。FairyGUI 的日志位于 `vendor/fairygui-cc/source/CHANGELOG.md`。本地自动提交准备发布的源码和 Changeset，CI 自动提交版本、日志、锁文件和 gitlink；实际 npm 上传和 dist-tag 变更只在 CI 中执行。
 
@@ -72,6 +72,10 @@ OIDC 身份与工作流事件提交绑定，npm provenance 的来源提交必须
 npm 在上传后扫描包，通常约五分钟，部分情况可能超过十五分钟才可用，详见 [npm 发布时扫描说明](https://github.blog/changelog/2026-07-28-npm-publish-time-malware-scanning-and-dual-use-metadata/)。发布脚本每十五秒轮询仍未可见的候选包，整批共享二十分钟等待窗口；全部包可见并通过内容校验后才更新 `latest`。标签写入后的回读共享五分钟等待窗口，等待期间不重复上传或重复写入标签。只有明确的版本不存在或标签尚未更新会等待，鉴权、网络、无效响应和内容不一致立即停止；超时保留冻结批次，之后按同一版本恢复。
 
 每次 CI 将事件提交中的发布工具保存在 runner 临时目录，再检出和构建冻结包源码。工具显式使用冻结工作区作为根目录，依赖由该工作区的锁文件安装；npm 包内容和正式标签始终对应冻结提交。
+
+临时分支仅清理本批次的精确引用，删除时核对预期提交并使用 lease；`main`、`ccc3.0` 和正式版本标签保留。子仓库分支清理失败或引用已移动时，主仓库 pending 继续保留，按同一批次重试；已经删除的子仓库临时分支视为清理完成。
+
+本地 `mise run publish` 在本次目标版本整体完成后，刷新两仓库的 origin 远端跟踪引用，清除 Git 客户端中的过期分支显示。刷新失败会提示对应仓库的手工命令，远端发布成功的结论保持不变。通过网页或单独 `gh run watch` 跟踪时，本地引用可用 `git fetch --prune --no-prune-tags --no-tags --recurse-submodules=no origin` 刷新；在子仓库使用同样命令。
 
 ## 失败恢复
 

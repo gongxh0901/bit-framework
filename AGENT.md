@@ -63,27 +63,7 @@ mise run publish
 
 只提供以上四个 mise task。`setup` 安装固定的 Node.js、pnpm 和 GitHub CLI 版本，同步子模块到主仓库记录的 gitlink 并安装依赖；CI 安装使用冻结锁文件。`changeset` 可单独记录变更。`publish` 携带本地修改进行仅快进同步、全量构建、准备 Changeset、预检并提交推送父子仓库全部可提交修改，再通过 GitHub CLI 调度发布并等待结果。
 
-## Skills
-
-| 命令 | 用途 |
-|------|------|
-| `$fairygui-release` | 准备包含 FairyGUI 的全量统一发版 |
-| `/changelog` | 生成 CHANGELOG |
-
-## AI 技能规则
-
-技能实际存放在根目录 `skills/`，`.codex/skills` 是指向它的软链接。修改技能时只修改 `skills/` 下的源文件。
-
-### changelog
-
-- 根据 git log 生成 CHANGELOG 条目，包含主仓库和 `vendor/fairygui-cc` 子模块的提交。
-- 按 `feat`、`fix`、`refactor`/其他、`docs`、`chore` 分类。
-- 过滤 `chore: bump version` 和 `chore: release`。
-- 版本号读取并校验所有公开包的 `package.json`，全部一致后使用该统一版本；日期使用当天日期。
-- 已有 CHANGELOG 时插入到第一个 `## [` 之前，完成后展示写入条目。
-- 包日志只记录该包的真实变化；没有实际变化的包保留统一版本条目，不虚构变更说明。
-
-### release
+## 发布约定
 
 - 执行 `mise run publish` 即授权自动提交并推送主仓库和 `vendor/fairygui-cc` 内全部可提交修改，包含已暂存、未暂存及未被 Git 忽略的未跟踪文件；不增加逐次确认步骤。
 - Changesets 按本批次最高 `patch` / `minor` / `major` 级别统一升级全部公开包，当前范围是 12 个 bit 包和 FairyGUI，共 13 个包。
@@ -92,11 +72,13 @@ mise run publish
 - `publish` 完成全量构建后复用已有非空 Changeset，没有可复用记录时交互填写；规划和打包检查成功后先将子仓库全部修改提交推送到 `ccc3.0`，再将主仓库全部修改和 gitlink 提交推送到 `main`。
 - `publish` 使用已登录的 `gh` 调度主仓库 `publish.yml` 并等待本次运行；正式发布由手动调度触发，普通 PR 执行校验。
 - CI 先全量构建，再消费 Changeset，统一更新版本、包级 CHANGELOG 和锁文件；FairyGUI 的版本提交先推到子仓库专用发布分支，主仓库版本提交记录该 gitlink 并推送到 `main`。
+- CHANGELOG 按包记录真实变化；没有实际变化的包保留统一版本条目，不虚构变更说明。
 - 生成版本的运行仅预检、冻结并返回 `prepared`；入口核验 pending 后从 `bit-framework-release/pending` 启动发布运行。npm 上传前要求 GitHub 事件 SHA 与冻结 HEAD 一致，不改写 `GITHUB_SHA`，保持 OIDC 与 provenance 来源一致。
 - CI 将事件提交中的发布工具保存在检出范围外，所有包读取、构建、打包和正式标签仍使用冻结工作区。显式 `finalize_only` 维修必须指定 `frozen_sha`、保留已存在的 pending，逐包验证所有版本和内容后只收尾标签；零上传、零版本生成，成功状态为 `finalized`。
 - CI 在上传 npm 前冻结主仓库版本提交，确保子仓库 `ccc3.0` 包含本批次 gitlink，必要时快进；已包含该提交的后代分支保持原位，真正分叉时停止。发布仍使用冻结 gitlink，不混入后代源码。
 - 主仓库 `refs/heads/bit-framework-release/pending` 冻结正在发布的主仓库 SHA；失败后按同一 SHA、版本和产物重试，完成前阻止下一版本。
-- 发布前统一构建并检查所有包。全部上传到 npm `release-candidate` 标签并验证后，逐包提升 `latest`；双仓库同名 `vX.Y.Z` tag 完成后清除 pending 引用。
+- 发布前统一构建并检查所有包。全部上传到 npm `release-candidate` 标签并验证后，逐包提升 `latest`；双仓库同名 `vX.Y.Z` tag 验证成功后，按精确引用和预期 SHA 清理 FairyGUI 本批次临时分支，再删除主 pending。清理失败保留 pending 重试；保留 main、ccc3.0 和正式 tag。
+- 本地 publish 整体完成后刷新父子仓库 origin 的远端跟踪引用；刷新失败只提示手工刷新，不把已完成的远端发布报告为失败。
 - npm 上传和 `dist-tag` 变更只在主仓库 `.github/workflows/publish.yml` 执行，本地入口负责构建、Changeset、预检、父子仓库提交推送、调度和结果核验。
 - 恢复 pending 且没有新改动时不生成 Changeset；有新改动时可先准备入队，CI 优先完成旧批次。若本次有新版本计划且先完成旧批次，入口确认远端 `main` 仍为本次队列提交后，再处理目标版本。每批最多一次准备运行和一次发布运行，总共最多两批、四次运行，请求标识各不相同。目标版本完成后整个命令才成功，失败、来源或冻结引用变化、发布结果与准备清单不一致时停止并报告未完成。
 - 发布凭证使用 GitHub App 的 `RELEASE_APP_CLIENT_ID` 仓库变量和 `RELEASE_APP_PRIVATE_KEY` 仓库 secret；App 需要两个仓库的 Contents 读写权限。

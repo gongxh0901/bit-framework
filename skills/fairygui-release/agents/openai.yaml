@@ -1,4 +1,0 @@
-interface:
-  display_name: "全量统一发版"
-  short_description: "自动准备 Changeset、提交推送父子仓库全部修改并跟踪全量统一发布"
-  default_prompt: "使用 $fairygui-release 准备包含 FairyGUI 的全部公开包统一发版，并完成全量验证。"

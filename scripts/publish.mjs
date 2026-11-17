@@ -150,10 +150,22 @@ export async function requestPublish({ root = ROOT, env = process.env, runComman
         return published
     }
 
+    async function refreshRemoteTracking(result) {
+        if (result.status !== 'published') return result
+        const args = ['fetch', '--prune', '--no-tags', '--no-prune-tags', '--recurse-submodules=no', 'origin']
+        for (const cwd of [root, join(root, 'vendor/fairygui-cc')]) {
+            try { await run('git', args, { cwd }) }
+            catch (error) {
+                log(`警告：版本 ${result.version} 的远端发布已成功；${cwd} 的本地 origin 跟踪引用刷新失败：${error.message}\n请在该目录手工执行：git ${args.join(' ')}`)
+            }
+        }
+        return result
+    }
+
     const first = await runBatch()
-    if (!hasNewRelease) return first
+    if (!hasNewRelease) return refreshRemoteTracking(first)
     if (first.status !== 'published') throw new Error(`CI 未发布本次计划版本 ${plan.version}，本次队列尚未完成：${first.url}`)
-    if (first.version === plan.version) return first
+    if (first.version === plan.version) return refreshRemoteTracking(first)
     let main
     try { main = await api(`repos/${REPOSITORY}/git/ref/heads/main`) }
     catch (error) {
@@ -171,7 +183,7 @@ export async function requestPublish({ root = ROOT, env = process.env, runComman
     if (second.status !== 'published' || second.version !== plan.version) {
         throw new Error(`已处理两个批次，本次排队版本 ${plan.version} 仍未完成，停止自动跟进：${second.url}\n旧批次工作流：${first.url}`)
     }
-    return { ...second, previousRelease: first }
+    return refreshRemoteTracking({ ...second, previousRelease: first })
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -131,6 +131,7 @@ export function prepareSubmoduleRelease(root, version, packages) {
         version,
         packages: packages.map(pkg => ({ name: pkg.packageJson.name, dir: relative(root, pkg.dir).split('\\').join('/') })),
         submoduleSha: sha,
+        submoduleRef: branch,
     }
     mkdirSync(join(root, dirname(MANIFEST)), { recursive: true })
     writeFileSync(join(root, MANIFEST), `${JSON.stringify(manifest, null, 2)}\n`)
@@ -206,15 +207,40 @@ function ensureRemoteTag(root, version, sha) {
     if (remoteCommit(root, ref) !== sha) throw new Error(`${ref} 推送后校验失败`)
 }
 
-/** 双仓标签均可验证后才能解除下一版本的门禁。 */
+function submoduleReleaseRef(root, version, subSha) {
+    const manifest = readManifest(root)
+    if (!manifest || manifest.version !== version || manifest.submoduleSha !== subSha) {
+        throw new Error('清理候选分支时的发布清单与本批次不一致')
+    }
+    // 兼容未记录 ref 的直接 CI 版本提交，按第一父提交还原候选来源。
+    const ref = manifest.submoduleRef === undefined
+        ? `refs/heads/bit-framework-release/${git(root, ['rev-parse', 'HEAD^'])}/v${version}`
+        : manifest.submoduleRef
+    const match = typeof ref === 'string' && /^refs\/heads\/bit-framework-release\/[0-9a-f]{40}\/v(\d+\.\d+\.\d+)$/.exec(ref)
+    if (!match || match[1] !== version) throw new Error('发布清单 submoduleRef 必须为本版本的精确候选分支，禁止清理其他引用')
+    return ref
+}
+
+function removeSubmoduleReleaseRef(root, ref, sha) {
+    const existing = remoteCommit(root, ref)
+    if (!existing) return
+    if (existing !== sha) throw new Error(`候选分支 ${ref} 已移动，禁止删除；冻结批次继续保留`)
+    git(root, ['push', 'origin', `--force-with-lease=${ref}:${sha}`, `:${ref}`])
+    if (remoteCommit(root, ref)) throw new Error(`候选分支 ${ref} 尚未清除；冻结批次继续保留`)
+}
+
+/** 双仓标签核验后清理本批次候选分支，最后解除主仓库冻结。 */
 export function completeRelease(root, version, subSha) {
     checkVersion(version)
     assertSource(root, subSha)
     const sha = head(root)
     const pending = remoteCommit(root, PENDING_REF)
     if (pending !== sha) throw new Error('完成发布时的冻结提交不一致')
-    ensureRemoteTag(join(root, SUBMODULE), version, subSha)
+    const child = join(root, SUBMODULE)
+    const candidate = submoduleReleaseRef(root, version, subSha)
+    ensureRemoteTag(child, version, subSha)
     ensureRemoteTag(root, version, sha)
+    removeSubmoduleReleaseRef(child, candidate, subSha)
     git(root, ['push', 'origin', `--force-with-lease=${PENDING_REF}:${sha}`, `:${PENDING_REF}`])
     if (remoteCommit(root, PENDING_REF)) throw new Error('发布已打标签，但冻结批次尚未清除')
 }
