@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0",
+  "version": "0.6.1",
   "packages": [
     {
       "name": "@gongxh/bit-assets",
@@ -54,5 +54,6 @@
       "dir": "vendor/fairygui-cc/source"
     }
   ],
-  "submoduleSha": "f3f872e7f53c92a02d78cfa552e6f385b805c83a"
+  "submoduleSha": "da721b84161a0f2625998e622d6578bf17c32190",
+  "submoduleRef": "refs/heads/bit-framework-release/a99c7b8f5a19231d5752e9b7f9b3cbc5e14a2763/v0.6.1"
 }

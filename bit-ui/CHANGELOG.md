@@ -1,5 +1,14 @@
 # @gongxh/bit-ui
 
+## 0.6.1
+
+### Patch Changes
+
+- a99c7b8: fix:fgui 列表中组件触摸后关闭所在窗口事件继续派发导致的崩溃
+- Updated dependencies [a99c7b8]
+  - @gongxh/bit-core@0.6.1
+  - @gongxh/fairygui-cc@0.6.1
+
 ## 0.6.0
 
 ### Minor Changes
